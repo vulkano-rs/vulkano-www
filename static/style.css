@@ -127,5 +127,7 @@ header ul li a:hover {
 
 #guides > div {
     flex: 1;
+    font-family: sans-serif;
+    font-size: 0.9em;
     padding: 1em 2em;
 }

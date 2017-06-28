@@ -53,6 +53,9 @@ pub fn start<A>(addr: A)
                     (GET) (/guide/buffer-creation) => {
                         guide_template_markdown(include_str!("../content/guide-buffer-creation.md"))
                     },
+                    (GET) (/guide/example-operation) => {
+                        guide_template_markdown(include_str!("../content/guide-example-operation.md"))
+                    },
                     (GET) (/guide/compute-intro) => {
                         guide_template_markdown(include_str!("../content/guide-compute-intro.md"))
                     },
