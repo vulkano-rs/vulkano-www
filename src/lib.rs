@@ -14,6 +14,7 @@ extern crate mustache;
 #[macro_use]
 extern crate rouille;
 
+use rouille::Request;
 use rouille::Response;
 use std::collections::HashMap;
 use std::collections::hash_map::Entry;
@@ -21,6 +22,7 @@ use std::io;
 use std::net::ToSocketAddrs;
 use std::sync::Mutex;
 
+/// Runs the HTTP server forever on the given address.
 pub fn start<A>(addr: A)
     where A: ToSocketAddrs
 {
@@ -37,48 +39,55 @@ pub fn start<A>(addr: A)
                     }
                 }
 
-                router!(request,
-                    (GET) (/) => {
-                        main_template(include_str!("../content/home.html"))
-                    },
-                    (GET) (/guide/introduction) => {
-                        guide_template_markdown(include_str!("../content/guide-introduction.md"))
-                    },
-                    (GET) (/guide/initialization) => {
-                        guide_template_markdown(include_str!("../content/guide-initialization.md"))
-                    },
-                    (GET) (/guide/device-creation) => {
-                        guide_template_markdown(include_str!("../content/guide-device-creation.md"))
-                    },
-                    (GET) (/guide/buffer-creation) => {
-                        guide_template_markdown(include_str!("../content/guide-buffer-creation.md"))
-                    },
-                    (GET) (/guide/example-operation) => {
-                        guide_template_markdown(include_str!("../content/guide-example-operation.md"))
-                    },
-                    (GET) (/guide/compute-intro) => {
-                        guide_template_markdown(include_str!("../content/guide-compute-intro.md"))
-                    },
-                    (GET) (/guide/render-pass-framebuffer) => {
-                        guide_template_markdown({
-                            include_str!("../content/guide-render-pass-framebuffer.md")
-                        })
-                    },
-                    (GET) (/guide/swapchain-creation) => {
-                        guide_template_markdown({
-                            include_str!("../content/guide-swapchain-creation.md")
-                        })
-                    },
-                    _ => {
-                        main_template(include_str!("../content/404.html"))
-                            .with_status_code(404)
-                    }
-                )
+                routes(request)
             }),
         )
     });
 }
 
+// Handles all the non-static routes.
+fn routes(request: &Request) -> Response {
+    router!(request,
+        (GET) (/) => {
+            main_template(include_str!("../content/home.html"))
+        },
+        (GET) (/guide/introduction) => {
+            guide_template_markdown(include_str!("../content/guide-introduction.md"))
+        },
+        (GET) (/guide/initialization) => {
+            guide_template_markdown(include_str!("../content/guide-initialization.md"))
+        },
+        (GET) (/guide/device-creation) => {
+            guide_template_markdown(include_str!("../content/guide-device-creation.md"))
+        },
+        (GET) (/guide/buffer-creation) => {
+            guide_template_markdown(include_str!("../content/guide-buffer-creation.md"))
+        },
+        (GET) (/guide/example-operation) => {
+            guide_template_markdown(include_str!("../content/guide-example-operation.md"))
+        },
+        (GET) (/guide/compute-intro) => {
+            guide_template_markdown(include_str!("../content/guide-compute-intro.md"))
+        },
+        (GET) (/guide/render-pass-framebuffer) => {
+            guide_template_markdown({
+                include_str!("../content/guide-render-pass-framebuffer.md")
+            })
+        },
+        (GET) (/guide/swapchain-creation) => {
+            guide_template_markdown({
+                include_str!("../content/guide-swapchain-creation.md")
+            })
+        },
+        _ => {
+            main_template(include_str!("../content/404.html"))
+                .with_status_code(404)
+        }
+    )
+}
+
+// `body` is expected to be HTML code. Puts `body` inside of the main template and builds a
+// `Response` that contains the whole.
 fn main_template<S>(body: S) -> Response
     where S: Into<String>
 {
@@ -109,6 +118,8 @@ fn main_template<S>(body: S) -> Response
     Response::html(html.clone())
 }
 
+// `body` is expected to be HTML code. Puts `body` inside of the guide template and builds a
+// `Response` that contains the whole.
 fn guide_template<S>(body: S) -> Response
     where S: Into<String>
 {
@@ -139,6 +150,7 @@ fn guide_template<S>(body: S) -> Response
     main_template(html.clone())
 }
 
+// `body` is expected to be markdown. Turns it into HTML and calls `guide_template`.
 fn guide_template_markdown<S>(body: S) -> Response
     where S: Into<String>
 {
