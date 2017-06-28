@@ -83,6 +83,33 @@ header ul li a:hover {
 }
 
 /*
+ * Home page
+ */
+#home {
+    padding: 2em 1em;
+}
+
+#home #infos {
+    display: flex;
+    align-items: stretch;
+    flex-direction: row;
+    flex-wrap: wrap;
+    text-align: center;
+    margin: 0 auto;
+    width: 80%;
+}
+
+#home #infos > div {
+    flex: 1;
+    min-width: 10%;
+    padding: 1em 2em;
+}
+
+#home #infos > div + div {
+    border-left: 1px dashed rgba(255, 255, 255, 0.5);
+}
+
+/*
  * Guides
  */
 #guides {
