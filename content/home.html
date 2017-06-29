@@ -1,33 +1,38 @@
 <div id="home">
-    <div id="infos">
-        <div>
+    <ul id="infos">
+        <li>            
             <h3>Safe</h3>
 
             <p>Vulkano follows the Rust definition of safety. It should be impossible for
                 the user to get any undefined behavior using safe code, even when that code seems
                 absurd.</p>
-        </div>
+        </li>
         
-        <div>
+        <li>
             <h3>Predictable</h3>
 
-            <p>Operations performed by vulkano are precisely documented so that you are able to
-                know which underlying Vulkan operation is actually performed, making vulkano very
-                easy to profile or debug with Vulkan tools.</p>
-        </div>
+            <p>The actual Vulkan functions called by vulkano are precisely documented, making
+                vulkano very easy to profile or debug with Vulkan tools.</p>
+        </li>
         
-        <div>
-            <h3>Exhaustive</h3>
+        <li>
+            <h3>Efficient</h3>
 
-            <p>If you can use a feature in Vulkan, you can also use it in vulkano (with some
-                exceptions, such as experimental extensions).</p>
-        </div>
+            <p>Vulkano tries to have as few runtime overhead as possible by moving some elements
+                to compile-time, while still maintaining safety.
+            </p>
+        </li>
         
-        <div>
+        <li>
             <h3>Convenient</h3>
 
             <p>Vulkano provides convenient methods on top of Vulkan in order to make it more
                 convenient to use.</p>
-        </div>
+        </li>
+    </ul>
+
+    <div id="jump">
+        <a href="/guide/introduction">Jump to the guide</a>
+        <a href="https://github.com/tomaka/vulkano/blob/master/examples/src/bin/triangle.rs">Jump to the triangle example</a>
     </div>
 </div>

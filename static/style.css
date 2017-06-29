@@ -86,7 +86,7 @@ header ul li a:hover {
  * Home page
  */
 #home {
-    padding: 2em 1em;
+    padding: 2em 0;
 }
 
 #home #infos {
@@ -96,17 +96,41 @@ header ul li a:hover {
     flex-wrap: wrap;
     text-align: center;
     margin: 0 auto;
+    padding: 3em 0 5em;
     width: 80%;
 }
 
-#home #infos > div {
+#home #infos > li {
+    display: block;
     flex: 1;
     min-width: 10%;
-    padding: 1em 2em;
+    padding: 2em 2em;
 }
 
-#home #infos > div + div {
+#home #infos > li + li {
     border-left: 1px dashed rgba(255, 255, 255, 0.5);
+}
+
+#home #jump {
+    text-align: center;
+}
+
+#home #jump a {
+    background-color: #6a8500;
+    border: 10px solid rgba(0, 0, 0, 0.5);
+    border-radius: 20px;
+    display: inline-block;
+    margin: 0 1em;
+    padding: 1em 2em;
+    text-decoration: none;
+}
+
+#home #jump a:hover {
+    background-color: #8eb300;
+}
+
+#home #jump a:active {
+    border-color: black;
 }
 
 /*
