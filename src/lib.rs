@@ -69,15 +69,35 @@ fn routes(request: &Request) -> Response {
         (GET) (/guide/compute-intro) => {
             guide_template_markdown(include_str!("../content/guide-compute-intro.md"))
         },
+        (GET) (/guide/compute-pipeline) => {
+            guide_template_markdown(include_str!("../content/guide-compute-pipeline.md"))
+        },
+        (GET) (/guide/descriptor-sets) => {
+            guide_template_markdown(include_str!("../content/guide-descriptor-sets.md"))
+        },
+        (GET) (/guide/dispatch) => {
+            guide_template_markdown(include_str!("../content/guide-dispatch.md"))
+        },
+        (GET) (/guide/image-creation) => {
+            guide_template_markdown(include_str!("../content/guide-image-creation.md"))
+        },
         (GET) (/guide/render-pass-framebuffer) => {
             guide_template_markdown({
                 include_str!("../content/guide-render-pass-framebuffer.md")
+            })
+        },
+        (GET) (/guide/window) => {
+            guide_template_markdown({
+                include_str!("../content/guide-window.md")
             })
         },
         (GET) (/guide/swapchain-creation) => {
             guide_template_markdown({
                 include_str!("../content/guide-swapchain-creation.md")
             })
+        },
+        (GET) (/guide/acquire-present) => {
+            guide_template_markdown(include_str!("../content/guide-acquire-present.md"))
         },
         _ => {
             main_template(include_str!("../content/404.html"))

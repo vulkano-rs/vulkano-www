@@ -173,7 +173,8 @@ header ul li a:hover {
     border-left: 2px solid rgba(255, 255, 255, 0.1);
     margin: 0;
     padding: 0.1em 0;
-    padding-left: 0.7em;
+    padding-left: 1.7em;
+    text-indent: -1.0em;
 }
 
 #guides > div {

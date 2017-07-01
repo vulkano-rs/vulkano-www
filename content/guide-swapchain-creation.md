@@ -1,64 +1,40 @@
-# Windows and swapchains
+# Swapchains
 
-Vulkan can be used to perform calculations (like OpenCL for example), but its main usage is to
-draw graphics. And before we can draw graphics, we have to create a window where to display
-the result.
+Since we are going to draw to a window which is ultimately on the screen, things are a bit special.
+We can't just "write" to the window's surface. Instead we have to go through what is called a
+*swapchain*.
 
-## Creating a window
+> **Note**: See also [the wikipedia article for a swap chain](https://en.wikipedia.org/wiki/Swap_Chain).
 
-Creating a window is out of the scope of Vulkan. Instead, just like for OpenGL and other
-graphical APIs we have to use platform-specific functionnalities dedicated to opening a window.
+A swapchain is a group of one or multiple images, sometimes two images but most commonly three. If
+you have ever heard terms such as *double buffering* or *triple buffering*, it refers to having
+respectively two or three swapchain images.
 
-For the purpose of this tutorial, we are going to use the `winit` and the `vulkano-win` crates.
-The former will be used to open a window and handle keyboard and mouse input, and the latter
-is used as a glue between `winit` and `vulkano`. It is possible to manipulate windows in vulkano
-without using any third-party crate, but doing so would require unsafe code.
-
-Let's add these dependencies to our Cargo.toml:
-
-    winit = "0.5"
-    vulkano-win = "0.1"
-
-... and to our Rust code:
-
-    extern crate winit;
-    extern crate vulkano_win;
-
-Creating a window is as easy as this:
-
-    use vulkano_win::VkSurfaceBuild;
-     
-    let window = winit::WindowBuilder::new().build_vk_surface(&instance).unwrap();
-
-This code creates a window with the default parameters, and also builds a Vulkan *surface* object
-that represents the surface of that window whenever the Vulkan API is concerned.
-Calling `window.window()` will return an object that allows you to manipulate the window, and
-calling `window.surface()` will return a `Surface` object of `vulkano`.
-
-However, if you try to run this code you will notice that the `build_vk_surface` returns an error.
-The reason is that surfaces are actually not part of Vulkan itself, but of several *extension*s
-to the Vulkan API. These extensions are disabled by default and need to be manually enabled when
-creating the instance before one can use their capabilities.
-
-To make this task easier, the `vulkano_win` provides a function named `required_extensions()` that
-will return a list of the extensions that are needed on the current platform.
-
-In order to make this work, we need to modify the way the instance is created:
-
-    let instance = {
-        let extensions = vulkano_win::required_extensions();
-        Instance::new(None, &extensions, None).expect("failed to create Vulkan instance")
-    };
-
-After you made the change, running the program should now work and open then immediately close
-a window.
-
-## Events handling
+The idea behind a swapchain is to draw to one of its images while another one of these images is
+being shown on the screen. When we are done drawing we ask the swapchain to show the image we have
+just drawn to, and in return the swapchain gives us drawing access to another of its images.
 
 ## Creating a swapchain
 
-Since the window is ultimately on the screen, things are a bit special.
+Swapchains have a lot of properties: the format and dimensions of their images, an optional
+transformation, a presentation mode, and so on. We have to specify a value for each of these
+parameters when we create the swapchain. Therefore before we can do so we have to query the
+capabilities of the surface.
 
-## Clearing the image
+    let caps = window.surface().capabilities(physical)
+        .expect("failed to get surface capabilities");
 
-    let cmd = PrimaryCommandBuffer::new().copy(&source, &destination).build();
+If we don't really care about all these properties, the only things that we need to choose is
+the dimensions of the image (which have to be constrainted between a minimum and a maximum), the
+behavior when it comes to transparency, and the format of the images.
+
+    let dimensions = caps.current_extent.unwrap_or([1280, 1024]);
+    let alpha = caps.supported_composite_alpha.iter().next().unwrap();
+    let format = caps.supported_formats[0].0;
+
+We can now create the swapchain:
+
+    let (swapchain, images) = Swapchain::new(device.clone(), window.surface().clone(),
+        caps.min_image_count, format, dimensions, 1, caps.supported_usage_flags, &queue,
+        SurfaceTransform::Identity, alpha, PresentMode::Fifo, true, None)
+        .expect("failed to create swapchain");
