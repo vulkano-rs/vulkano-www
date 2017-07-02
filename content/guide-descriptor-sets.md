@@ -29,10 +29,26 @@ let set = Arc::new(simple_descriptor_set!(pipeline.clone(), 0, {
 }));
 ```
 
+The first parameter of the macro is the pipeline for which we create this set, and the second
+parameter is the index of the set in the pipeline. Since `pipeline` is an `Arc`, cloning it just
+clones the `Arc` and is not an expensive operation.
+
+Note that you are allowed to use a set for a different pipeline than the one it was created with,
+but only if there is no conflict. However you can't create a descriptor set out of thin air, as
+Vulkan doesn't allow it.
+
+The third parameter is the content of the set, which here is just the `data` variable. Just like
+for `pipeline`, cloning `data_buffer` only clones an `Arc` and isn't expensive.
+
 > **Note**: `data_buffer` was created in [the introduction](/guide/compute-intro).
 
-> **Note**: The `simple_descriptor_set!` will be replaced with something else in the future.
+> **Note**: The `simple_descriptor_set!` macro will be replaced with something else in the future.
+
+Now that we have a compute pipeline and a descriptor set to bind to it, we can start our operation.
+This is covered in [the next section](/guide/dispatch).
 
 ## Advanced: about descriptor sets
+
+Calling `simple_descriptor_set!` is fairly expensive.
 
 *To be written*.
