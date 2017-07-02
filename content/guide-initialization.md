@@ -26,7 +26,7 @@ for example by opening a dialog box with an explanation. This is out of scope of
 
 Before going further you can try your code by running:
 
-```sh
+```bash
 cargo run
 ```
 

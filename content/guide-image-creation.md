@@ -7,6 +7,13 @@ This is not exactly true, as there is an alternative which are ***images***.
 An *image* in the context of Vulkan designates a multidimensional array of pixels, where each
 pixels has a specific format amongst a list of hardcoded formats.
 
+<center>
+![](/guide-image-creation-1.png)
+
+*Example: the various images used by a Vulkan-using<br />
+application, as seen from a debugger*
+</center>
+
 We often use Vulkan images to store *images* in the common sense of the word, in which case each
 value of the array contains the color of the pixel. However keep in mind that Vulkan images can
 also be used to store arbitrary data (in other words, not just colors).

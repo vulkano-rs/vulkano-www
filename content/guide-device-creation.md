@@ -45,13 +45,13 @@ let queue_family = physical.queue_families()
 ```
 
 Creating a device returns two things: the device itself, but also a list of *queue objects* that
-will allow us to submit operations.
+will later allow us to submit operations.
 
 ```rust
 use vulkano::device::Device;
 use vulkano::device::DeviceExtensions;
 use vulkano::instance::Features;
- 
+
 let (device, mut queues) = {
     Device::new(physical, &Features::none(), &DeviceExtensions::none(), None,
                 [(queue_family, 0.5)].iter().cloned()).expect("failed to create device")
@@ -61,7 +61,7 @@ let (device, mut queues) = {
 Just like creating an instance, creating a device takes additional parameters which we are going
 to cover later.
 
-If this function call succeeds, we have an open channel of communication with a Vulkan device!
+Once this function call succeeds we have an open channel of communication with a Vulkan device!
 
 Since it is possible to request multiple queues, the `queues` variable returned is in fact an
 iterator. In this example code this iterator contains just one element, so let's extract it:

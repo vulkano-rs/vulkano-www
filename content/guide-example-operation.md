@@ -11,10 +11,13 @@ To do so, we are going to create two `CpuAccessibleBuffer`s: the source and the 
 was already covered in a previous section.
 
 ```rust
+let source_content = 0 .. 64;
 let source = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), Some(queue.family()),
-                                            0 .. 64).expect("failed to create buffer");
+                                            source_content).expect("failed to create buffer");
+
+let dest_content = 0 .. 64.map(|_| 0);
 let dest = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), Some(queue.family()),
-                                          0 .. 64.map(|_| 0)).expect("failed to create buffer");
+                                          dest_content).expect("failed to create buffer");
 ```
 
 As you can see, the source buffer contains sixty-four values ranging from 0 to 63. The destination
@@ -49,10 +52,11 @@ And now we submit it:
 
 
 After submitting the command buffer to the GPU, we might be tempted to try read the content of the
-`destination` buffer. However calling `destination.read()` would return an error, because the
-buffer is currently being written by the GPU! Submitting an operation to the GPU doesn't wait for
-the operation to be complete. Instead it just sends a message, and the actual processing is
-performed asynchronously.
+`destination` buffer as demonstrated in [the previous section](/guide/buffer-creation). However
+calling `destination.read()` now would return an error, because the buffer is currently being
+written by the GPU! Submitting an operation to the GPU doesn't wait for the operation to be
+complete. Instead it just sends some kind of signal to the GPU to instruct it that it must start
+processing the command buffer, and the actual processing is performed asynchronously.
 
 In order to read the content of `destination` and make sure that our copy succeeded, we need to
 wait until the operation is complete. This is done like this:
