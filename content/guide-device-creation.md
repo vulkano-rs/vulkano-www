@@ -4,20 +4,22 @@ In [the previous section](/guide/initialization) we created an instance and chos
 device from this instance.
 
 But initialization isn't finished yet. Before being able to do anything, we have to create a
-**device**. A *device* is an object that represents an open channel of communication with a
+***device***. A *device* is an object that represents an open channel of communication with a
 *physical device*, and it is probably the most important object of the Vulkan API.
 
 ## About queues
 
 Just like it is possible to use multiple threads in your program running on the CPU, it is also
 possible to run multiple operations in parallel on the GPU of your graphics card. The Vulkan
-equivalent of a CPU thread is a **queue**. Queues are grouped by **queue families**.
+equivalent of a CPU thread is a ***queue***. Queues are grouped by **queue families**.
 
 The queue families of a physical device can be enumerated like this:
 
-    for family in physical_device.queue_families() {
-        println!("Found a queue family with {:?} queue(s)", family.queues_count());
-    }
+```rust
+for family in physical_device.queue_families() {
+    println!("Found a queue family with {:?} queue(s)", family.queues_count());
+}
+```
 
 While some implementations only provide one family with one queue, some others have three or four
 families with up to sixteen queues in some of these families.
@@ -36,21 +38,25 @@ The reason why queues are relevant right now is in order to create a *device*, w
 Vulkan implementation which queues we want to use. Let's choose a single queue that we will use for
 all our operations.
 
-    let queue_family = physical.queue_families()
-        .find(|&q| q.supports_graphics())
-        .expect("couldn't find a graphical queue family");
+```rust
+let queue_family = physical.queue_families()
+    .find(|&q| q.supports_graphics())
+    .expect("couldn't find a graphical queue family");
+```
 
 Creating a device returns two things: the device itself, but also a list of *queue objects* that
 will allow us to submit operations.
 
-    use vulkano::device::Device;
-    use vulkano::device::DeviceExtensions;
-    use vulkano::instance::Features;
-     
-    let (device, mut queues) = {
-        Device::new(physical, &Features::none(), &DeviceExtensions::none(), None,
-                    [(queue_family, 0.5)].iter().cloned()).expect("failed to create device")
-    };
+```rust
+use vulkano::device::Device;
+use vulkano::device::DeviceExtensions;
+use vulkano::instance::Features;
+ 
+let (device, mut queues) = {
+    Device::new(physical, &Features::none(), &DeviceExtensions::none(), None,
+                [(queue_family, 0.5)].iter().cloned()).expect("failed to create device")
+};
+```
 
 Just like creating an instance, creating a device takes additional parameters which we are going
 to cover later.
@@ -60,7 +66,9 @@ If this function call succeeds, we have an open channel of communication with a 
 Since it is possible to request multiple queues, the `queues` variable returned is in fact an
 iterator. In this example code this iterator contains just one element, so let's extract it:
 
-    let queue = queues.next().unwrap();
+```rust
+let queue = queues.next().unwrap();
+```
 
 We now have our `device` and our `queue`, which means that we are ready to ask the GPU to perform
 operations.

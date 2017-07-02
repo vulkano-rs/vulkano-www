@@ -10,11 +10,13 @@ Creating an instance takes three optional parameters which aren't going to cover
 check [the documentation of `Instance`](https://docs.rs/vulkano/0.4/vulkano/instance/struct.Instance.html)
 for more information.
 
-    use vulkano::instance::Instance;
-    use vulkano::instance::InstanceExtensions;
-     
-    let instance = Instance::new(None, &InstanceExtensions::none(), None)
-        .expect("failed to create instance");
+```rust
+use vulkano::instance::Instance;
+use vulkano::instance::InstanceExtensions;
+
+let instance = Instance::new(None, &InstanceExtensions::none(), None)
+    .expect("failed to create instance");
+```
 
 Like many other functions in vulkano, creating an instance returns a `Result`. If Vulkan is not
 available on the system, this result will contain an error. For the sake of this example we call
@@ -24,7 +26,9 @@ for example by opening a dialog box with an explanation. This is out of scope of
 
 Before going further you can try your code by running:
 
-    cargo run
+```sh
+cargo run
+```
 
 ## Enumerating physical devices
 
@@ -42,9 +46,11 @@ program, but there is not much point in doing so because you cannot share anythi
 Consequently the best thing to do in practice is to chose one physical device which is going to run
 everything:
 
-    use vulkano::instance::PhysicalDevice;
-     
-    let physical = PhysicalDevice::enumerate(&instance).next().expect("no device available");
+```rust
+use vulkano::instance::PhysicalDevice;
+
+let physical = PhysicalDevice::enumerate(&instance).next().expect("no device available");
+```
 
 The `enumerate` function returns an iterator to the list of available physical devices.
 We call `next` on it to return the first device, if any. Note that the first device is not

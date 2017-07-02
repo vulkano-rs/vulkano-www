@@ -42,7 +42,9 @@ are not really appropriate for a tutorial.
 As explained above, all we have to do is write the operation that is performed on *one* value. 
 Therefore our operation here is simply (in pseudo-code):
 
-    value = value * 12;
+```glsl
+value = value * 12;
+```
 
 The Vulkan implementation will automatically handle all the details that make it possible to run
 this in parallel for each of the 65536 values.

@@ -3,7 +3,9 @@
 In order to use the swapchain, we have to start by *acquiring* an image. This is done with the
 `swapchain::acquire_next_image()` function.
 
-    let (image_num, acquire_future) = swapchain::acquire_next_image(swapchain.clone(), None).unwrap();
+```rust
+let (image_num, acquire_future) = swapchain::acquire_next_image(swapchain.clone(), None).unwrap();
+```
 
 This function call returns a tuple. The first element is a `usize` corresponding to the index of
 the image within the `images` array of the image which is now available to us. The second element

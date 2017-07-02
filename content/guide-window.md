@@ -13,18 +13,24 @@ going to add a dependency to the `vulkano-win` crate which is a link between vul
 
 In your Cargo.toml:
 
-    vulkano_win = "0.4"
-    winit = "0.7"
+```toml
+vulkano_win = "0.4"
+winit = "0.7"
+```
 
 And at the crate root:
 
-    extern crate vulkano_win;
-    extern crate winit;
+```rust
+extern crate vulkano_win;
+extern crate winit;
+```
 
 I encourage you to browse a bit [the documentation of `winit`](https://docs.rs/winit/0.7).
 
-    use winit::EventsLoop;
-    let events_loop = EventsLoop::new();
+```rust
+use winit::EventsLoop;
+let events_loop = EventsLoop::new();
+```
 
 This code creates a window with the default parameters, and also builds a Vulkan *surface* object
 that represents the surface of that window whenever the Vulkan API is concerned.
@@ -41,10 +47,12 @@ will return a list of the extensions that are needed on the current platform.
 
 In order to make this work, we need to modify the way the instance is created:
 
-    let instance = {
-        let extensions = vulkano_win::required_extensions();
-        Instance::new(None, &extensions, None).expect("failed to create Vulkan instance")
-    };
+```rust
+let instance = {
+    let extensions = vulkano_win::required_extensions();
+    Instance::new(None, &extensions, None).expect("failed to create Vulkan instance")
+};
+```
 
 After you made the change, running the program should now work and open then immediately close
 a window.

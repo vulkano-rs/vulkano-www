@@ -9,8 +9,8 @@
 
 #[macro_use]
 extern crate lazy_static;
-extern crate markdown;
 extern crate mustache;
+extern crate pulldown_cmark;
 #[macro_use]
 extern crate rouille;
 
@@ -184,8 +184,9 @@ fn guide_template_markdown<S>(body: S) -> Response
     let html = match compil_cache.entry(body) {
         Entry::Occupied(e) => e.into_mut(),
         Entry::Vacant(e) => {
-            let val = markdown::to_html(e.key());
-            e.insert(val)
+            let mut html = String::new();
+            pulldown_cmark::html::push_html(&mut html, pulldown_cmark::Parser::new(e.key()));
+            e.insert(html)
         },
     };
 

@@ -16,7 +16,9 @@ is also possible for the GPU to access RAM, and usually also possible for the CP
 video memory, but the read and write accesses are going to be much slower as they have to go
 through the PCI Express bus that connects your video card to your motherboard.
 
+<center>
 ![](/guide-buffer-creation-1.svg)
+</center>
 
 > **Note**: All of this is true only for desktop machines with video cards, which is what we
 > are going to focus on. Mobile machines usually share the same memory for both the CPU and the

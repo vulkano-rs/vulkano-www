@@ -17,11 +17,8 @@ a {
 }
 
 pre {
-    background-color: #111;
     border: 1px dashed #888;
     border-radius: 2px;
-    box-shadow: 2px 2px 1px black;
-    padding: 0.9em 1.5em;
 }
 
 /*

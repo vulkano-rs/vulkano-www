@@ -21,20 +21,26 @@ transformation, a presentation mode, and so on. We have to specify a value for e
 parameters when we create the swapchain. Therefore before we can do so we have to query the
 capabilities of the surface.
 
-    let caps = window.surface().capabilities(physical)
-        .expect("failed to get surface capabilities");
+```rust
+let caps = window.surface().capabilities(physical)
+    .expect("failed to get surface capabilities");
+```
 
 If we don't really care about all these properties, the only things that we need to choose is
 the dimensions of the image (which have to be constrainted between a minimum and a maximum), the
 behavior when it comes to transparency, and the format of the images.
 
-    let dimensions = caps.current_extent.unwrap_or([1280, 1024]);
-    let alpha = caps.supported_composite_alpha.iter().next().unwrap();
-    let format = caps.supported_formats[0].0;
+```rust
+let dimensions = caps.current_extent.unwrap_or([1280, 1024]);
+let alpha = caps.supported_composite_alpha.iter().next().unwrap();
+let format = caps.supported_formats[0].0;
+```
 
 We can now create the swapchain:
 
-    let (swapchain, images) = Swapchain::new(device.clone(), window.surface().clone(),
-        caps.min_image_count, format, dimensions, 1, caps.supported_usage_flags, &queue,
-        SurfaceTransform::Identity, alpha, PresentMode::Fifo, true, None)
-        .expect("failed to create swapchain");
+```rust
+let (swapchain, images) = Swapchain::new(device.clone(), window.surface().clone(),
+    caps.min_image_count, format, dimensions, 1, caps.supported_usage_flags, &queue,
+    SurfaceTransform::Identity, alpha, PresentMode::Fifo, true, None)
+    .expect("failed to create swapchain");
+```
