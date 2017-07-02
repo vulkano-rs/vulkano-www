@@ -17,7 +17,7 @@ you should definitely [learn it first](https://www.rust-lang.org/documentation.h
 When you write some program (either in Rust or any other programming language) and run it, the
 program's instructions are executed by the ***CPU***.
 
-But desktop computers also usually have a ***video card*** plugged in them. This video card has its
+But some computers also usually have a ***video card*** plugged in them. This video card has its
 own microprocessor called the ***GPU*** or the ***graphics processor***. It can be seen more or
 less as a secondary machine within your main machine. Your monitor is plugged in to your video
 card.
