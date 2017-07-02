@@ -8,7 +8,7 @@ This is done in two steps:
   will compile the GLSL code at compile-time into an intermediate representation called *SPIR-V*.
 - At runtime we pass this *SPIR-V* to the Vulkan implementation.
 
-![](/guide-compute-pipeline-1.svg)
+<center>![](/guide-compute-pipeline-1.svg)</center>
 
 ## The GLSL code
 

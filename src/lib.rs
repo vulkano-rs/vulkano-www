@@ -99,6 +99,9 @@ fn routes(request: &Request) -> Response {
         (GET) (/guide/acquire-present) => {
             guide_template_markdown(include_str!("../content/guide-acquire-present.md"))
         },
+        (GET) (/guide/memory) => {
+            guide_template_markdown(include_str!("../content/guide-memory.md"))
+        },
         _ => {
             main_template(include_str!("../content/404.html"))
                 .with_status_code(404)

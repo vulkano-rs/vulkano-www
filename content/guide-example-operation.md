@@ -1,6 +1,6 @@
 # Running an operation
 
-Now that you are familiar with devices, queues and buffers, we are finally going to ask the GPU
+Now that we are familiar with devices, queues and buffers, we are finally going to ask the GPU
 to do something.
 
 What we are going to ask is very simple: we will ask the GPU to copy data from a buffer to another.
@@ -8,14 +8,13 @@ What we are going to ask is very simple: we will ask the GPU to copy data from a
 ## Creating the buffers
 
 To do so, we are going to create two `CpuAccessibleBuffer`s: the source and the destination. This
-was already covered in the previous section.
+was already covered in a previous section.
 
 ```rust
-let source = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), Some(queue.family()), [
-    Vertex { position: [-0.5, -0.25] },
-    Vertex { position: [0.0, 0.5] },
-    Vertex { position: [0.25, -0.1] }
-].iter().cloned()).expect("failed to create buffer");
+let source = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), Some(queue.family()),
+                                            0 .. 64).expect("failed to create buffer");
+let dest = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), Some(queue.family()),
+                                          0 .. 64.map(|_| 0)).expect("failed to create buffer");
 ```
 
 As you can see, the source buffer contains sixty-four values ranging from 0 to 63. The destination
@@ -23,12 +22,19 @@ buffer contains sixty-four 0s.
 
 ## Command buffers
 
-In order to ask the GPU to perform any operation, we need to create what is called a
-*command buffer*.
+In order to ask the GPU to perform an operation, we need to create a type of object that we
+haven't talked about yet: ***command buffer***.
 
 With Vulkan and vulkano, you can't just execute commands one by one as it would be too inefficient
-anyway (submitting a command to the GPU can take up to several hundred microseconds). Instead we
+(submitting a command to the GPU can take up to several hundred microseconds). Instead we
 need to build a *command buffer* that contains the list of commands that we want to execute.
+
+> **Note**: OpenGL allows you to execute commands one by one, but in reality implementations buffer
+> commands internally into command buffers. In other words, OpenGL automatically does what Vulkan
+> requires us to do manually. This is a good thing though, as OpenGL's automatic buffering often
+> causes more harm than good.
+
+Here is how you create a command buffer:
 
 ```rust
 let command_buffer = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap()
@@ -60,3 +66,5 @@ let src_content = source.read().unwrap();
 let dest_content = destination.read().unwrap();
 assert_eq!(&*src_content, &*dest_content);
 ```
+
+*To be finished*
