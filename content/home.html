@@ -6,23 +6,29 @@
             <p>Vulkano follows the Rust definition of safety. It should be impossible for
                 the user to get any undefined behavior using safe code, even when that code seems
                 absurd.</p>
+
+            <p><small><em>Note: while total safety is vulkano's goal,
+                                it isn't fulfilled yet.</em></small></p>
         </li>
-        
+
         <li>
             <h3>Predictable</h3>
 
             <p>The actual Vulkan functions called by vulkano are precisely documented, making
                 vulkano very easy to profile or debug with Vulkan tools.</p>
         </li>
-        
+
         <li>
             <h3>Efficient</h3>
 
             <p>Vulkano tries to have as few runtime overhead as possible by moving some elements
                 to compile-time, while still maintaining safety.
             </p>
+
+            <p><small><em>Note: this is blocked waiting for some upcoming Rust features, most
+                                notably procedural macros.</em></small></p>
         </li>
-        
+
         <li>
             <h3>Convenient</h3>
 
