@@ -22,7 +22,7 @@ available on the system, this result will contain an error. For the sake of this
 contains an error. In a real game or application you should handle that situation in a nicer way,
 for example by opening a dialog box with an explanation. This is out of scope of this guide.
 
-Before going further you should try your code by running:
+Before going further you can try your code by running:
 
     cargo run
 

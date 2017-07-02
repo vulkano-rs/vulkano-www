@@ -18,10 +18,19 @@ Vulkan images have other usages than just this.
 
 There are four kinds of images:
 
+- One-dimensional images.
+- Two-dimensional images.
+- Three-dimensional images.
+- Two-dimensional image arrays.
+
 ## Values
+
+Each element of an image consists of one to four values.
 
 ## Mipmaps
 
 ## Image creation
+
+Creating an image is very similar to creating a buffer.
 
 ## Advanced: compressed formats
