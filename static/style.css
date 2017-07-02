@@ -100,7 +100,7 @@ header ul li a:hover {
 #home #infos > li {
     display: block;
     flex: 1;
-    min-width: 10%;
+    width: 15em;
     padding: 2em 2em;
 }
 
