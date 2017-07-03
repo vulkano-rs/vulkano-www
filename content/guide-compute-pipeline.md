@@ -1,6 +1,7 @@
 # Compute pipelines
 
-In order to ask the GPU to perform an operation, we have to program it.
+In order to ask the GPU to perform an operation, we have to write some kind of code for it like we
+would for a regular program.
 
 This is done in two steps:
 
@@ -10,7 +11,14 @@ This is done in two steps:
 
 <center>![](/guide-compute-pipeline-1.svg)</center>
 
+> **Note**: In the very far future it may be possible to write programs in Rust, or rather in a
+> domain specific language that ressembles Rust.
+
 ## The GLSL code
+
+The GLSL language looks a lot like the C language.
+
+*To be finished*
 
 This is the GLSL code:
 

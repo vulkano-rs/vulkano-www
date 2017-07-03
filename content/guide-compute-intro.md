@@ -49,8 +49,18 @@ value = value * 12;
 The Vulkan implementation will automatically handle all the details that make it possible to run
 this in parallel for each of the 65536 values in the most optimized possible way.
 
-Another preliminary thing we want to do is create the buffer that will contain the values.
-*To be finished*.
+Another preliminary thing we want to do is create the buffer that will contain the values. This is
+similar to what we already did twice:
+
+```rust
+let data_iter = 0 .. 65536;
+let data_buffer = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(),
+                                                 Some(queue.family()),
+                                                 data_iter).expect("failed to create buffer");
+```
+
+The `data_buffer` buffer now contains the data before the transformation, and we are going to
+perform the calculation on each element.
 
 [The next section of the guide](/guide/compute-pipeline) will indicate how to actually code this
 operation.
