@@ -58,13 +58,14 @@ let (device, mut queues) = {
 };
 ```
 
-Just like creating an instance, creating a device takes additional parameters which we are going
-to cover later.
+Just like creating an instance, creating a device takes additional parameters which we aren't going
+to cover yet.
 
 Once this function call succeeds we have an open channel of communication with a Vulkan device!
 
-Since it is possible to request multiple queues, the `queues` variable returned is in fact an
-iterator. In this example code this iterator contains just one element, so let's extract it:
+Since it is possible to request multiple queues, the `queues` variable returned by the function is
+in fact an iterator. In this example code this iterator contains just one element, so let's
+extract it:
 
 ```rust
 let queue = queues.next().unwrap();

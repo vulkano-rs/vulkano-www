@@ -5,22 +5,22 @@ Welcome to the vulkano guide!
 This guide will cover the basics of Vulkan and vulkano, and will help you getting started with
 interfacing with a GPU.
 
-This guide will teach you the basics of graphics programming in the sense that you will know how
+It will teach you the basics of graphics programming in the sense that you will know how
 to draw objects on the screen. However this guide doesn't cover actual graphics programming
 techniques, such as loading a 3D model or adding realistic lighting to a scene.
 
-This guide assumes that you are familiar with the Rust programming language. If you are not,
+We will assume that you are familiar with the Rust programming language. If you are not,
 you should definitely [learn it first](https://www.rust-lang.org/documentation.html)!
 
 ## Quick glossary
 
-When you write some program (either in Rust or any other programming language) and run it, the
-program's instructions are executed by the ***CPU***.
+When you create a program (either in Rust or any other programming language) and run it, the
+program's instructions are executed by the ***CPU*** (Central Processing Unit).
 
 But some computers also usually have a ***video card*** plugged in them. This video card has its
-own microprocessor called the ***GPU*** or the ***graphics processor***. It can be seen more or
-less as a secondary machine within your main machine. Your monitor is plugged in to your video
-card.
+own microprocessor called the ***GPU*** (Graphics Processing Unit) or the ***graphics processor***.
+It can be seen more or less as a secondary machine within your main machine. Your monitor is
+generally plugged in to your video card if you have one.
 
 The objective of Vulkan and vulkano is to let you interface with the video card and the GPU of the
 machine your program is running on. After you have learned to use Vulkan/vulkano, you will be
