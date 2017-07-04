@@ -25,7 +25,7 @@ by one, a GPU can perform it on multiple values at once.
 Vulkan (or any other API) doesn't let you directly control the threading aspect of the GPU.
 In order to perform an operation with multiple values at once, you will only need to indicate the
 list of operations to perform on **one** value. The Vulkan implementation will automatically make
-the necessary adjustements to make your operation run on multiple values at once.
+the necessary adjustments to make your operation run on multiple values at once.
 
 This makes using a GPU much easier than if you had to manually control everything. However you
 still need to be aware that your program will run multiple times in parallel, because it has
