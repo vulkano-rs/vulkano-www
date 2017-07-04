@@ -12,6 +12,12 @@ body {
     padding: 0;
 }
 
+@media (max-width: 1200px) {
+    body {
+        font-size: 10px;
+    }
+}
+
 a {
     color: white;
 }
@@ -30,6 +36,7 @@ header {
     background-repeat: no-repeat, repeat;
     background-size: auto 80%, cover;
     background-position: 5% 70%;
+    display: block;
     margin: 0;
     padding: 0;
 }
@@ -60,6 +67,7 @@ header ul li {
     display: inline;
     margin: 0;
     padding: 0;
+    font-weight: bold;
     text-transform: lowercase;
 }
 
@@ -94,13 +102,18 @@ header ul li a:hover {
     text-align: center;
     margin: 0 auto;
     padding: 3em 0 5em;
-    width: 80%;
+}
+
+@media (min-width: 1200px) {
+    #home #infos {
+        width: 80%;
+    }
 }
 
 #home #infos > li {
     display: block;
-    flex: 1;
-    width: 15em;
+    flex-grow: 1;
+    flex-basis: 10em;
     padding: 2em 2em;
 }
 
@@ -117,7 +130,7 @@ header ul li a:hover {
     border: 10px solid rgba(0, 0, 0, 0.5);
     border-radius: 20px;
     display: inline-block;
-    margin: 0 1em;
+    margin: 0 1em 1em;
     padding: 1em 2em;
     text-decoration: none;
 }
@@ -143,8 +156,8 @@ header ul li a:hover {
     background-color: #444;
     font-size: 0.95em;
     padding: 1em 5em 1em 3em;
-    flex: 0.2;
-    min-width: 10vw;
+    flex-basis: 10vw;
+    flex-grow: 0.05;
 }
 
 #guides > nav a {
