@@ -8,11 +8,12 @@ section](/guide/example-operation).
 
 ```rust
 let command_buffer = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap()
-    .dispatch([1024, 1, 1], pipeline.clone(), set.clone(), ()).unwrap()
+    .dispatch([1024, 1, 1], compute_pipeline.clone(), set.clone(), ()).unwrap()
     .build().unwrap();
 ```
 
-*To be finished ; explain 1024, 1, 1*
+As explained in [the compute pipeline section](/guide/compute-pipeline), we want to spawn 1024
+*work groups*. This value is indicated when we add the command to the command buffer.
 
 > **Note**: The last parameter contains the *push constants*, which we haven't covered yet.
 > Push constants are a way to pass a small amount of data to a shader, as an alternative to

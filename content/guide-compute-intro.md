@@ -39,17 +39,19 @@ point example. Most real-world usages of the GPU involve complex mathematical al
 are not really appropriate for a tutorial.
 
 As explained above, you don't need to use any `for` loop or anything similar of that sort. All we
-have to do is write the operation that is performed on *one* value. Our operation here is therefore
-simply (in pseudo-code):
+have to do is write the operation that is performed on *one* value, and ask the GPU to execute
+it 65536 times. Our operation here is therefore simply (in pseudo-code):
 
 ```glsl
-value = value * 12;
+// `index` will range from 0 to 65536
+buffer_content[index] *= 12;
 ```
 
-The Vulkan implementation will automatically handle all the details that make it possible to run
-this in parallel for each of the 65536 values in the most optimized possible way.
+While it may look like this code multiplies a single value by 12, in reality the Vulkan
+implementation will automatically handle all the details that make it possible to run this in
+parallel multiple times in the most optimized way.
 
-Another preliminary thing we want to do is create the buffer that will contain the values. This is
+As a preliminary action we are going to create the buffer that will contain the values. This is
 similar to what we already did twice:
 
 ```rust

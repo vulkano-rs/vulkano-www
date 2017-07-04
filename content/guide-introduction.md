@@ -22,17 +22,19 @@ own microprocessor called the ***GPU*** (Graphics Processing Unit) or the ***gra
 It can be seen more or less as a secondary machine within your main machine. Your monitor is
 generally plugged in to your video card if you have one.
 
-The objective of Vulkan and vulkano is to let you interface with the video card and the GPU of the
-machine your program is running on. After you have learned to use Vulkan/vulkano, you will be
-able to ask your GPU to perform operations and either write the result into memory (which you can
-then read from your Rust program), or to write the result to your monitor for you to physically see.
+***Vulkan*** is a standard API whose version 1.0 was released in 2016 that lets you interface with
+the video card and the GPU of the machine your program is running on. ***Vulkano*** is a Rust
+library on top of Vulkan that makes it much easier and safer to use. After you have learned to
+use Vulkan/vulkano, you will be able to ask your GPU to perform operations and either write the
+result into memory (which you can then read from your Rust program), or to write the result to your
+monitor for you to physically see.
 
 ## Setup
 
 As with all Rust libraries, add this entry in your Cargo.toml:
 
 ```toml
-vulkano = "0.4"
+vulkano = "0.5"
 ```
 
 And add this to your crate root:
