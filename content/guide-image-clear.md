@@ -1,0 +1,3 @@
+# Clearing an image
+
+
