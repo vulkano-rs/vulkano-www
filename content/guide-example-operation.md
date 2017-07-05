@@ -16,7 +16,7 @@ let source_content = 0 .. 64;
 let source = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), Some(queue.family()),
                                             source_content).expect("failed to create buffer");
 
-let dest_content = 0 .. 64.map(|_| 0);
+let dest_content = (0 .. 64).map(|_| 0);
 let dest = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), Some(queue.family()),
                                           dest_content).expect("failed to create buffer");
 ```
@@ -49,7 +49,7 @@ Here is how you create a command buffer:
 use vulkano::command_buffer::AutoCommandBufferBuilder;
 
 let command_buffer = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap()
-    .copy_buffers(source.clone(), destination.clone()).unwrap()
+    .copy_buffer(source.clone(), dest.clone()).unwrap()
     .build().unwrap();
 ```
 
@@ -88,10 +88,10 @@ wait until the operation is complete. This is done by making use of the `finishe
 was returned by `execute`:
 
 ```rust
-use vulkano::sync::Future;
+use vulkano::sync::GpuFuture;
 
 finished.then_signal_fence_and_flush().unwrap()
-    .wait().unwrap();
+    .wait(None).unwrap();
 ```
 
 This may look a bit complicated, but we will cover what a *fence* is in a later section of the
@@ -102,6 +102,6 @@ Only after this was done we can call `destination.read()` and check that our cop
 
 ```rust
 let src_content = source.read().unwrap();
-let dest_content = destination.read().unwrap();
+let dest_content = dest.read().unwrap();
 assert_eq!(&*src_content, &*dest_content);
 ```

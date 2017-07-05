@@ -16,7 +16,7 @@ equivalent of a CPU thread is a ***queue***. Queues are grouped by **queue famil
 The queue families of a physical device can be enumerated like this:
 
 ```rust
-for family in physical_device.queue_families() {
+for family in physical.queue_families() {
     println!("Found a queue family with {:?} queue(s)", family.queues_count());
 }
 ```
