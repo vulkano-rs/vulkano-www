@@ -30,7 +30,7 @@ descriptor set to that slot.
 Creating a descriptor set can be done with the `simple_descriptor_set!` macro:
 
 ```rust
-let set = Arc::new(simple_descriptor_set!(pipeline.clone(), 0, {
+let set = Arc::new(simple_descriptor_set!(compute_pipeline.clone(), 0, {
     data: data_buffer.clone()
 }));
 ```

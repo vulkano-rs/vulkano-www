@@ -169,8 +169,11 @@ create a ***compute pipeline*** object from that shader. This is the object that
 the compute operation that we are going to perform.
 
 ```rust
-let compute_pipeline = ComputePipeline::new(device.clone(), &shader.main_entry_point(), &())
-    .expect("failed to create compute pipeline");
+use std::sync::Arc;
+use vulkano::pipeline::ComputePipeline;
+
+let compute_pipeline = Arc::new(ComputePipeline::new(device.clone(), &shader.main_entry_point(), &())
+    .expect("failed to create compute pipeline"));
 ```
 
 Before invoking that compute pipeline, we need to bind a buffer to it. This is covered by [the

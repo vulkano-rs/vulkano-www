@@ -29,7 +29,7 @@ This just schedules the operation for execution. We have to wait for it to be co
 
 ```rust
 finished.then_signal_fence_and_flush().unwrap()
-    .wait().unwrap();
+    .wait(None).unwrap();
 ```
 
 Once complete we can check that the pipeline has been correctly executed:
@@ -39,4 +39,6 @@ let content = data_buffer.read().unwrap();
 for (n, val) in content.iter().enumerate() {
     assert_eq!(*val, n as u32 * 12);
 }
+
+println!("Everything succeeded!");
 ```
