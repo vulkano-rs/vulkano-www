@@ -35,7 +35,7 @@ need to do so for most of the Vulkan objects that you create.
 
 The second parameter indicates for [which purpose we are creating the
 buffer](https://docs.rs/vulkano/0.5/vulkano/buffer/struct.BufferUsage.html), which can help the
-implementation perform some optimizations. Trying to use a buffer in a way that wasn't indicate in
+implementation perform some optimizations. Trying to use a buffer in a way that wasn't indicated in
 its constructor will result in an error. For the sake of the example, we just create a
 `BufferUsage` that allows all possible usages.
 
