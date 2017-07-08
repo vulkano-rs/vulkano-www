@@ -27,29 +27,31 @@ descriptor set to that slot.
 
 ## Creating a descriptor set
 
-Creating a descriptor set can be done with the `simple_descriptor_set!` macro:
+Just like there exists multiple kind of buffers, there also exists multiple different structs that
+all represent a descriptor set. Here we are going to use a `PersistentDescriptorSet`:
 
 ```rust
-let set = Arc::new(simple_descriptor_set!(compute_pipeline.clone(), 0, {
-    data: data_buffer.clone()
-}));
+use vulkano::descriptor::descriptor_set::PersistentDescriptorSet;
+
+let set = Arc::new(PersistentDescriptorSet::start(compute_pipeline.clone(), 0)
+    .add_buffer(data_buffer.clone()).unwrap()
+    .build().unwrap()
+);
 ```
 
-The first parameter of the macro is the pipeline for which we create this set, and the second
-parameter is the index of the set in the pipeline. Since `pipeline` is an `Arc`, cloning it just
-clones the `Arc` and is not an expensive operation. For once it is not the *device* that we pass
-as first parameter, because the device is determined from `pipeline`.
+The first parameter of the `start` function is the pipeline for which we create this set, and the
+second parameter is the index of the set in the pipeline. Since `pipeline` is an `Arc`, cloning it
+just clones the `Arc` and is not an expensive operation. For once it is not the *device* that we
+pass as first parameter, because the device is determined from `pipeline`.
 
 Note that you are allowed to use a set for a different pipeline than the one it was created with,
 but only if there is no conflict. However you can't create a descriptor set out of thin air, as
 Vulkan doesn't allow it.
 
-The third parameter is the content of the set, which here is just the `data` variable. Just like
+We then bind each descriptor one by one in order, which here is just the `data` variable. Just like
 for `pipeline`, cloning `data_buffer` only clones an `Arc` and isn't expensive.
 
 > **Note**: `data_buffer` was created in [the introduction](/guide/compute-intro).
-
-> **Note**: The `simple_descriptor_set!` macro will be replaced with something else in the future.
 
 Now that we have a compute pipeline and a descriptor set to bind to it, we can start our operation.
 This is covered in [the next section](/guide/dispatch).
