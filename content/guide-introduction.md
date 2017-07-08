@@ -37,6 +37,11 @@ As with all Rust libraries, add this entry in your Cargo.toml:
 vulkano = "0.5"
 ```
 
+> **Note**: New versions of vulkano (0.5.1, 0.5.2, ...) are being regularly released. If you some
+> code in this guide doesn't compile for you, try running `cargo update` to get the latest version.
+> And if it still doesn't compile, feel free to
+> [open an issue](https://github.com/tomaka/vulkano-www/issues).
+
 And add this to your crate root:
 
 ```rust
