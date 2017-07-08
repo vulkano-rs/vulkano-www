@@ -43,8 +43,8 @@ of one to four values. The four components are named, in order, R, G, B and A.
 > don't want to be confused in the future you should always keep in mind that the pixels of an
 > image can be arbitrary data.
 
-In order to get a more precise idea of what a pixel format is, I invite you to take a look at
-[the list of available formats](https://docs.rs/vulkano/0.5/vulkano/format/enum.Format.html).
+You can check [the list of available formats
+here](https://docs.rs/vulkano/0.5/vulkano/format/enum.Format.html).
 
 For example if you create an image with the format `R8Sint`, then it will only have one component.
 But with the format `A2R10G10B10SscaledPack32`, you have all four components. The first part of the
@@ -55,10 +55,25 @@ if you are confused, as we will only use the most simple formats in this guide.
 
 ## Image creation
 
-Creating an image is very similar to creating a buffer.
+Creating an image is very similar to creating a buffer. Just like there are multiple different
+structs in vulkano that represent buffers, there are also multiple different structs that
+represent images. Here we are going to use a *StorageImage*, which is a general-purpose image.
 
-*To be written*
+> **Note**: In practice the `StorageImage` is recommended for storing general-purpose values for
+> usage in shaders, like you would use a buffer. It is not recommended for storing actual images.
 
-## Advanced: mipmaps
+```rust
+use vulkano::format::Format;
+use vulkano::image::Dimensions;
+use vulkano::image::StorageImage;
 
-*To be written*
+let image = StorageImage::new(device.clone(), Dimensions::Dim2d { width: 1024, height: 1024 },
+                              Format::R8G8B8A8Unorm, Some(queue.family())).unwrap();
+```
+
+As explained above we pass the dimensions of the image and its format. The queue family to use is
+similar to the parameter when creating a buffer. It indicates which queue families are going to
+access the image.
+
+> **Note**: Images also have usage flags similar to buffers, but this precise constructor doesn't
+> require them.
