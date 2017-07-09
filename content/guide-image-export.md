@@ -1,4 +1,4 @@
-# Exporting the content of an imaage
+# Exporting the content of an image
 
 In [the previous section](/guide/image-clear) we filled the image with a color.
 
