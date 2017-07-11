@@ -75,8 +75,8 @@ numbers, so in this shader we use several `vec2`s to store the real and imaginar
 complex numbers that we manipulate.
 
 The purpose of these two lines is to put in the variable `c` the complex number that corresponds
-to the pixel of the image that we modify. Each pixel of the image is going to have a color that
-depends on whether or not its corresponding complex number is within the set or not.
+to the pixel of the image that we modify. The pixel that we are going to write will have a color
+that depends on whether or not its corresponding complex number is within the set or not.
 
 ```glsl
 vec2 z = vec2(0.0, 0.0);
@@ -95,17 +95,17 @@ for (i = 0.0; i < 1.0; i += 0.005) {
 
 We now want to find out whether the complex number that we are manipulating (ie. `c`) is within the
 Mandelbrot set. The definition of the Mandelbrot set says that a number `c` is within the set if
-the function `f(z) = z² + c` diverges when iterated from `z = 0`.
+the function `f(z) = z² + c` diverges when iterated from `z = 0` (`z` being a complex number).
 
-This is exactly what we do in this code. We start from `z = vec2(0.0, 0.0)` and iterate with a for
-loop. Each iteration puts the value of the next iterator in `z` and checks whether it is diverging
-(we consider that it is diverging if `length(z) > 4.0`).
+This is exactly what we do in this code. We start from `z = vec2(0.0, 0.0)` and iterate with a
+*for* loop. Each iteration puts the value of the next iteration in `z` and checks whether it is
+diverging (we consider that it is diverging if `length(z) > 4.0`).
 
 > **Note**: The `length` function is a built-in function in GLSL. You can find its definition and
 > the definitions of all the built-in functions at [docs.gl](http://docs.gl/sl4/length).
 
-What we have left at the end of the `for` loop is the `i` variable. If `c` is in the set then the
-function didn't diverge, the for loop went to the end, and `i` will contain `1.0`. Otherwise `c`
+What we have left at the end of the *for* loop is the `i` variable. If `c` is in the set then the
+function didn't diverge, the *for* loop went to the end, and `i` will contain `1.0`. Otherwise `c`
 is not within the set and `i` will contain a number between `0.0` and `1.0`. The closer `c` is to
 the set, the higher `i` will be. Therefore the value of `i` is what we are going to store in our
 image.
