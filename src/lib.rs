@@ -87,6 +87,9 @@ fn routes(request: &Request) -> Response {
         (GET) (/guide/image-export) => {
             guide_template_markdown(include_str!("../content/guide-image-export.md"))
         },
+        (GET) (/guide/mandelbrot) => {
+            guide_template_markdown(include_str!("../content/guide-mandelbrot.md"))
+        },
         (GET) (/guide/what-graphics-pipeline) => {
             guide_template_markdown(include_str!("../content/guide-what-graphics-pipeline.md"))
         },
