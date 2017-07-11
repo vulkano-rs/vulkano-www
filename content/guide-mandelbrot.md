@@ -9,8 +9,8 @@ some GLSL code and create a compute pipeline. This is done with the `#[derive(Vu
 hack, as explained in that section. Each invocation of the `main` function of the shader will write
 one pixel.
 
-You can find the [full source code of the example
-here](https://github.com/tomaka/vulkano/blob/master/examples/src/bin/guide-mandelbrot.rs).
+> **Note**: You can find the [full source code of this section
+> here](https://github.com/tomaka/vulkano/blob/master/examples/src/bin/guide-mandelbrot.rs).
 
 # The shader
 
@@ -51,17 +51,17 @@ Let's go through this line by line:
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 ```
 
-Each invocation of the shader will write a value to a pixel of the image. As you can see, this
-time we use a local size of 8x8, which is two-dimensional. The value of `gl_GlobalInvocationID`
-will correspond to the coordinates of the pixel that we will write between 0 and 1024.
+For better parallelisation, we decided that each invocation of the shader would write a value to a
+pixel of the image. As you can see, this time we use a local size of 8x8, which is two-dimensional.
+We will use the value of `gl_GlobalInvocationID` to decide which pixel we will write.
 
 ```glsl
 layout(set = 0, binding = 0, rgba8) uniform writeonly image2D img;
 ```
 
-This declares the presence of an image that we are going to use, at the slot 0 of the descriptor
-set 0. As you can see we have to specify its format. Trying to use an image whose format doesn't
-match what is expected will result in an error.
+This line declares the presence of an image that we are going to use, at the slot 0 of the
+descriptor set 0. As you can see we have to specify its format. Trying to use an image whose format
+doesn't match what is expected will result in an error.
 
 ```glsl
 vec2 norm_coordinates = (gl_GlobalInvocationID.xy + vec2(0.5)) / vec2(imageSize(img));
@@ -74,10 +74,9 @@ and is usually used to store 2D coordinates. Similarly `ivec4` is for example eq
 numbers, so in this shader we use several `vec2`s to store the real and imaginary parts of the
 complex numbers that we manipulate.
 
-The purpose of these two lines is to calculate the complex number that corresponds to the pixel of
-the image that we modify. This number is put in the variable `c`. Each pixel of the image
-is going to have a color that depends on whether or not its corresponding complex number is
-within the set or not.
+The purpose of these two lines is to put in the variable `c` the complex number that corresponds
+to the pixel of the image that we modify. Each pixel of the image is going to have a color that
+depends on whether or not its corresponding complex number is within the set or not.
 
 ```glsl
 vec2 z = vec2(0.0, 0.0);
@@ -94,7 +93,7 @@ for (i = 0.0; i < 1.0; i += 0.005) {
 }
 ```
 
-We now want to find out whether the complex number that we are manipulating (`c`) is within the
+We now want to find out whether the complex number that we are manipulating (ie. `c`) is within the
 Mandelbrot set. The definition of the Mandelbrot set says that a number `c` is within the set if
 the function `f(z) = z² + c` diverges when iterated from `z = 0`.
 
