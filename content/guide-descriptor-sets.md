@@ -9,7 +9,7 @@ layout(set = 0, binding = 0) buffer Data {
 } data;
 ```
 
-In Vulkan the buffers that a compute pipeline need to access must be bound to what are called
+In Vulkan the buffers that a compute pipeline needs to access must be bound to what are called
 *descriptor*s. The code above declares such a descriptor.
 
 > **Note**: A descriptor can contain a buffer, but also other types that we haven't covered yet:
@@ -27,7 +27,7 @@ descriptor set to that slot.
 
 ## Creating a descriptor set
 
-Just like there exists multiple kind of buffers, there also exists multiple different structs that
+Just like there exist multiple kinds of buffers, there also exist multiple different structs that
 all represent a descriptor set. Here we are going to use a `PersistentDescriptorSet`:
 
 ```rust

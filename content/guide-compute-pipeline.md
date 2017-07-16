@@ -13,7 +13,7 @@ This is done in two steps:
 <center>![](/guide-compute-pipeline-1.svg)</center>
 
 > **Note**: In the very far future it may be possible to write programs in Rust, or in a
-> domain specific language that ressembles Rust.
+> domain specific language that resembles Rust.
 
 ## The GLSL code
 

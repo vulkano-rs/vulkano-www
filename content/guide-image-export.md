@@ -13,7 +13,7 @@ of the image to the buffer.
 
 The first step is to create the buffer, as we have already covered in previous sections. The buffer
 has to be large enough, otherwise the copy will result in an error. Each pixel of the image
-contains four unsigned 8-bit values, and the image dimensions are 1024 per 1024 pixels. Hence why
+contains four unsigned 8-bit values, and the image dimensions are 1024 by 1024 pixels. Hence why
 the number of elements in the buffer is `1024 * 1024 * 4`.
 
 ```rust
