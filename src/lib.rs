@@ -96,6 +96,9 @@ fn routes(request: &Request) -> Response {
         (GET) (/guide/vertex-input) => {
             guide_template_markdown(include_str!("../content/guide-vertex-input.md"))
         },
+        (GET) (/guide/fragment-shader) => {
+            guide_template_markdown(include_str!("../content/guide-fragment-shader.md"))
+        },
         (GET) (/guide/render-pass-framebuffer) => {
             guide_template_markdown({
                 include_str!("../content/guide-render-pass-framebuffer.md")
