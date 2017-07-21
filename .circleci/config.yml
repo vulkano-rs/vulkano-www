@@ -35,10 +35,16 @@ jobs:
             curl -L -o /tmp/docker-$VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$VER.tgz
             tar -xz -C /tmp -f /tmp/docker-$VER.tgz
             mv /tmp/docker/* /usr/bin
-      - run: |
-          docker build -t $DOCKER_IMAGE_TAG .
-          docker login -u $DOCKER_REGISTRY_LOGIN -p $DOCKER_REGISTRY_PASS $DOCKER_REGISTRY_URL
-          docker push $DOCKER_IMAGE_TAG
+      - run:
+          name: Push Docker image to registry
+          command: |
+            docker build -t $DOCKER_IMAGE_TAG .
+            docker login -u $DOCKER_REGISTRY_LOGIN -p $DOCKER_REGISTRY_PASS $DOCKER_REGISTRY_URL
+            docker push $DOCKER_IMAGE_TAG  
+      - run:
+          name: Send restart command
+          command: |
+            curl --request POST $MARATHON_URL/v2/apps/$MARATHON_APP_ID/restart
 
 workflows:
   version: 2
