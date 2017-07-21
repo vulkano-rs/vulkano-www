@@ -84,6 +84,6 @@ And that's it! When running your program, a blue image named `image.png` should 
 *Here it is.*
 </center>
 
-This might you look stupid, but think about the fact that it's the GPU that wrote the content of
+This might look stupid, but think about the fact that it's the GPU that wrote the content of
 the image. In the next sections we will do more than just fill an image with blue, but we will
 continue to retreive the image's content and write it to a PNG file.
