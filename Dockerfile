@@ -11,6 +11,7 @@ COPY . /root/
 
 RUN cargo build --release --manifest-path=/root/Cargo.toml
 RUN mv /root/target/release/main /
+RUN mv /root/static /
 RUN rm -rf /root/*
 
 WORKDIR /
