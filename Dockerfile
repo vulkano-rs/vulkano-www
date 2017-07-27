@@ -14,5 +14,8 @@ RUN mv /root/target/release/main /
 RUN mv /root/static /
 RUN rm -rf /root/*
 
+HEALTHCHECK --interval=5m --timeout=3s \
+  CMD curl -f http://localhost/ || exit 1
+
 WORKDIR /
 CMD ./main
