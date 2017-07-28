@@ -14,6 +14,7 @@ RUN mv /root/target/release/main /
 RUN mv /root/static /
 RUN rm -rf /root/*
 
+ENV ADDR 0.0.0.0:80
 HEALTHCHECK --interval=5m --timeout=3s \
   CMD curl -f http://localhost/ || exit 1
 
