@@ -104,6 +104,11 @@ fn routes(request: &Request) -> Response {
                 include_str!("../content/guide-render-pass-framebuffer.md")
             })
         },
+        (GET) (/guide/graphics-pipeline-creation) => {
+            guide_template_markdown({
+                include_str!("../content/guide-graphics-pipeline-creation.md")
+            })
+        },
         (GET) (/guide/window) => {
             guide_template_markdown({
                 include_str!("../content/guide-window.md")
