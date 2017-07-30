@@ -1,15 +1,8 @@
 # Render passes
 
-In the previous section, we created a window and asked the GPU to fill its surface with a color.
-However our ultimate goal is to draw some shapes on that surface, not just clear it.
-
-In order to fully optimize and parallelize commands execution, we can't just add ask the GPU
+In order to fully optimize and parallelize commands execution, we can't just ask the GPU
 to draw a shape whenever we want. Instead we first have to enter "rendering mode" by entering
-what is called a *render pass*, then draw, and then leave the render pass.
-
-In this section we are just going to enter a render pass and leave it immediately. This is not
-very useful per se, but it will serve as a foundation for the next tutorial, which is about
-drawing a triangle.
+what is called a ***render pass***, then draw, and then leave the render pass.
 
 ## What is a render pass?
 
@@ -36,27 +29,20 @@ complex usages, vulkano's API to create a render pass is a bit particular.
 TODO: provide a simpler way in vulkano to do that?
 
 ```rust
-mod render_pass {
-    use vulkano::format::Format;
-     
-    single_pass_renderpass!{
-        attachments: {
-            color: {
-                load: Clear,
-                store: Store,
-                format: Format,
-            }
-        },
-        pass: {
-            color: [color],
-            depth_stencil: {}
+let render_pass = Arc::new(single_pass_renderpass!(device.clone(),
+    attachments: {
+        color: {
+            load: Clear,
+            store: Store,
+            format: swapchain.format(),
+            samples: 1,
         }
+    },
+    pass: {
+        color: [color],
+        depth_stencil: {}
     }
-}
- 
-let render_pass = render_pass::CustomRenderPass::new(&device, &render_pass::Formats {
-    color: (images[0].format(), 1)
-}).unwrap();
+).unwrap());
 ```
 
 ## Entering the render pass
@@ -67,7 +53,7 @@ draw upon. It is enough to initialize all the objects we need.
 But before we can draw, we also need to indicate the actual list of attachments. This is done
 by creating a *framebuffer*.
 
-Creating a framebuffer is typically done as part of the rendering process. Although it is not a
+Creating a framebuffer is typically done as part of the rendering process. It is not a
 bad idea to keep the framebuffer objects alive between frames, but it won't kill your
 performances to create and destroy a few framebuffer objects during each frame.
 
@@ -83,24 +69,23 @@ let framebuffer = {
 
 We are now ready the enter drawing mode!
 
-This is done by calling the `draw_inline` function on the primary command buffer builder.
-This function takes as parameter the render pass object, the framebuffer, and a struct that
+This is done by calling the `begin_render_pass` function on the command buffer builder.
+This function takes as parameter the framebuffer, TODO, and a `Vec` that
 contains the colors to fill the attachments with.
 
-This struct is created by the `single_pass_renderpass!` macro and contains one field for
-each attachment that was defined with `load: Clear`.
+Clearing our attachment has exactly the same effect as the `clear_color_image` function we covered
+previously, except that this time it is done by the rendering engine.
 
-Clearing our attachment has exactly the same effect as `clear_color_foo`, except that this
-time it is done by the rendering engine.
+For the sake of the example, let's just enter a render pass and leave it immediately after:
 
 ```rust
-let command_buffer = PrimaryCommandBufferBuilder::new(&cb_pool)
-    .draw_inline(&render_pass, &framebuffer, render_pass::ClearValues {
-        color: [0.0, 0.0, 1.0, 1.0]
-    })
-    .draw_end()
-    .build();
+AutoCommandBufferBuilder::primary_one_time_submit(device.clone(), queue.family()).unwrap()
+    .begin_render_pass(framebuffers.as_ref().unwrap()[image_num].clone(), false,
+                        vec![[0.0, 0.0, 1.0, 1.0].into()])
+    .unwrap()
+    .end_render_pass()
+    .unwrap()
 ```
 
-We enter the render pass and immediately leave it afterward. In the next section, we are going
-to insert a function call between `draw_inline` and `draw_end`.
+The next section will introduce the `draw` command, which we will put between `begin_render_pass`
+and `end_render_pass`.
