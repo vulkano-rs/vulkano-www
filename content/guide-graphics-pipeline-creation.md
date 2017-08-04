@@ -9,7 +9,7 @@ In [the fragment shader section](/guide/fragment-shader) we wrote the source cod
 Finally in [the render passes section](/guide/render-pass-framebuffer) we create a render pass and
 a framebuffer.
 
-It is now time to put everything together and perform the draw operation.
+It is now time to put everything together and perform the draw operation!
 
 ## Creating a graphics pipeline
 

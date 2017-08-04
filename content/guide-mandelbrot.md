@@ -10,7 +10,7 @@ hack, as explained in that section. Each invocation of the `main` function of th
 one pixel.
 
 > **Note**: You can find the [full source code of this section
-> here](https://github.com/tomaka/vulkano/blob/master/examples/src/bin/guide-mandelbrot.rs).
+> here](https://github.com/vulkano-rs/vulkano/blob/master/examples/src/bin/guide-mandelbrot.rs).
 
 # The shader
 
