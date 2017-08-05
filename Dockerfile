@@ -1,5 +1,5 @@
 FROM alpine:3.6
-RUN apk add --no-cache cargo rust
+RUN apk add --no-cache cargo rust curl
 
 COPY . /root/
 
