@@ -70,7 +70,7 @@ use vulkano::framebuffer::Framebuffer;
 
 let framebuffer = Arc::new(Framebuffer::start(render_pass.clone())
     .add(image.clone()).unwrap()
-    .build().unwrap())
+    .build().unwrap());
 ```
 
 We are now ready the enter drawing mode!
