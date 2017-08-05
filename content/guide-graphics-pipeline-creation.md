@@ -1,13 +1,14 @@
 # Putting it all together
 
 In [the vertex input section](/guide/vertex-input) we created a buffer named `vertex_buffer` which
-contains the shape of our triangle, and wrote the source code of a *vertex shader*.
+contains the shape of our triangle, and wrote the source code of a *vertex shader* that positions
+vertices on the image.
 
 In [the fragment shader section](/guide/fragment-shader) we wrote the source code of a
-*fragment shader*.
+*fragment shader* that fills pixels with a color.
 
-Finally in [the render passes section](/guide/render-pass-framebuffer) we create a render pass and
-a framebuffer.
+Finally in [the render passes section](/guide/render-pass-framebuffer) we create a *render pass*
+and a *framebuffer* that contains the target image.
 
 It is now time to put everything together and perform the draw operation!
 
@@ -61,7 +62,7 @@ let pipeline = Arc::new(GraphicsPipeline::start()
     .vertex_input_single_buffer::<Vertex>()
     // The vertex shader.
     .vertex_shader(vs.main_entry_point(), ())
-    // TODO:
+    // Defines the viewport (explanations below).
     .viewports_dynamic_scissors_irrelevant(1)
     // The fragment shader.
     .fragment_shader(fs.main_entry_point(), ())

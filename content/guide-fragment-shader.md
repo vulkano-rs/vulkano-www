@@ -1,14 +1,15 @@
 # Fragment shader
 
 After the vertex shader has run on each vertex, the next step that the GPU performs is to determine
-which pixels of the target image are within the triangle.
+which pixels of the target image are within the shape of the triangle. Only these pixels will be
+modified on the final image.
 
 > **Note**: More precisely, it is only if the center of a pixel is within the triangle that the
 > GPU considers that the whole pixel is inside.
 
 <center>![Illustration of which pixels are inside the triangle](/guide-fragment-shader-1.svg)</center>
 
-Then the GPU takes each of these pixels one by one (the ones in red in the image above) and runs
+The GPU then takes each of these pixels one by one (the ones in red in the image above) and runs
 another type of shader named a **fragment shader** which we also need to provide in order to start
 our draw operation.
 

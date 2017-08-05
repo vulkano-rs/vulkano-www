@@ -1,8 +1,9 @@
 # Render passes
 
 In order to fully optimize and parallelize commands execution, we can't just ask the GPU
-to draw a shape whenever we want. Instead we first have to enter "rendering mode" by entering
-what is called a ***render pass***, then draw, and then leave the render pass.
+to draw a shape whenever we want. Instead we first have to enter a special "rendering mode" by
+*entering* what is called a ***render pass***. It is only once we have entered a render pass that
+you can draw.
 
 ## What is a render pass?
 
@@ -17,16 +18,13 @@ Entering a render pass (as in "the rendering mode") requires passing a render pa
 
 ## Creating a render pass
 
-For the moment, the only thing we want to do is draw some color to an image that corresponds to
-our window. This is the most simple case possible, and we only need to provide two informations
-to a render pass: the format of the images of our swapchain, and the fact that we don't use
-multisampling (which is an advanced anti-aliasing technique).
+For the moment, the only thing we want to do is draw some color to a single image. This is the most
+simple case possible, and we only need to provide two informations to a render pass: the format of
+the image, and the fact that we don't use multisampling (which is an anti-aliasing technique).
 
-However complex games can use render passes in very complex ways, with multiple subpasses and
-multiple attachments, and with various micro-optimizations. In order to accomodate for these
-complex usages, vulkano's API to create a render pass is a bit particular.
-
-TODO: provide a simpler way in vulkano to do that?
+More complex games can use render passes in very complex ways, with multiple subpasses and
+multiple attachments, and with various micro-optimizations. Vulkano's API is suitable for both the
+simple cases and the complex usages, which is why it may look complex at first.
 
 ```rust
 let render_pass = Arc::new(single_pass_renderpass!(device.clone(),
@@ -34,7 +32,7 @@ let render_pass = Arc::new(single_pass_renderpass!(device.clone(),
         color: {
             load: Clear,
             store: Store,
-            format: swapchain.format(),
+            format: Format::R8G8B8A8Unorm,
             samples: 1,
         }
     },
@@ -44,6 +42,16 @@ let render_pass = Arc::new(single_pass_renderpass!(device.clone(),
     }
 ).unwrap());
 ```
+
+A render pass is made of **attachments** and **passes**. Here we declare one attachment whose name
+is `color` (the name is arbitrary), and one pass that will use `color` as its single output.
+
+The `load: Clear` line indicates that we want the GPU to *clear* the image when entering the render
+pass (ie. fill it with a single color), while `store: Store` indicates that we want the GPU to
+actually store the output of our draw commands to the image.
+
+> **Note**: It is possible to create temporary images whose content is only relevant inside of a
+> render pass, in which case it is more optimal to use `store: DontCare` instead of `store: Store`.
 
 ## Entering the render pass
 
@@ -55,37 +63,39 @@ by creating a *framebuffer*.
 
 Creating a framebuffer is typically done as part of the rendering process. It is not a
 bad idea to keep the framebuffer objects alive between frames, but it won't kill your
-performances to create and destroy a few framebuffer objects during each frame.
+performances to create and destroy a few framebuffer objects during some frames.
 
 ```rust
-let framebuffer = {
-    let image = &images[image_num];
-    let dimensions = [image.dimensions()[0], image.dimensions()[1], 1];
-    Framebuffer::new(&render_pass, dimensions, render_pass::AList {
-        color: image
-    }).unwrap()
-};
+use vulkano::framebuffer::Framebuffer;
+
+let framebuffer = Arc::new(Framebuffer::start(render_pass.clone())
+    .add(image.clone()).unwrap()
+    .build().unwrap())
 ```
 
 We are now ready the enter drawing mode!
 
 This is done by calling the `begin_render_pass` function on the command buffer builder.
-This function takes as parameter the framebuffer, TODO, and a `Vec` that
-contains the colors to fill the attachments with.
+This function takes as parameter the framebuffer, a boolean, and a `Vec` that contains the colors
+to fill the attachments with. Since we have only one single attachment, this `Vec` contains only
+one element.
 
 Clearing our attachment has exactly the same effect as the `clear_color_image` function we covered
 previously, except that this time it is done by the rendering engine.
 
-For the sake of the example, let's just enter a render pass and leave it immediately after:
+The boolean passed as second parameter indicates whether we are going to directly invoke draw
+commands or use secondary command buffers instead. Secondary command buffers are a more advanced
+topic.
+
+As a demonstration, let's just enter a render pass and leave it immediately after:
 
 ```rust
 AutoCommandBufferBuilder::primary_one_time_submit(device.clone(), queue.family()).unwrap()
-    .begin_render_pass(framebuffers.as_ref().unwrap()[image_num].clone(), false,
-                        vec![[0.0, 0.0, 1.0, 1.0].into()])
+    .begin_render_pass(framebuffer.clone(), false, vec![[0.0, 0.0, 1.0, 1.0].into()])
     .unwrap()
     .end_render_pass()
     .unwrap()
 ```
 
-The next section will introduce the `draw` command, which we will put between `begin_render_pass`
-and `end_render_pass`.
+The [next section](/guide/graphics-pipeline-creation) will introduce the `draw` command, which will
+be inserted between `begin_render_pass` and `end_render_pass`.
