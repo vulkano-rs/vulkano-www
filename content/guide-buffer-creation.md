@@ -50,7 +50,7 @@ Finally, the last parameter is the content of the buffer. Here as you can see we
 that contains a single integer with the value `12`.
 
 > **Note**: In a real application you shouldn't create buffers with only 4 bytes of data. Although
-> buffers aren't be expensive, you should try to group as much data as you can in the same buffer.
+> buffers aren't expensive, you should try to group as much data as you can in the same buffer.
 
 ## From_data and from_iter
 
