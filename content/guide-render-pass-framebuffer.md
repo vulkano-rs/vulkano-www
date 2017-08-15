@@ -51,7 +51,7 @@ pass (ie. fill it with a single color), while `store: Store` indicates that we w
 actually store the output of our draw commands to the image.
 
 > **Note**: It is possible to create temporary images whose content is only relevant inside of a
-> render pass, in which case it is more optimal to use `store: DontCare` instead of `store: Store`.
+> render pass, in which case it is optimal to use `store: DontCare` instead of `store: Store`.
 
 ## Entering the render pass
 
