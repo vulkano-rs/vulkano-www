@@ -13,11 +13,11 @@ was covered in [the previous section](/guide/buffer-creation).
 
 ```rust
 let source_content = 0 .. 64;
-let source = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), Some(queue.family()),
+let source = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(),
                                             source_content).expect("failed to create buffer");
 
 let dest_content = (0 .. 64).map(|_| 0);
-let dest = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), Some(queue.family()),
+let dest = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(),
                                           dest_content).expect("failed to create buffer");
 ```
 

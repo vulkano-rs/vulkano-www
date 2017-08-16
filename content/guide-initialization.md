@@ -7,7 +7,7 @@ an *instance*. Creating an instance tries to load Vulkan from the system and rea
 available implementations.
 
 Creating an instance takes three optional parameters which aren't going to cover for now. You can
-check [the documentation of `Instance`](https://docs.rs/vulkano/0.5/vulkano/instance/struct.Instance.html)
+check [the documentation of `Instance`](https://docs.rs/vulkano/0.6/vulkano/instance/struct.Instance.html)
 for more information.
 
 ```rust

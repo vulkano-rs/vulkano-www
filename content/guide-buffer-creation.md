@@ -24,8 +24,7 @@ use vulkano::buffer::CpuAccessibleBuffer;
 
 let data = 12;
 let buffer = CpuAccessibleBuffer::from_data(device.clone(), BufferUsage::all(),
-                                            Some(queue.family()), data)
-                                            .expect("failed to create buffer");
+                                            data).expect("failed to create buffer");
 ```
 
 We have to indicate several things when creating the buffer. The first parameter is the device
@@ -34,19 +33,12 @@ which shouldn't be expensive. You should get used to passing the device as param
 need to do so for most of the Vulkan objects that you create.
 
 The second parameter indicates for [which purpose we are creating the
-buffer](https://docs.rs/vulkano/0.5/vulkano/buffer/struct.BufferUsage.html), which can help the
+buffer](https://docs.rs/vulkano/0.6/vulkano/buffer/struct.BufferUsage.html), which can help the
 implementation perform some optimizations. Trying to use a buffer in a way that wasn't indicated in
 its constructor will result in an error. For the sake of the example, we just create a
 `BufferUsage` that allows all possible usages.
 
-The third parameter is the list of queue families that are going to access the buffer. Accessing it
-from another family will trigger an error. Again, this is used by the Vulkan implementation to
-perform some optimizations.
-
-> **Note**: Vulkano may provide some shortcut functions in the future for the most common usages,
-> in order to make things more straight-forward.
-
-Finally, the last parameter is the content of the buffer. Here as you can see we create a buffer
+Finally, the third parameter is the content of the buffer. Here as you can see we create a buffer
 that contains a single integer with the value `12`.
 
 > **Note**: In a real application you shouldn't create buffers with only 4 bytes of data. Although
@@ -67,7 +59,7 @@ struct MyStruct {
 let data = MyStruct { a: 5, b: true };
 
 let buffer = CpuAccessibleBuffer::from_data(device.clone(), BufferUsage::all(),
-                                            Some(queue.family()), data).unwrap();
+                                            data).unwrap();
 ```
 
 > **Note**: While you can put any type you want in a buffer, using a type that doesn't implement
@@ -89,7 +81,7 @@ is only known at runtime.
 ```rust
 let iter = (0 .. 128).map(|_| 5u8);
 let buffer = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(),
-                                            Some(queue.family()), iter).unwrap();
+                                            iter).unwrap();
 ```
 
 You now know how to create a `CpuAccessibleBuffer`.
