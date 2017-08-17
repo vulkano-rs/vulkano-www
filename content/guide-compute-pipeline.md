@@ -120,7 +120,7 @@ While we're waiting for the Rust language to provide procedural macros, vulkano 
 to add a dependency to it:
 
 ```toml
-vulkano-shader-derive = "0.5"
+vulkano-shader-derive = "0.6"
 ```
 
 And add these lines to our crate root:

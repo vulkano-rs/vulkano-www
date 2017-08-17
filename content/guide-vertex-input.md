@@ -57,7 +57,6 @@ that we are going to pass as parameter when we start the drawing operation.
 
 ```rust
 let vertex_buffer = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(),
-                                                   Some(queue.family()),
                                                    vec![vertex1, vertex2, vertex3].into_iter()).unwrap();
 ```
 

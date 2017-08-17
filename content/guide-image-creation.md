@@ -44,7 +44,7 @@ of one to four values. The four components are named, in order, R, G, B and A.
 > image can be arbitrary data.
 
 You can check [the list of available formats
-here](https://docs.rs/vulkano/0.5/vulkano/format/enum.Format.html).
+here](https://docs.rs/vulkano/0.6/vulkano/format/enum.Format.html).
 
 For example if you create an image with the format `R8Sint`, then it will only have one component.
 But with the format `A2R10G10B10SscaledPack32`, you have all four components. The first part of the
