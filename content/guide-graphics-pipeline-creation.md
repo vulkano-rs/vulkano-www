@@ -150,4 +150,4 @@ And here is what you should get:
 </center>
 
 > **Note**: You can find the [full source code of this section
-> here](https://github.com/vulkano-rs/vulkano/blob/master/examples/src/bin/guide-triangle.rs).
+> here](https://github.com/vulkano-rs/vulkano-www/blob/master/examples/guide-triangle.rs).

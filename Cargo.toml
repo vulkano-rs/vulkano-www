@@ -9,3 +9,12 @@ lazy_static = "0.2"
 mustache = "0.8"
 pulldown-cmark = "0.0.15"
 rouille = "1.0"
+
+[dev-dependencies]
+vulkano = "0.6.0"
+vulkano-shader-derive = "0.6.0"
+vulkano-win = "0.6.0"
+cgmath = "0.14.1"
+image = "0.14.0"
+winit = "0.7.0"
+time = "0.1.37"
