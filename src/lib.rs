@@ -51,6 +51,9 @@ fn routes(request: &Request) -> Response {
         (GET) (/) => {
             main_template(include_str!("../content/home.html"))
         },
+        (GET) (/donate) => {
+            main_template(include_str!("../content/donate.html"))
+        },
         (GET) (/guide/introduction) => {
             guide_template_markdown(include_str!("../content/guide-introduction.md"))
         },

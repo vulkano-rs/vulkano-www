@@ -144,6 +144,13 @@ header ul li a:hover {
 }
 
 /*
+ * Donate page
+ */
+ #donate {
+    margin: 0 10%;
+}
+
+/*
  * Guides
  */
 #guides {
