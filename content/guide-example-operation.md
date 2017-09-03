@@ -1,6 +1,6 @@
-# Running an operation
+# Example operation
 
-Now that we are familiar with devices, queues and buffers, we are going to see how to ask the GPU
+Now that we are familiar with devices, queues, and buffers, we are going to see how to ask the GPU
 to actually do something.
 
 What we are going to ask in this example is very simple: we will ask it to copy data from one
@@ -32,7 +32,7 @@ In order to ask the GPU to perform an operation, we need to create a type of obj
 haven't covered yet: ***command buffer***.
 
 With Vulkan and vulkano you can't just execute commands one by one, as it would be too inefficient.
-Instead we need to build a *command buffer* that contains a list of commands that we want to
+Instead, we need to build a *command buffer* that contains a list of commands that we want to
 execute.
 
 > **Note**: Submitting a command to the GPU can take up to several hundred microseconds, which is
@@ -98,7 +98,7 @@ This may look a bit complicated, but we will cover what a *fence* is in a later 
 guide and what signalling it means. The `wait()` function blocks the current thread until the GPU
 has finished execution.
 
-Only after this was done we can call `destination.read()` and check that our copy succeeded.
+Only after this is done can we call `destination.read()` and check that our copy succeeded.
 
 ```rust
 let src_content = source.read().unwrap();

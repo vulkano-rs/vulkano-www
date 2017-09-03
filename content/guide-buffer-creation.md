@@ -1,6 +1,6 @@
 # Creating a buffer
 
-When using Vulkan, you will very often need for the GPU to read or write data in memory. In fact
+When using Vulkan, you will very often need the GPU to read or write data in memory. In fact
 there isn't much point in using the GPU otherwise, as there is nothing you can do with the results
 of its work except write them to memory.
 
@@ -10,8 +10,8 @@ first need to create a ***buffer*** object and put the data in it.
 ## Several kinds of buffers
 
 Vulkano does not provide a generic `Buffer` struct which you could create with `Buffer::new`.
-Instead it provides several different structs that all represent buffers, each of these structs
-being optimized for a certain kind of usage. For example if you want to continuously upload data
+Instead, it provides several different structs that all represent buffers, each of these structs
+being optimized for a certain kind of usage. For example, if you want to continuously upload data
 you should use a `CpuBufferPool`, while on the other hand if you have some data that you are never
 going to modify you should use an `ImmutableBuffer`.
 
@@ -32,8 +32,8 @@ to use. Since `device` is actually an `Arc<Device>`, the call to `.clone()` only
 which shouldn't be expensive. You should get used to passing the device as parameter, as you will
 need to do so for most of the Vulkan objects that you create.
 
-The second parameter indicates for [which purpose we are creating the
-buffer](https://docs.rs/vulkano/0.6/vulkano/buffer/struct.BufferUsage.html), which can help the
+The second parameter indicates [which purpose we are creating the
+buffer](https://docs.rs/vulkano/0.6/vulkano/buffer/struct.BufferUsage.html) for, which can help the
 implementation perform some optimizations. Trying to use a buffer in a way that wasn't indicated in
 its constructor will result in an error. For the sake of the example, we just create a
 `BufferUsage` that allows all possible usages.
@@ -47,7 +47,7 @@ that contains a single integer with the value `12`.
 ## From_data and from_iter
 
 In the example above we create a buffer that contains the value `12`, which is of type `i32`.
-But you can put any type you want in a buffer, there is no restriction. You can for example write
+But you can put any type you want in a buffer, there is no restriction. You can, for example, write
 this:
 
 ```rust
@@ -67,15 +67,15 @@ let buffer = CpuAccessibleBuffer::from_data(device.clone(), BufferUsage::all(),
 > that buffer.
 
 While it is sometimes useful to use a buffer that contains a single struct, in practice it is very
-common to put an array of values inside of a buffer. You can for example put an array of fifty
+common to put an array of values inside of a buffer. You can, for example, put an array of fifty
 `i32`s in a buffer with the `CpuAccessibleBuffer::from_data` function.
 
 However in practice it is also very common to not know the size of the array at compile-time. In
 order to handle this, `CpuAccessibleBuffer` provides a `from_iter` constructor that takes an
 iterator to the data as last parameter, instead of the data itself.
 
-In the example below, we create a buffer that contains 128 times the value `5` of type `u8`. The
-type of the content of the buffer is `[u8]`, which represents in Rust an array of `u8`s whose size
+In the example below, we create a buffer that contains the value `5` of type `u8`, 128 times. The
+type of the content of the buffer is `[u8]`, which, in Rust, represents an array of `u8`s whose size
 is only known at runtime.
 
 ```rust
@@ -88,7 +88,7 @@ You now know how to create a `CpuAccessibleBuffer`.
 Keep in mind that `from_data` and `from_iter` are specific to the `CpuAccessibleBuffer`. Each type
 of buffer has its own constructors, sometimes similar but sometimes different.
 
-## Reading and writing the content of the buffer
+## Reading and writing the contents of a buffer
 
 Once a `CpuAccessibleBuffer` is created, you can access its content with the `read()` or `write()`
 methods. Using `read()` will grant you shared access to the content of the buffer, and using
@@ -103,7 +103,7 @@ content.a *= 2;
 content.b = false;
 ```
 
-Alternatively, supposing that the content of `buffer` is of type `[u8]` (like with the example that
+Alternatively, suppose that the content of `buffer` is of type `[u8]` (like with the example that
 uses `from_iter`):
 
 ```rust

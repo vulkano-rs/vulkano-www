@@ -6,7 +6,7 @@ Before you can start using any function from Vulkan and vulkano, the first thing
 an *instance*. Creating an instance tries to load Vulkan from the system and reads the list of
 available implementations.
 
-Creating an instance takes three optional parameters which aren't going to cover for now. You can
+Creating an instance takes three optional parameters which we aren't going to cover for now. You can
 check [the documentation of `Instance`](https://docs.rs/vulkano/0.6/vulkano/instance/struct.Instance.html)
 for more information.
 
@@ -43,7 +43,7 @@ operations.
 As of the writing of this guide, it is not yet possible to use multiple devices simultaneously
 in an efficient way (eg. SLI/Crossfire). You *can* use multiple devices simultaneously in the same
 program, but there is not much point in doing so because you cannot share anything between them.
-Consequently the best thing to do in practice is to chose one physical device which is going to run
+Consequently the best thing to do in practice is to choose one physical device which is going to run
 everything:
 
 ```rust

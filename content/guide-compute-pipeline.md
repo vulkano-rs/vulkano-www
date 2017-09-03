@@ -20,8 +20,8 @@ This is done in two steps:
 But first, we need to write the source code of the operation. The GLSL language looks a lot like
 the C programming language, but has some differences.
 
-This guide is not going to cover teaching you GLSL, as it is an entire programming language. Just
-like many programming languages, the easiest way to learn GLSL is by looking an examples.
+This guide is not going to cover teaching you GLSL, as it is an entire programming language. As with 
+many programming languages, the easiest way to learn GLSL is by looking at examples.
 
 Let's take a look at some GLSL that takes each element of a buffer and multiplies it by 12:
 
@@ -32,11 +32,11 @@ layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
 
 layout(set = 0, binding = 0) buffer Data {
     uint data[];
-} data;
+} buf;
 
 void main() {
     uint idx = gl_GlobalInvocationID.x;
-    data.data[idx] *= 12;
+    buf.data[idx] *= 12;
 }
 ```
 
@@ -106,18 +106,19 @@ buf.data[idx] *= 12;
 The content of the buffer is accessed with `buf.data`. We multiply the value at the given index
 with 12.
 
-> **Note**: You can easily trigger a data race by calling for example `buf.data[0] *= 12;`, as all
-> the shader invocations will access the buffer simultaneously. This is a safety problem that
-> vulkano doesn't detect or handle yet. Doing so will lead to an undefined result but not in an
+> **Note**: You can easily trigger a data race by calling, for example, `buf.data[0] *= 12;`, as all
+> of the shader invocations will access the buffer simultaneously. This is a safety problem that
+> vulkano doesn't detect or handle yet. Doing so will lead to an undefined result, but not in an
 > undefined behavior.
 
 ## Embedding the GLSL code in the Rust code
 
-Now that we wrote the shader in GLSL, we have to compile it and load it at runtime.
+Now that we've written the shader in GLSL, we're going to be compiling the shaders *at 
+application compile-time*. We'll accomplish this using `vulkano-shader-derive`, which is a 
+less-than-ideal way of compiling shaders at compile time, but it'll have to do until procedural 
+macros are stabalized.
 
-While we're waiting for the Rust language to provide procedural macros, vulkano provides a
-"hack-ish" way to compile shaders thanks to the `vulkano-shader-derive`. To use it, we first have
-to add a dependency to it:
+To use `vulkano-shader-derive`, we first have to add a dependency:
 
 ```toml
 vulkano-shader-derive = "0.6"
@@ -143,11 +144,11 @@ layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
 
 layout(set = 0, binding = 0) buffer Data {
     uint data[];
-} data;
+} buf;
 
 void main() {
     uint idx = gl_GlobalInvocationID.x;
-    data.data[idx] *= 12;
+    buf.data[idx] *= 12;
 }"
     ]
     struct Dummy;

@@ -25,14 +25,14 @@ Just like we already covered, we submit the command buffer:
 let finished = command_buffer.execute(queue.clone()).unwrap();
 ```
 
-This just schedules the operation for execution. We have to wait for it to be complete:
+This just schedules the operation for execution. We have to wait for it to complete:
 
 ```rust
 finished.then_signal_fence_and_flush().unwrap()
     .wait(None).unwrap();
 ```
 
-Once complete we can check that the pipeline has been correctly executed:
+Once complete, we can check that the pipeline has been correctly executed:
 
 ```rust
 let content = data_buffer.read().unwrap();
