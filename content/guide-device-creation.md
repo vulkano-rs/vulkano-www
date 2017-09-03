@@ -1,6 +1,6 @@
-# Creating a device
+# Device creation
 
-In [the previous section](/guide/initialization) we created an instance and chosen a physical
+In [the previous section](/guide/initialization) we created an instance and chose a physical
 device from this instance.
 
 But initialization isn't finished yet. Before being able to do anything, we have to create a
@@ -9,7 +9,7 @@ But initialization isn't finished yet. Before being able to do anything, we have
 
 ## About queues
 
-Just like it is possible to use multiple threads in your program running on the CPU, it is also
+Just like how it's possible to use multiple threads in your program running on the CPU, it's also
 possible to run multiple operations in parallel on the GPU of your graphics card. The Vulkan
 equivalent of a CPU thread is a ***queue***. Queues are grouped by **queue families**.
 
@@ -36,7 +36,7 @@ and some others support both.
 
 The reason why queues are relevant right now is in order to create a *device*, we have to tell the
 Vulkan implementation which queues we want to use. Let's choose a single queue that we will use for
-all our operations.
+all of our operations.
 
 ```rust
 let queue_family = physical.queue_families()

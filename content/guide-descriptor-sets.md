@@ -6,18 +6,18 @@ this:
 ```glsl
 layout(set = 0, binding = 0) buffer Data {
     uint data[];
-} data;
+} buf;
 ```
 
-In Vulkan the buffers that a compute pipeline needs to access must be bound to what are called
+In Vulkan, the buffers that a compute pipeline needs to access must be bound to what are called
 *descriptor*s. The code above declares such a descriptor.
 
 > **Note**: A descriptor can contain a buffer, but also other types that we haven't covered yet:
-> a buffer view, an image, a sampled image, etc.. Each descriptor can also be an array.
+> a buffer view, an image, a sampled image, etc. Each descriptor can also be an array.
 
 Descriptors are grouped by *descriptor set*s. The `layout(set = 0, binding = 0)` attribute in the
-GLSL code indicates that this descriptor is the descriptor 0 in the set 0. Descriptors indices and
-sets indices are 0-based.
+GLSL code indicates that this descriptor is the descriptor 0 in the set 0. Descriptor indices and
+set indices are 0-based.
 
 What we declared in the GLSL code is actually not a descriptor set, but only a slot for a
 descriptor set. Before we can invoke the compute pipeline, we first need to bind an actual
@@ -48,7 +48,7 @@ Note that you are allowed to use a set for a different pipeline than the one it 
 but only if there is no conflict. However you can't create a descriptor set out of thin air, as
 Vulkan doesn't allow it.
 
-We then bind each descriptor one by one in order, which here is just the `data` variable. Just like
+We then bind each descriptor one by one in order, which here is just the `buf` variable. Just like
 for `pipeline`, cloning `data_buffer` only clones an `Arc` and isn't expensive.
 
 > **Note**: `data_buffer` was created in [the introduction](/guide/compute-intro).
