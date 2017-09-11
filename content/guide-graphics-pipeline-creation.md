@@ -124,6 +124,9 @@ let command_buffer = AutoCommandBufferBuilder::primary_one_time_submit(device.cl
 // (continued below)
 ```
 
+> **Note**: If you wanted to draw multiple objects, the most straight-forward method is to call
+> `draw()` multiple time in a row.
+
 Once we have finished drawing, let's do the same thing as [in the mandelbrot
 example](/guide/mandelbrot) and write the image to a PNG file.
 
