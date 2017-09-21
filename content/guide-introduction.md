@@ -34,10 +34,10 @@ monitor for you to physically see.
 As with all Rust libraries, add this entry in your Cargo.toml:
 
 ```toml
-vulkano = "0.6"
+vulkano = "0.7"
 ```
 
-> **Note**: New versions of vulkano (0.6.1, 0.6.2, ...) are being regularly released. If some
+> **Note**: New versions of vulkano (0.7.1, 0.7.2, ...) are being regularly released. If some
 > code in this guide doesn't compile for you, try running `cargo update` to get the latest version.
 > And if it still doesn't compile, feel free to
 > [open an issue](https://github.com/vulkano-rs/vulkano-www/issues).

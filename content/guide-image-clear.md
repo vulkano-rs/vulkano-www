@@ -25,7 +25,7 @@ let command_buffer = AutoCommandBufferBuilder::new(device.clone(), queue.family(
 
 ## Normalized components
 
-[The `ClearValue` enum](https://docs.rs/vulkano/0.6/vulkano/format/enum.ClearValue.html) indicates
+[The `ClearValue` enum](https://docs.rs/vulkano/0.7/vulkano/format/enum.ClearValue.html) indicates
 which color to fill the image with. Depending on the format of the image, we have to use the right
 enum variant of `ClearValue`.
 
