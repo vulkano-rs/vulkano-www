@@ -116,7 +116,7 @@ with 12.
 Now that we've written the shader in GLSL, we're going to be compiling the shaders *at 
 application compile-time*. We'll accomplish this using `vulkano-shader-derive`, which is a 
 less-than-ideal way of compiling shaders at compile time, but it'll have to do until procedural 
-macros are stabalized.
+macros are stabilized.
 
 To use `vulkano-shader-derive`, we first have to add a dependency:
 
@@ -155,7 +155,7 @@ void main() {
 }
 ```
 
-As you can see, we create a dummy struct with a some attributes that the `vulkano_shader_derive`
+As you can see, we create a dummy struct with some attributes that the `vulkano_shader_derive`
 crate will pick up. The crate will then compile the GLSL code (outputting compilation errors if
 any) and generate several structs, including one named `Shader` that provides a method named
 `load`. This is the method that we have to use next:
