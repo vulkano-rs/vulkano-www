@@ -82,7 +82,7 @@ void main() {
 }
 ```
 
-The line `layout(location = 0) in vec2 position;` declares that each vertex as an *attribute* named
+The line `layout(location = 0) in vec2 position;` declares that each vertex has an *attribute* named
 `position` and of type `vec2`. This corresponds to the definition of the `Vertex` struct we created.
 
 > **Note**: Calling the `impl_vertex!` macro is what makes it possible for vulkano to build the
