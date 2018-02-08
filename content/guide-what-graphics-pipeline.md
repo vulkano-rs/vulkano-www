@@ -29,7 +29,7 @@ simple as a single triangle, or can be complex like a human body for example.
 In order to start a graphical operation (ie. an operation that uses the graphics pipeline), you
 will need the following elements:
 
-- A **graphics pipeline object** that describes the way the GPU should behavior, similar to the
+- A **graphics pipeline object** that describes the way the GPU should behave, similar to the
   way [a compute pipeline object](/guide/compute-pipeline) describes a compute operation.
 - One or multiple buffers containing the shape of the object we want to draw.
 - A ***framebuffer*** object, which is a collection of images to write to.
