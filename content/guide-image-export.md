@@ -63,7 +63,7 @@ In this library the main type that represents an image is the `ImageBuffer`. It 
 from a slice:
 
 ```rust
-use image::ImageBuffer;
+use image::{ImageBuffer, Rgba};
 
 let buffer_content = buf.read().unwrap();
 let image = ImageBuffer::<Rgba<u8>, _>::from_raw(1024, 1024, &buffer_content[..]).unwrap();
