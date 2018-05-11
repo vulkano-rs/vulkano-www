@@ -82,7 +82,7 @@ events_loop.run_forever(|event| {
 
 What this code does is block the main thread forever, and calls the closure whenever the events
 loop (which we used to create our window) receives an event. These events include the events
-that are tired to our window, such a mouse movements.
+that are tied to our window, such a mouse movements.
 
 When the user wants to close the window, a `Closed` event is received, which makes our closure
 return `ControlFlow::Break`. This stops the `run_forever` function.
