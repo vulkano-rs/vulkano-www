@@ -19,7 +19,7 @@ Entering a render pass (as in "the rendering mode") requires passing a render pa
 ## Creating a render pass
 
 For the moment, the only thing we want to do is draw some color to a single image. This is the most
-simple case possible, and we only need to provide two informations to a render pass: the format of
+simple case possible, and we only need to provide two things to a render pass: the format of
 the image, and the fact that we don't use multisampling (which is an anti-aliasing technique).
 
 More complex games can use render passes in very complex ways, with multiple subpasses and
