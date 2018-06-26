@@ -10,7 +10,7 @@ parallel calculations (as seen in [the Mandelbrot example](/guide/mandelbrot)), 
 kind of operations: graphical operations.
 
 Before they were used for general-purpose calculations, GPU were used for graphics (hence their
-name). To benefit from this, GPUs provide to developers a specialized well-optimized serie of steps
+name). To benefit from this, GPUs provide to developers a specialized well-optimized series of steps
 called ***the graphics pipeline***. Using the graphics pipeline is more restrictive than using
 compute operations, but it is also much faster.
 
