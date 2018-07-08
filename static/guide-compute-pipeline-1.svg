@@ -39,6 +39,7 @@
      inkscape:window-maximized="1" />
   <defs
      id="defs4">
+    <style type="text/css">@import 'svg-styles.css';</style>
     <marker
        style="overflow:visible"
        id="Arrow1Mend"

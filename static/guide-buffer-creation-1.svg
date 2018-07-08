@@ -15,8 +15,9 @@
    version="1.1"
    inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
    sodipodi:docname="guide-buffer-creation-1.svg">
-  <defs
-     id="defs4734" />
+  <defs id="defs4734">
+    <style type="text/css">@import 'svg-styles.css';</style>
+  </defs>
   <sodipodi:namedview
      id="base"
      pagecolor="#000000"

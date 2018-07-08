@@ -16,7 +16,9 @@
    inkscape:version="0.48.5 r10040"
    sodipodi:docname="guide-vertex-input-2.svg">
   <defs
-     id="defs3283" />
+      id="defs3283">
+    <style type="text/css">@import 'svg-styles.css';</style>
+  </defs>
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"

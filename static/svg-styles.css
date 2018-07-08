@@ -1,0 +1,22 @@
+/* The SVG diagrams in this directory import this style sheet via nodes like:
+
+   <style type="text/css">@import 'svg-styles.css';</style>
+
+   (If the other tags in the SVG are namespaced, the starting and ending tags
+   must be 'svg:style'.)
+
+   You can edit this into the SVG manually, or use Inkscape's XML editor. It
+   should a child of the 'defs' node. Once you've added it, Inkscape should
+   leave it there. */
+
+/* Definitions for fonts loaded from Google Fonts. For editing with Inkscape,
+   you should install these fonts locally. */
+
+/* Open Sans: https://fonts.google.com/specimen/Open+Sans
+   Available under the Apache License, Version 2.0. */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Open Sans Regular'), local('OpenSans-Regular'), url(https://fonts.gstatic.com/s/opensans/v15/mem8YaGs126MiZpBA-UFVZ0e.ttf) format('truetype');
+}
