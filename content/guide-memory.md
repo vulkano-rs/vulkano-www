@@ -15,7 +15,7 @@ video memory, but the read and write accesses are going to be much slower as the
 through the PCI Express bus that connects your video card to your motherboard.
 
 <center>
-![](/guide-buffer-creation-1.svg)
+<object data="/guide-buffer-creation-1.svg"></object>
 </center>
 
 > **Note**: All of this is true only for desktop machines with video cards, which is what we

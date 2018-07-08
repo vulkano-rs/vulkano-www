@@ -7,7 +7,11 @@ modified on the final image.
 > **Note**: More precisely, it is only if the center of a pixel is within the triangle that the
 > GPU considers that the whole pixel is inside.
 
-<center>![Illustration of which pixels are inside the triangle](/guide-fragment-shader-1.svg)</center>
+<center>
+    <object data='/guide-fragment-shader-1.svg'>
+            alt='Illustration of which pixels are inside the triangle'
+    </object>
+</center>
 
 The GPU then takes each of these pixels one by one (the ones in red in the image above) and runs
 another type of shader named a **fragment shader** which we also need to provide in order to start
