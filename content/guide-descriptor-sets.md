@@ -44,9 +44,10 @@ second parameter is the index of the set in the pipeline. Since `compute_pipelin
 just clones the `Arc` and is not an expensive operation. For once it is not the *device* that we
 pass as first parameter, because the device is determined from `compute_pipeline`.
 
-Note that you are allowed to use a set for a different pipeline than the one it was created with,
-but only if there is no conflict. However you can't create a descriptor set out of thin air, as
-Vulkan doesn't allow it.
+Once you have created a descriptor set, you may also use it with other pipelines, as long as the
+bindings' types match those the pipelines' shaders expect. But Vulkan requires that you provide a
+pipeline whenever you create a descriptor set; you cannot create one independently of any
+particular pipeline.
 
 We then bind each descriptor one by one in order, which here is just the `buf` variable. Just like
 for `compute_pipeline`, cloning `data_buffer` only clones an `Arc` and isn't expensive.
