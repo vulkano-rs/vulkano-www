@@ -17,7 +17,9 @@
    sodipodi:docname="guide-descriptor-sets-1.svg">
   <defs
      id="defs4">
-    <style type="text/css">@import 'svg-styles.css';</style>
+    <style
+       type="text/css"
+       id="style70">@import 'svg-styles.css';</style>
     <marker
        inkscape:stockid="Arrow1Mstart"
        orient="auto"
@@ -27,8 +29,8 @@
        style="overflow:visible">
       <path
          id="path3865"
-         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
-         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt"
          transform="matrix(0.4,0,0,0.4,4,0)"
          inkscape:connector-curvature="0" />
     </marker>
@@ -41,8 +43,8 @@
        style="overflow:visible">
       <path
          id="path3859"
-         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
-         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt"
          transform="matrix(0.8,0,0,0.8,10,0)"
          inkscape:connector-curvature="0" />
     </marker>
@@ -54,9 +56,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="1"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.7"
-     inkscape:cx="-374.36622"
-     inkscape:cy="249.66167"
+     inkscape:zoom="3.0916455"
+     inkscape:cx="134.86496"
+     inkscape:cy="203.15515"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -77,7 +79,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -87,23 +89,23 @@
      id="layer1"
      transform="translate(-170.35044,-117.13088)">
     <path
-       style="color:#000000;fill:none;stroke:#ffffff;stroke-width:1.69095254;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       d="m 235.92346,466.70926 0,53.88645 201.31142,0 0,-53.88645 -148.64529,0 0,8.18204 -31.01841,0 0,-8.18204 -21.64772,0 z"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;stroke:#ffffff;stroke-width:1.69095254;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       d="m 235.92346,466.70926 v 53.88645 H 437.23488 V 466.70926 H 288.58959 v 8.18204 h -31.01841 v -8.18204 z"
        id="rect2985"
        inkscape:connector-curvature="0" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
-       x="249.29256"
-       y="501.66348"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Open Sans';-inkscape-font-specification:'Open Sans';letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
+       x="243.05386"
+       y="501.17831"
        id="text2987"><tspan
          sodipodi:role="line"
          id="tspan2989"
-         x="249.29256"
-         y="501.66348"
-         style="font-size:22.54603386px;line-height:1.25;font-family:sans-serif">Compute pipeline</tspan></text>
+         x="243.05386"
+         y="501.17831"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.54603386px;line-height:1.25;font-family:'Open Sans';-inkscape-font-specification:'Open Sans'">Compute pipeline</tspan></text>
     <rect
-       style="color:#000000;fill:none;stroke:#ffffff;stroke-width:1.69095254;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;stroke:#ffffff;stroke-width:1.69095254;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
        id="rect3759"
        width="31.030846"
        height="61.810425"
@@ -111,78 +113,78 @@
        y="412.79843" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
-       x="-468.68051"
-       y="279.15356"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Open Sans';-inkscape-font-specification:'Open Sans';letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
+       x="-468.58493"
+       y="279.12677"
        id="text3761"
        transform="rotate(-90)"><tspan
          sodipodi:role="line"
          id="tspan3763"
-         x="-468.68051"
-         y="279.15356"
-         style="font-size:16.90952492px;line-height:1.25;font-family:sans-serif">Set #0</tspan></text>
+         x="-468.58493"
+         y="279.12677"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16.90952492px;line-height:1.25;font-family:'Open Sans';-inkscape-font-specification:'Open Sans'">Set #0</tspan></text>
     <path
-       style="color:#000000;fill:none;stroke:#ffffff;stroke-width:1.69095254;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       d="m 173.19592,324.76982 0,53.88646 201.31142,0 0,-53.88646 -148.6453,0 0,8.18205 -31.01841,0 0,-8.18205 -21.64771,0 z"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;stroke:#ffffff;stroke-width:1.69095254;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       d="m 173.19592,324.76982 v 53.88646 h 201.31142 v -53.88646 h -148.6453 v 8.18205 h -31.01841 v -8.18205 z"
        id="rect2985-9"
        inkscape:connector-curvature="0" />
     <rect
-       style="color:#000000;fill:none;stroke:#ffffff;stroke-width:1.69095254;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;stroke:#ffffff;stroke-width:1.69095254;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
        id="rect3759-4"
        width="31.03067"
-       height="92.811218"
+       height="97.986473"
        x="194.83586"
-       y="239.8582" />
+       y="234.68297" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
-       x="-326.74109"
-       y="216.42601"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Open Sans';-inkscape-font-specification:'Open Sans';letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
+       x="-326.55276"
+       y="214.74371"
        id="text3761-8"
        transform="rotate(-90)"><tspan
          sodipodi:role="line"
          id="tspan3763-8"
-         x="-326.74109"
-         y="216.42601"
-         style="font-size:16.90952492px;line-height:1.25;font-family:sans-serif">Binding #0</tspan></text>
+         x="-326.55276"
+         y="214.74371"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16.90952492px;line-height:1.25;font-family:'Open Sans';-inkscape-font-specification:'Open Sans'">Binding #0</tspan></text>
     <path
-       style="fill:none;stroke:#ffff00;stroke-width:3.94555569;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-start:none"
-       d="m 272.88537,384.46437 0,21.33821"
+       style="fill:none;stroke:#ffff00;stroke-width:3.94555569;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:none"
+       d="m 273.07881,384.46437 v 21.33821"
        id="path3853"
        inkscape:connector-curvature="0" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
-       x="203.9006"
-       y="360.43683"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Open Sans';-inkscape-font-specification:'Open Sans';letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
+       x="199.33853"
+       y="358.57181"
        id="text2987-2"><tspan
          sodipodi:role="line"
          id="tspan2989-4"
-         x="203.9006"
-         y="360.43683"
-         style="font-size:22.54603386px;line-height:1.25;font-family:sans-serif">Descriptor set</tspan></text>
+         x="199.33853"
+         y="358.57181"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.54603386px;line-height:1.25;font-family:'Open Sans';-inkscape-font-specification:'Open Sans'">Descriptor set</tspan></text>
     <path
-       style="fill:none;stroke:#ffff00;stroke-width:3.94555569;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-start:none"
-       d="m 210.07856,213.35608 0,21.33821"
+       style="fill:none;stroke:#ffff00;stroke-width:3.94555569;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:none"
+       d="m 210.3512,208.01911 v 21.33821"
        id="path3853-5"
        inkscape:connector-curvature="0" />
     <path
-       style="color:#000000;fill:none;stroke:#ffffff;stroke-width:1.69095254;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       d="m 190.81392,207.69429 38.52927,0 0,-87.71793 -38.52927,0 z"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;stroke:#ffffff;stroke-width:1.69095254;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       d="m 191.08656,202.51905 h 38.52927 v -82.54269 h -38.52927 z"
        id="rect2985-9-5"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccccc" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
-       x="-193.51254"
-       y="218.39975"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Open Sans';-inkscape-font-specification:'Open Sans';letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
+       x="-194.97868"
+       y="218.8665"
        id="text2987-2-1"
        transform="rotate(-90)"><tspan
          sodipodi:role="line"
          id="tspan2989-4-7"
-         x="-193.51254"
-         y="218.39975"
-         style="font-size:22.54603386px;line-height:1.25;font-family:sans-serif">Buffer</tspan></text>
+         x="-194.97868"
+         y="218.8665"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.54603386px;line-height:1.25;font-family:'Open Sans';-inkscape-font-specification:'Open Sans'">Buffer</tspan></text>
   </g>
 </svg>
