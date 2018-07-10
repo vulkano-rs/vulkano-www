@@ -16,7 +16,11 @@
    inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
    sodipodi:docname="guide-vertex-input-2.svg">
   <defs
-     id="defs3283" />
+     id="defs3283">
+    <style
+       type="text/css"
+       id="style273">@import 'svg-styles.css';</style>
+  </defs>
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"
@@ -24,9 +28,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.979899"
-     inkscape:cx="190.82962"
-     inkscape:cy="223.93727"
+     inkscape:zoom="5.5287093"
+     inkscape:cx="248.73423"
+     inkscape:cy="185.78177"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -38,7 +42,16 @@
      inkscape:window-height="2031"
      inkscape:window-x="0"
      inkscape:window-y="55"
-     inkscape:window-maximized="1" />
+     inkscape:window-maximized="1"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:snap-object-midpoints="false"
+     inkscape:snap-others="true"
+     inkscape:snap-nodes="true"
+     inkscape:snap-grids="false"
+     inkscape:snap-bbox="true"
+     inkscape:snap-bbox-midpoints="true"
+     inkscape:snap-to-guides="true" />
   <metadata
      id="metadata3286">
     <rdf:RDF>
@@ -65,29 +78,29 @@
        y="303.83914" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#b90000;fill-opacity:1;stroke:none"
-       x="228.94928"
-       y="361.89932"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Open Sans';-inkscape-font-specification:'Open Sans';letter-spacing:0px;word-spacing:0px;fill:#b90000;fill-opacity:1;stroke:none"
+       x="224.41011"
+       y="364.2048"
        id="text4075"><tspan
          sodipodi:role="line"
          id="tspan4077"
-         x="228.94928"
-         y="361.89932"
-         style="font-size:14px;line-height:1.25;font-family:sans-serif">(-0.5, -0.5)</tspan></text>
+         x="224.41011"
+         y="364.2048"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;line-height:1.25;font-family:'Open Sans';-inkscape-font-specification:'Open Sans'">(-0.5, -0.5)</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#b90000;fill-opacity:1;stroke:none"
-       x="320.04721"
-       y="569.33893"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Open Sans';-inkscape-font-specification:'Open Sans';letter-spacing:0px;word-spacing:0px;fill:#b90000;fill-opacity:1;stroke:none"
+       x="318.35849"
+       y="564.53076"
        id="text4075-1"><tspan
          sodipodi:role="line"
          id="tspan4077-7"
-         x="320.04721"
-         y="569.33893"
-         style="font-size:14px;line-height:1.25;font-family:sans-serif">(0, 0.5)</tspan></text>
+         x="318.35849"
+         y="564.53076"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;line-height:1.25;font-family:'Open Sans';-inkscape-font-specification:'Open Sans'">(0, 0.5)</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#b90000;fill-opacity:1;stroke:none"
+       style="font-style:normal;font-weight:normal;line-height:0%;font-family:'Open Sans';letter-spacing:0px;word-spacing:0px;fill:#b90000;fill-opacity:1;stroke:none;-inkscape-font-specification:'Open Sans';font-stretch:normal;font-variant:normal;"
        x="426.28653"
        y="428.35922"
        id="text4075-4"><tspan
@@ -95,7 +108,7 @@
          id="tspan4077-0"
          x="426.28653"
          y="428.35922"
-         style="font-size:14px;line-height:1.25;font-family:sans-serif">(0.5, -0.25)</tspan></text>
+         style="font-size:14px;line-height:1.25;font-family:'Open Sans';-inkscape-font-specification:'Open Sans';font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;">(0.5, -0.25)</tspan></text>
     <path
        style="fill:#b90000;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1"
        d="M 166,91.359767 249.57143,274.50262 344.71429,159.64548 z"

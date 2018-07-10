@@ -9,8 +9,8 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="693.64813"
-   height="154.31203"
+   width="708.47626"
+   height="164.63101"
    id="svg2"
    version="1.1"
    inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
@@ -22,16 +22,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="1"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.98994949"
-     inkscape:cx="241.12949"
-     inkscape:cy="138.82029"
+     inkscape:zoom="3.0910988"
+     inkscape:cx="363.0101"
+     inkscape:cy="86.252663"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     fit-margin-top="0.5"
-     fit-margin-left="0.5"
-     fit-margin-right="0.5"
-     fit-margin-bottom="0.5"
+     fit-margin-top="2"
+     fit-margin-left="2"
+     fit-margin-right="2"
+     fit-margin-bottom="2"
      inkscape:window-width="3840"
      inkscape:window-height="2031"
      inkscape:window-x="0"
@@ -39,6 +39,9 @@
      inkscape:window-maximized="1" />
   <defs
      id="defs4">
+    <style
+       type="text/css"
+       id="style36">@import 'svg-styles.css';</style>
     <marker
        style="overflow:visible"
        id="Arrow1Mend"
@@ -49,8 +52,8 @@
       <path
          inkscape:connector-curvature="0"
          transform="matrix(-0.4,0,0,-0.4,-4,0)"
-         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
-         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
          id="path4034" />
     </marker>
     <marker
@@ -63,8 +66,8 @@
       <path
          inkscape:connector-curvature="0"
          transform="matrix(-0.8,0,0,-0.8,-10,0)"
-         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
-         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
          id="path4028" />
     </marker>
     <marker
@@ -76,8 +79,8 @@
        inkscape:stockid="Arrow1Mend">
       <path
          transform="matrix(-0.4,0,0,-0.4,-4,0)"
-         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
-         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
          id="path4034-8"
          inkscape:connector-curvature="0" />
     </marker>
@@ -90,8 +93,8 @@
        inkscape:stockid="Arrow1Mend-8S">
       <path
          transform="matrix(-0.4,0,0,-0.4,-4,0)"
-         style="fill:#ffffff;fill-rule:evenodd;stroke:#ffffff;stroke-width:1pt"
-         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill:#ffffff;fill-rule:evenodd;stroke:#ffffff;stroke-width:1.00000003pt"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
          id="path3995"
          inkscape:connector-curvature="0" />
     </marker>
@@ -104,8 +107,8 @@
        inkscape:stockid="Arrow1Mend-8k">
       <path
          transform="matrix(-0.4,0,0,-0.4,-4,0)"
-         style="fill:#ffffff;fill-rule:evenodd;stroke:#ffffff;stroke-width:1pt"
-         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill:#ffffff;fill-rule:evenodd;stroke:#ffffff;stroke-width:1.00000003pt"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
          id="path3998"
          inkscape:connector-curvature="0" />
     </marker>
@@ -118,12 +121,12 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <g
-     transform="translate(-111.73553,-239.429)"
+     transform="translate(-110.54803,-229.87856)"
      id="layer1"
      inkscape:groupmode="layer"
      inkscape:label="Calque 1">
@@ -131,101 +134,101 @@
        id="text2985"
        y="370.50922"
        x="110.10663"
-       style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Open Sans';-inkscape-font-specification:'Open Sans';letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
        xml:space="preserve"><tspan
          y="370.50922"
          x="110.10663"
          id="tspan2987"
          sodipodi:role="line"
-         style="font-size:40px;line-height:1.25;font-family:sans-serif">GLSL</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:1.25;font-family:'Open Sans';-inkscape-font-specification:'Open Sans'">GLSL</tspan></text>
     <text
        id="text2985-4"
        y="370.50922"
        x="350.10663"
-       style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Open Sans';-inkscape-font-specification:'Open Sans';letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
        xml:space="preserve"><tspan
          y="370.50922"
          x="350.10663"
          id="tspan2987-0"
          sodipodi:role="line"
-         style="font-size:40px;line-height:1.25;font-family:sans-serif">SPIR-V</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:1.25;font-family:'Open Sans';-inkscape-font-specification:'Open Sans'">SPIR-V</tspan></text>
     <text
        id="text2985-4-9"
        y="370.50922"
        x="618.10663"
-       style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Open Sans';-inkscape-font-specification:'Open Sans';letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
        xml:space="preserve"><tspan
          y="370.50922"
          x="618.10663"
          id="tspan2987-0-4"
          sodipodi:role="line"
-         style="font-size:40px;line-height:1.25;font-family:sans-serif">???</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:1.25;font-family:'Open Sans';-inkscape-font-specification:'Open Sans'">???</tspan></text>
     <text
        id="text3063"
        y="388.71228"
        x="612.27429"
-       style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Open Sans';-inkscape-font-specification:'Open Sans';letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
        xml:space="preserve"><tspan
          id="tspan3067"
          y="388.71228"
          x="612.27429"
          sodipodi:role="line"
-         style="font-size:14px;line-height:1.25;font-family:sans-serif">(implementation-specific detail)</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;line-height:1.25;font-family:'Open Sans';-inkscape-font-specification:'Open Sans'">(implementation-specific detail)</tspan></text>
     <path
        inkscape:connector-curvature="0"
        id="path3071"
-       d="m 230.33509,355.35693 94.95433,0"
-       style="fill:none;stroke:#ffffff;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-mid:none;marker-end:url(#Arrow1Mend-8S)" />
+       d="m 230.33509,355.35693 h 94.95433"
+       style="fill:none;stroke:#ffffff;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-mid:none;marker-end:url(#Arrow1Mend-8S)" />
     <path
        inkscape:connector-curvature="0"
        id="path3071-2"
-       d="m 504.33509,355.35693 94.95433,0"
-       style="fill:none;stroke:#ffffff;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-mid:none;marker-end:url(#Arrow1Mend-8k)" />
+       d="m 504.33509,355.35693 h 94.95433"
+       style="fill:none;stroke:#ffffff;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-mid:none;marker-end:url(#Arrow1Mend-8k)" />
     <text
        transform="rotate(-63.039481)"
        id="text4675"
        y="384.91385"
        x="-192.2471"
-       style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Open Sans';-inkscape-font-specification:'Open Sans';letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
        xml:space="preserve"><tspan
          y="384.91385"
          x="-192.2471"
          id="tspan4677"
          sodipodi:role="line"
-         style="font-size:14px;line-height:1.25;font-family:sans-serif">During compilation</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;line-height:1.25;font-family:'Open Sans';-inkscape-font-specification:'Open Sans'">During compilation</tspan></text>
     <text
        transform="rotate(-63.039481)"
        id="text4675-4"
        y="634.0318"
        x="-64.72538"
-       style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Open Sans';-inkscape-font-specification:'Open Sans';letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
        xml:space="preserve"><tspan
          y="634.0318"
          x="-64.72538"
          id="tspan4677-5"
          sodipodi:role="line"
-         style="font-size:14px;line-height:1.25;font-family:sans-serif">At runtime</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;line-height:1.25;font-family:'Open Sans';-inkscape-font-specification:'Open Sans'">At runtime</tspan></text>
     <text
        id="text3063-5"
        y="390.29474"
        x="115.8045"
-       style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Open Sans';-inkscape-font-specification:'Open Sans';letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
        xml:space="preserve"><tspan
          id="tspan4721"
          y="390.29474"
          x="115.8045"
          sodipodi:role="line"
-         style="font-size:14px;line-height:1.25;font-family:sans-serif">(source code)</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;line-height:1.25;font-family:'Open Sans';-inkscape-font-specification:'Open Sans'">(source code)</tspan></text>
     <text
        id="text3063-5-7"
        y="388.315"
        x="306.21524"
-       style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Open Sans';-inkscape-font-specification:'Open Sans';letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
        xml:space="preserve"><tspan
          id="tspan4721-1"
          y="388.315"
          x="306.21524"
          sodipodi:role="line"
-         style="font-size:14px;line-height:1.25;font-family:sans-serif">(binary intermediate representation)</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;line-height:1.25;font-family:'Open Sans';-inkscape-font-specification:'Open Sans'">(binary intermediate representation)</tspan></text>
   </g>
 </svg>

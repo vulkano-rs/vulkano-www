@@ -32,14 +32,14 @@ the image we are drawing to. Being a vectorial renderer, Vulkan doesn't use coor
 pixels. Instead it considers that the image has a width and a height of 2 units, and that the
 origin is at the center of the image.
 
-<center>![](/guide-vertex-input-1.svg)</center>
+<center><object data="/guide-vertex-input-1.svg"></object></center>
 
 When we give positions to Vulkan, we need to use its coordinate system.
 
 In this guide we are going to draw only a single triangle for now. Let's pick a shape for it,
 for example this one:
 
-<center>![](/guide-vertex-input-2.svg)</center>
+<center><object data="/guide-vertex-input-2.svg"></object></center>
 
 Which translates into this code:
 

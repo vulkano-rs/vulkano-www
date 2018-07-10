@@ -13,10 +13,14 @@
    height="369.50262"
    id="svg3281"
    version="1.1"
-   inkscape:version="0.48.5 r10040"
-   sodipodi:docname="guide-vertex-input-2.svg">
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
+   sodipodi:docname="guide-fragment-shader-1.svg">
   <defs
-     id="defs3283" />
+     id="defs3283">
+    <style
+       type="text/css"
+       id="style2">@import 'svg-styles.css';</style>
+  </defs>
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"
@@ -24,9 +28,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.979899"
-     inkscape:cx="161.5352"
-     inkscape:cy="216.36113"
+     inkscape:zoom="5.6"
+     inkscape:cx="159.50979"
+     inkscape:cy="130.64684"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -34,10 +38,10 @@
      fit-margin-top="10"
      fit-margin-right="10"
      fit-margin-bottom="10"
-     inkscape:window-width="1680"
-     inkscape:window-height="987"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
+     inkscape:window-width="3840"
+     inkscape:window-height="2031"
+     inkscape:window-x="0"
+     inkscape:window-y="55"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata3286">
@@ -47,7 +51,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -176,12 +180,6 @@
        style="fill:#646464;fill-opacity:1;stroke:#646464;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 189.09685,539.71418 313.65238,0"
        id="path4792-7-3"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cc" />
-    <path
-       style="fill:#646464;fill-opacity:1;stroke:#646464;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 189.09685,552.96556 313.65238,0"
-       id="path4792-1-80"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />
     <path
@@ -838,5 +836,11 @@
        id="path5672"
        inkscape:connector-curvature="0"
        transform="translate(90.354446,277.19701)" />
+    <path
+       style="fill:#646464;fill-opacity:1;stroke:#646464;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 189.09685,552.96556 313.65238,0"
+       id="path4792-1-80"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc" />
   </g>
 </svg>

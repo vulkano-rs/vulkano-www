@@ -10,7 +10,7 @@ This is done in two steps:
 - At runtime we pass this *SPIR-V* to the Vulkan implementation, which in turn converts it into
   its own implementation-specific format.
 
-<center>![](/guide-compute-pipeline-1.svg)</center>
+<center><object data="/guide-compute-pipeline-1.svg"></object></center>
 
 > **Note**: In the very far future it may be possible to write programs in Rust, or in a
 > domain specific language that resembles Rust.
