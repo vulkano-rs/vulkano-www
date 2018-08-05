@@ -54,7 +54,7 @@ let command_buffer = AutoCommandBufferBuilder::new(device.clone(), queue.family(
 ```
 
 As you can see, it is very straight-forward. We create a *builder*, add a copy command to it with
-`copy_buffers`, then turn that builder into an actual command buffer with `build`. Like we saw in
+`copy_buffer`, then turn that builder into an actual command buffer with `build`. Like we saw in
 [the buffers creation section](/guide/buffer-creation), we call `clone()` multiple times but in
 reality we only clone `Arc`s.
 
