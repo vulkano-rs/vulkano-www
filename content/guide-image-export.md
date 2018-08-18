@@ -50,7 +50,7 @@ file. The Rust ecosystem has a crate named `image` that can do this.
 Let's add it to our Cargo.toml:
 
 ```toml
-image = "0.14"
+image = "0.19.0"
 ```
 
 And to our crate root:

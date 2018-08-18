@@ -121,7 +121,7 @@ macros are stabilized.
 To use `vulkano-shader-derive`, we first have to add a dependency:
 
 ```toml
-vulkano-shader-derive = "0.7"
+vulkano-shader-derive = "0.10.0"
 ```
 
 And add these lines to our crate root:

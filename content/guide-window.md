@@ -15,8 +15,8 @@ going to add a dependency to the `vulkano-win` crate which is a link between vul
 In your Cargo.toml:
 
 ```toml
-vulkano-win = "0.7"
-winit = "0.7"
+vulkano-win = "0.10.0"
+winit = "0.17.1"
 ```
 
 And at the crate root:
@@ -72,7 +72,7 @@ window's events. This is typically done after initialization, and right before t
 ```rust
 events_loop.run_forever(|event| {
     match event {
-        winit::Event::WindowEvent { event: winit::WindowEvent::Closed, .. } => {
+        winit::Event::WindowEvent { event: winit::WindowEvent::CloseRequested, .. } => {
             winit::ControlFlow::Break
         },
         _ => winit::ControlFlow::Continue,
