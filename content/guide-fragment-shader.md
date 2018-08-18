@@ -38,3 +38,5 @@ The `main()` function is executed once for each pixel covered by the triangle an
 section](/guide/image-clear) these values are normalized, in other words the value `1.0` will in
 reality write `255` in memory. In this example since our target image contains colors, we write the
 color red.
+
+Next: [Render passes and framebuffers](render-pass-framebuffer)

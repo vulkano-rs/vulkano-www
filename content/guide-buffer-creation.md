@@ -116,3 +116,5 @@ content[7] = 3;
 Just like the constructors, keep in mind that being able to read/write the content of the buffer
 like this is specific to the `CpuAccessibleBuffer`. Other kinds of buffers (for example the
 `ImmutableBuffer`) do not provide such methods.
+
+Next: [Example operation](/guide/example-operation)

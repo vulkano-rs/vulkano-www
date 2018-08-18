@@ -105,3 +105,5 @@ let src_content = source.read().unwrap();
 let dest_content = dest.read().unwrap();
 assert_eq!(&*src_content, &*dest_content);
 ```
+
+Next: [Introduction to compute operations](/guide/compute-intro)

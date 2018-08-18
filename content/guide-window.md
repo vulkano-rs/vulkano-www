@@ -35,13 +35,12 @@ use winit::EventsLoop;
 use winit::WindowBuilder;
 
 let mut events_loop = EventsLoop::new();
-let window = WindowBuilder::new().build_vk_surface(&events_loop, instance.clone()).unwrap();
+let surface = WindowBuilder::new().build_vk_surface(&events_loop, instance.clone()).unwrap();
 ```
 
 This code creates a window with the default parameters, and also builds a Vulkan *surface* object
 that represents the surface of that window whenever the Vulkan API is concerned.
-Calling `window.window()` will return an object that allows you to manipulate the window, and
-calling `window.surface()` will return a `Surface` object of `vulkano`.
+Calling `surface.window()` will return an object that allows you to manipulate the window.
 
 However, if you try to run this code you will notice that the `build_vk_surface` returns an error.
 The reason is that surfaces are actually not part of Vulkan itself, but of one of several
@@ -90,5 +89,5 @@ return `ControlFlow::Break`. This stops the `run_forever` function.
 ## Conclusion
 
 Right now, all we're doing is creating a window and keeping our program alive for as long as the
-window isn't closed. The next section will show how to initialize what is called a *swapchain* on
+window isn't closed. The [next section](/guide/swapchain-creation) will show how to initialize what is called a *swapchain* on
 the window's surface.
