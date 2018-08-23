@@ -59,3 +59,5 @@ necessarily the best device. In a real program you probably want to leave the ch
 Keep in mind that the list of physical devices can be empty. This happens if Vulkan is installed
 on the system, but none of the physical devices of the machine are capable of supporting Vulkan. In
 a real-world application you are encouraged to handle this situation properly as well.
+
+Next: [Initialization](/guide/device-creation)

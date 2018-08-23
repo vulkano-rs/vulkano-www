@@ -50,7 +50,7 @@ file. The Rust ecosystem has a crate named `image` that can do this.
 Let's add it to our Cargo.toml:
 
 ```toml
-image = "0.14"
+image = "0.19.0"
 ```
 
 And to our crate root:
@@ -86,3 +86,5 @@ And that's it! When running your program, a blue image named `image.png` should 
 This might look stupid, but think about the fact that it's the GPU that wrote the content of
 the image. In the next sections we will do more than just fill an image with blue, but we will
 continue to retreive the image's content and write it to a PNG file.
+
+Next: [Drawing a fractal with a compute shader](/guide/mandelbrot)

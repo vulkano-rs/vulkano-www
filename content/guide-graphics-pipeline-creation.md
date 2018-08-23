@@ -136,7 +136,7 @@ example](/guide/mandelbrot) and write the image to a PNG file.
 
     .build()
     .unwrap();
-    
+
 let finished = command_buffer.execute(queue.clone()).unwrap();
 finished.then_signal_fence_and_flush().unwrap()
     .wait(None).unwrap();
@@ -154,3 +154,5 @@ And here is what you should get:
 
 > **Note**: You can find the [full source code of this section
 > here](https://github.com/vulkano-rs/vulkano-www/blob/master/examples/guide-triangle.rs).
+
+Next: [Windowing](/guide/window)

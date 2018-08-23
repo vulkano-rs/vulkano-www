@@ -73,3 +73,5 @@ let queue = queues.next().unwrap();
 
 We now have our `device` and our `queue`, which means that we are ready to ask the GPU to perform
 operations.
+
+Next: [Creating a buffer](/guide/buffer-creation)

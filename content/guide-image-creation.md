@@ -77,3 +77,5 @@ access the image.
 
 > **Note**: Images also have usage flags similar to buffers, but this precise constructor doesn't
 > require them.
+
+Next: [Clearing an image](/guide/image-clear)

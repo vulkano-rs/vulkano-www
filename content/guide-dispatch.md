@@ -42,3 +42,5 @@ for (n, val) in content.iter().enumerate() {
 
 println!("Everything succeeded!");
 ```
+
+Next: [Creating an image](/guide/image-creation)

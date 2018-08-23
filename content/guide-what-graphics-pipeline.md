@@ -52,3 +52,5 @@ options that allows one to further configure the behavior of the graphics card.
 > have tons of configurable options, plus additional optional shader stages.
 
 The next sections will be dedicated to covering graphics pipeline in more details.
+
+Next: [Vertex input](/guide/vertex-input)
