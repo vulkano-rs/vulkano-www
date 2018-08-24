@@ -9,6 +9,9 @@ content?
 The answer to this question is that we have to create a buffer and ask the GPU to copy the content
 of the image to the buffer.
 
+> **Note**: You can find the [full source code of this section
+> here](https://github.com/vulkano-rs/vulkano-www/blob/master/examples/guide-image-clear.rs).
+
 ## Copying from the image to the buffer
 
 The first step is to create the buffer, as we have already covered in previous sections. The buffer
@@ -50,7 +53,7 @@ file. The Rust ecosystem has a crate named `image` that can do this.
 Let's add it to our Cargo.toml:
 
 ```toml
-image = "0.19.0"
+image = "0.19"
 ```
 
 And to our crate root:

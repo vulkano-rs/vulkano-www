@@ -6,6 +6,9 @@ to actually do something.
 What we are going to ask in this example is very simple: we will ask it to copy data from one
 buffer to another.
 
+> **Note**: You can find the [full source code of this section
+> here](https://github.com/vulkano-rs/vulkano-www/blob/master/examples/guide-example-operation.rs).
+
 ## Creating the buffers
 
 The first step is to create two `CpuAccessibleBuffer`s: the source and the destination. This
@@ -55,13 +58,13 @@ let command_buffer = AutoCommandBufferBuilder::new(device.clone(), queue.family(
 
 As you can see, it is very straight-forward. We create a *builder*, add a copy command to it with
 `copy_buffer`, then turn that builder into an actual command buffer with `build`. Like we saw in
-[the buffers creation section](/guide/buffer-creation), we call `clone()` multiple times but in
-reality we only clone `Arc`s.
+[the buffers creation section](/guide/buffer-creation), we call `clone()` multiple times but we
+ only clone `Arc`s.
 
 One thing to notice is that the `AutoCommandBufferBuilder::new()` method takes as
 parameter a queue family. This must be the queue family that the command buffer is going to run on.
 In this example we don't have much choice anyway (as we only use one queue and thus one queue
-family), but when you design a real program you have to be aware of this specificity.
+family), but when you design a real program you have to be aware of this requirement.
 
 ## Submission and synchronization
 
@@ -74,7 +77,7 @@ let finished = command_buffer.execute(queue.clone()).unwrap();
 
 The `execute` function returns an object that represents the execution of the command buffer.
 
-After submitting the command buffer, we might be tempted to try read the content of the
+After submitting the command buffer, we might be tempted to try to read the content of the
 `destination` buffer as demonstrated in [the previous section](/guide/buffer-creation). However
 calling `destination.read()` now would return an error, because the buffer is maybe currently being
 written by the GPU.

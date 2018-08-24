@@ -89,6 +89,7 @@ void main() {
 }
 		"
         ]
+        #[allow(dead_code)]
         struct Dummy;
     }
 

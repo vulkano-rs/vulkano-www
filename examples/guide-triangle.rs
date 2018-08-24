@@ -106,6 +106,7 @@ fn main() {
         gl_Position = vec4(position, 0.0, 1.0);
     }
     "]
+        #[allow(dead_code)]
         struct Dummy;
     }
 
@@ -121,6 +122,7 @@ fn main() {
         f_color = vec4(1.0, 0.0, 0.0, 1.0);
     }
     "]
+        #[allow(dead_code)]
         struct Dummy;
     }
 
@@ -149,7 +151,7 @@ fn main() {
         .begin_render_pass(framebuffer.clone(), false, vec![[0.0, 0.0, 1.0, 1.0].into()])
         .unwrap()
 
-        .draw(pipeline.clone(), dynamic_state, vertex_buffer.clone(), (), ())
+        .draw(pipeline.clone(), &dynamic_state, vertex_buffer.clone(), (), ())
         .unwrap()
 
         .end_render_pass()
@@ -167,5 +169,5 @@ fn main() {
 
     let buffer_content = buf.read().unwrap();
     let image = ImageBuffer::<Rgba<u8>, _>::from_raw(1024, 1024, &buffer_content[..]).unwrap();
-    image.save("triangle.png").unwrap();
+    image.save("image.png").unwrap();
 }
