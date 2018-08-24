@@ -20,6 +20,9 @@ by one, a GPU can perform it on multiple values at once.
 > **Note**: In [a previous section](/guide/device-creation) we talked about *queues*. These queues
 > are usually foremost *software* queues, and not actual hardware constructs.
 
+> **Note**: You can find the [full source code of this section
+> here](https://github.com/vulkano-rs/vulkano-www/blob/master/examples/guide-compute-operations.rs).
+
 ## Usability
 
 Vulkan (or any other API) doesn't let you directly control the threading aspect of the GPU.

@@ -11,7 +11,6 @@
 //!
 //! It is not commented, as the explanations can be found in the guide itself.
 
-#[macro_use]
 extern crate vulkano;
 #[macro_use]
 extern crate vulkano_shader_derive;
@@ -54,6 +53,7 @@ fn main() {
                                                     data_iter).expect("failed to create buffer");
 
     // Compute pipelines
+    #[allow(dead_code)]
     mod cs {
         #[derive(VulkanoShader)]
         #[ty = "compute"]

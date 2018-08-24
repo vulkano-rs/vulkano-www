@@ -15,8 +15,8 @@ going to add a dependency to the `vulkano-win` crate which is a link between vul
 In your Cargo.toml:
 
 ```toml
-vulkano-win = "0.10.0"
-winit = "0.17.1"
+vulkano-win = "0.10"
+winit = "0.17"
 ```
 
 And at the crate root:
@@ -26,7 +26,7 @@ extern crate vulkano_win;
 extern crate winit;
 ```
 
-I encourage you to browse a bit [the documentation of `winit`](https://docs.rs/winit/0.7).
+I encourage you to browse a bit [the documentation of `winit`](https://docs.rs/winit).
 Let's start by creating a window with it:
 
 ```rust
