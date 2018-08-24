@@ -155,7 +155,7 @@ fn main_template<S>(body: S) -> Response
         Entry::Occupied(e) => e.into_mut(),
         Entry::Vacant(e) => {
             let data = mustache::MapBuilder::new()
-                .insert_str("body", e.key())
+                .insert_str("body", e.key().as_ref())
                 .build();
 
             let mut out = Vec::new();
@@ -187,7 +187,7 @@ fn guide_template<S>(body: S) -> Response
         Entry::Occupied(e) => e.into_mut(),
         Entry::Vacant(e) => {
             let data = mustache::MapBuilder::new()
-                .insert_str("body", e.key())
+                .insert_str("body", e.key().as_ref())
                 .build();
 
             let mut out = Vec::new();
