@@ -5,10 +5,10 @@ authors = ["Pierre Krieger <pierre.krieger1708@gmail.com>"]
 publish = false
 
 [dependencies]
-lazy_static = "0.2"
-mustache = "0.8"
-pulldown-cmark = "0.0.15"
-rouille = "1.0"
+lazy_static = "1.1"
+mustache = "0.9"
+pulldown-cmark = "0.1"
+rouille = "2.1"
 
 [dev-dependencies]
 vulkano = "0.10.0"
