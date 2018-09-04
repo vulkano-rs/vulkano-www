@@ -14,7 +14,7 @@ of the tuple is a *future* that represents the moment when the image will be acq
 The `acquire_next_image` function will block until an image is available. This can happen depending
 on the present mode.
 
-*To be finished* - check the [Triangle example](https://github.com/vulkano-rs/vulkano-examples/blob/master/triangle/main.rs) for now.
+*To be finished* - check the [Triangle example](https://github.com/vulkano-rs/vulkano-examples/blob/master/src/bin/triangle.rs) for now.
 
 ## Clearing the image
 
