@@ -50,7 +50,7 @@ will later allow us to submit operations.
 ```rust
 use vulkano::device::Device;
 use vulkano::device::DeviceExtensions;
-use vulkano::instance::Features;
+use vulkano::device::Features;
 
 let (device, mut queues) = {
     Device::new(physical, &Features::none(), &DeviceExtensions::none(),

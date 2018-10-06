@@ -19,7 +19,7 @@ use vulkano::command_buffer::AutoCommandBufferBuilder;
 use vulkano::command_buffer::CommandBuffer;
 use vulkano::device::Device;
 use vulkano::device::DeviceExtensions;
-use vulkano::instance::Features;
+use vulkano::device::Features;
 use vulkano::instance::Instance;
 use vulkano::instance::InstanceExtensions;
 use vulkano::instance::PhysicalDevice;
