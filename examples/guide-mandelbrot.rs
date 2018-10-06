@@ -1,3 +1,4 @@
+#![feature(proc_macro_non_items)]
 // Copyright (c) 2017 The vulkano developers
 // Licensed under the Apache License, Version 2.0
 // <LICENSE-APACHE or
@@ -13,8 +14,7 @@
 
 extern crate image;
 extern crate vulkano;
-#[macro_use]
-extern crate vulkano_shader_derive;
+extern crate vulkano_shaders;
 
 use std::sync::Arc;
 use image::ImageBuffer;
@@ -35,6 +35,7 @@ use vulkano::instance::InstanceExtensions;
 use vulkano::instance::PhysicalDevice;
 use vulkano::pipeline::ComputePipeline;
 use vulkano::sync::GpuFuture;
+use vulkano_shaders::vulkano_shader;
 
 fn main() {
     let instance = Instance::new(None, &InstanceExtensions::none(), None)
@@ -56,10 +57,10 @@ fn main() {
     let image = StorageImage::new(device.clone(), Dimensions::Dim2d { width: 1024, height: 1024 },
                                   Format::R8G8B8A8Unorm, Some(queue.family())).unwrap();
 
-    mod cs {
-        #[derive(VulkanoShader)]
-        #[ty = "compute"]
-        #[src = "
+    vulkano_shader!{
+        mod_name: cs,
+        ty: "compute",
+        src: "
 #version 450
 
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
@@ -86,11 +87,7 @@ void main() {
 
     vec4 to_write = vec4(vec3(i), 1.0);
     imageStore(img, ivec2(gl_GlobalInvocationID.xy), to_write);
-}
-		"
-        ]
-        #[allow(dead_code)]
-        struct Dummy;
+}"
     }
 
     let shader = cs::Shader::load(device.clone())

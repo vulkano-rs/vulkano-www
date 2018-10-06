@@ -1,3 +1,4 @@
+#![feature(proc_macro_non_items)]
 // Copyright (c) 2017 The vulkano developers
 // Licensed under the Apache License, Version 2.0
 // <LICENSE-APACHE or
@@ -12,8 +13,7 @@
 //! It is not commented, as the explanations can be found in the guide itself.
 
 extern crate vulkano;
-#[macro_use]
-extern crate vulkano_shader_derive;
+extern crate vulkano_shaders;
 
 use std::sync::Arc;
 use vulkano::buffer::BufferUsage;
@@ -29,6 +29,7 @@ use vulkano::instance::InstanceExtensions;
 use vulkano::instance::PhysicalDevice;
 use vulkano::pipeline::ComputePipeline;
 use vulkano::sync::GpuFuture;
+use vulkano_shaders::vulkano_shader;
 
 fn main() {
     let instance = Instance::new(None, &InstanceExtensions::none(), None)
@@ -53,26 +54,23 @@ fn main() {
                                                     data_iter).expect("failed to create buffer");
 
     // Compute pipelines
-    #[allow(dead_code)]
-    mod cs {
-        #[derive(VulkanoShader)]
-        #[ty = "compute"]
-        #[src = "
-    #version 450
+    vulkano_shader!{
+        mod_name: cs,
+        ty: "compute",
+        src: "
+#version 450
 
-    layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
 
-    layout(set = 0, binding = 0) buffer Data {
-        uint data[];
-    } buf;
+layout(set = 0, binding = 0) buffer Data {
+    uint data[];
+} buf;
 
-    void main() {
-        uint idx = gl_GlobalInvocationID.x;
-        buf.data[idx] *= 12;
-    }"
-        ]
-        struct Dummy;
-    }
+void main() {
+    uint idx = gl_GlobalInvocationID.x;
+    buf.data[idx] *= 12;
+}"
+        }
 
     let shader = cs::Shader::load(device.clone())
         .expect("failed to create shader module");

@@ -114,30 +114,28 @@ with 12.
 ## Embedding the GLSL code in the Rust code
 
 Now that we've written the shader in GLSL, we're going to be compiling the shaders *at 
-application compile-time*. We'll accomplish this using `vulkano-shader-derive`, which is a 
-less-than-ideal way of compiling shaders at compile time, but it'll have to do until procedural 
-macros are stabilized.
+application compile-time*. We'll accomplish this using `vulkano-shaders`, which is a procedural macro that manages the compile-time compilation of GLSL into SPIR-V and generation of assosciated rust code.
 
-To use `vulkano-shader-derive`, we first have to add a dependency:
+To use `vulkano-shaders`, we first have to add a dependency:
 
 ```toml
-vulkano-shader-derive = "0.10.0"
+vulkano-shaders = "0.10.0"
 ```
 
 And add these lines to our crate root:
 
 ```rust
-#[macro_use]
-extern crate vulkano_shader_derive;
+extern crate vulkano_shaders;
+use vulkano_shaders::vulkano_shader;
 ```
 
 Here is the syntax:
 
 ```rust
-mod cs {
-    #[derive(VulkanoShader)]
-    #[ty = "compute"]
-    #[src = "
+vulkano_shader!{
+    mod_name: cs,
+    ty: "compute",
+    src: "
 #version 450
 
 layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
@@ -150,15 +148,12 @@ void main() {
     uint idx = gl_GlobalInvocationID.x;
     buf.data[idx] *= 12;
 }"
-    ]
-    struct Dummy;
 }
 ```
 
-As you can see, we create a dummy struct with some attributes that the `vulkano_shader_derive`
-crate will pick up. The crate will then compile the GLSL code (outputting compilation errors if
-any) and generate several structs, including one named `Shader` that provides a method named
-`load`. This is the method that we have to use next:
+As you can see, we specify some "fields" in the `vulkano_shader!` macro to specify our shader.
+The macro will then compile the GLSL code (outputting compilation errors if any) and generate several structs and methods, including one named `Shader` that provides a method named `load`.
+This is the method that we have to use next:
 
 ```rust
 let shader = cs::Shader::load(device.clone())

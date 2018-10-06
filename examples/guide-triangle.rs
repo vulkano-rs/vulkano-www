@@ -1,3 +1,4 @@
+#![feature(proc_macro_non_items)]
 // Copyright (c) 2017 The vulkano developers
 // Licensed under the Apache License, Version 2.0
 // <LICENSE-APACHE or
@@ -14,8 +15,7 @@
 extern crate image;
 #[macro_use]
 extern crate vulkano;
-#[macro_use]
-extern crate vulkano_shader_derive;
+extern crate vulkano_shaders;
 
 use std::sync::Arc;
 use image::ImageBuffer;
@@ -39,6 +39,7 @@ use vulkano::instance::PhysicalDevice;
 use vulkano::pipeline::GraphicsPipeline;
 use vulkano::pipeline::viewport::Viewport;
 use vulkano::sync::GpuFuture;
+use vulkano_shaders::vulkano_shader;
 
 fn main() {
     let instance = Instance::new(None, &InstanceExtensions::none(), None)
@@ -94,36 +95,30 @@ fn main() {
         .add(image.clone()).unwrap()
         .build().unwrap());
 
-    mod vs {
-        #[derive(VulkanoShader)]
-        #[ty = "vertex"]
-        #[src = "
-    #version 450
+    vulkano_shader!{
+        mod_name: vs,
+        ty: "vertex",
+        src: "
+#version 450
 
-    layout(location = 0) in vec2 position;
+layout(location = 0) in vec2 position;
 
-    void main() {
-        gl_Position = vec4(position, 0.0, 1.0);
-    }
-    "]
-        #[allow(dead_code)]
-        struct Dummy;
-    }
+void main() {
+    gl_Position = vec4(position, 0.0, 1.0);
+}"
+        }
 
-    mod fs {
-        #[derive(VulkanoShader)]
-        #[ty = "fragment"]
-        #[src = "
-    #version 450
+    vulkano_shader!{
+        mod_name: fs,
+        ty: "fragment",
+        src: "
+#version 450
 
-    layout(location = 0) out vec4 f_color;
+layout(location = 0) out vec4 f_color;
 
-    void main() {
-        f_color = vec4(1.0, 0.0, 0.0, 1.0);
-    }
-    "]
-        #[allow(dead_code)]
-        struct Dummy;
+void main() {
+    f_color = vec4(1.0, 0.0, 0.0, 1.0);
+}"
     }
 
     let vs = vs::Shader::load(device.clone()).expect("failed to create shader module");
