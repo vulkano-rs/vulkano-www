@@ -57,7 +57,7 @@ let (device, mut queues) = {
     };
 
     Device::new(physical, physical.supported_features(), &device_ext,
-                [(queue, 0.5)].iter().cloned()).expect("failed to create device")
+                [(queue_family, 0.5)].iter().cloned()).expect("failed to create device")
 };
 ```
 
