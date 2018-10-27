@@ -5,8 +5,8 @@ a compute shader to write a [Mandelbrot set](https://en.wikipedia.org/wiki/Mande
 image.
 
 Just like in [the introduction to compute pipelines](/guide/compute-pipeline), we need to write
-some GLSL code and create a compute pipeline. This is done with the `#[derive(VulkanoShader)]`
-hack, as explained in that section. Each invocation of the `main` function of the shader will write
+some GLSL code and create a compute pipeline. This is done with the `vulkano_shader::shader!` macro,
+as explained in that section. Each invocation of the `main` function of the shader will write
 one pixel.
 
 > **Note**: You can find the [full source code of this section
