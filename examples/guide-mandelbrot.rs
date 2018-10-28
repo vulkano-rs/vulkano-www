@@ -55,38 +55,10 @@ fn main() {
     let image = StorageImage::new(device.clone(), Dimensions::Dim2d { width: 1024, height: 1024 },
                                   Format::R8G8B8A8Unorm, Some(queue.family())).unwrap();
 
-    let shader = cs::Shader::load(device.clone())
-        .expect("failed to create shader module");
-    let compute_pipeline = Arc::new(ComputePipeline::new(device.clone(), &shader.main_entry_point(), &())
-        .expect("failed to create compute pipeline"));
-
-    let set = Arc::new(PersistentDescriptorSet::start(compute_pipeline.clone(), 0)
-        .add_image(image.clone()).unwrap()
-        .build().unwrap()
-    );
-
-    let buf = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(),
-                                             (0 .. 1024 * 1024 * 4).map(|_| 0u8))
-                                             .expect("failed to create buffer");
-
-    let command_buffer = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap()
-        .dispatch([1024 / 8, 1024 / 8, 1], compute_pipeline.clone(), set.clone(), ()).unwrap()
-        .copy_image_to_buffer(image.clone(), buf.clone()).unwrap()
-        .build().unwrap();
-
-    let finished = command_buffer.execute(queue.clone()).unwrap();
-    finished.then_signal_fence_and_flush().unwrap()
-        .wait(None).unwrap();
-
-    let buffer_content = buf.read().unwrap();
-    let image = ImageBuffer::<Rgba<u8>, _>::from_raw(1024, 1024, &buffer_content[..]).unwrap();
-    image.save("image.png").unwrap();
-}
-
-mod cs {
-    vulkano_shaders::shader!{
-        ty: "compute",
-        src: "
+    mod cs {
+        vulkano_shaders::shader!{
+            ty: "compute",
+            src: "
 #version 450
 
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
@@ -114,5 +86,33 @@ void main() {
     vec4 to_write = vec4(vec3(i), 1.0);
     imageStore(img, ivec2(gl_GlobalInvocationID.xy), to_write);
 }"
+        }
     }
+
+    let shader = cs::Shader::load(device.clone()).expect("failed to create shader module");
+
+    let compute_pipeline = Arc::new(ComputePipeline::new(device.clone(), &shader.main_entry_point(), &())
+        .expect("failed to create compute pipeline"));
+
+    let set = Arc::new(PersistentDescriptorSet::start(compute_pipeline.clone(), 0)
+        .add_image(image.clone()).unwrap()
+        .build().unwrap()
+    );
+
+    let buf = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(),
+                                             (0 .. 1024 * 1024 * 4).map(|_| 0u8))
+                                             .expect("failed to create buffer");
+
+    let command_buffer = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap()
+        .dispatch([1024 / 8, 1024 / 8, 1], compute_pipeline.clone(), set.clone(), ()).unwrap()
+        .copy_image_to_buffer(image.clone(), buf.clone()).unwrap()
+        .build().unwrap();
+
+    let finished = command_buffer.execute(queue.clone()).unwrap();
+    finished.then_signal_fence_and_flush().unwrap()
+        .wait(None).unwrap();
+
+    let buffer_content = buf.read().unwrap();
+    let image = ImageBuffer::<Rgba<u8>, _>::from_raw(1024, 1024, &buffer_content[..]).unwrap();
+    image.save("image.png").unwrap();
 }
