@@ -1038,8 +1038,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "vk-sys"
-version = "0.3.3"
-source = "git+https://github.com/vulkano-rs/vulkano#c7ce269aee03371da37b7caec677f02b5b79e382"
+version = "0.3.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "void"
@@ -1048,8 +1048,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "vulkano"
-version = "0.10.0"
-source = "git+https://github.com/vulkano-rs/vulkano#c7ce269aee03371da37b7caec677f02b5b79e382"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "crossbeam 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "fnv 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1057,13 +1057,13 @@ dependencies = [
  "lazy_static 1.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "shared_library 0.1.9 (registry+https://github.com/rust-lang/crates.io-index)",
  "smallvec 0.6.5 (registry+https://github.com/rust-lang/crates.io-index)",
- "vk-sys 0.3.3 (git+https://github.com/vulkano-rs/vulkano)",
+ "vk-sys 0.3.4 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "vulkano-shaders"
-version = "0.10.0"
-source = "git+https://github.com/vulkano-rs/vulkano#c7ce269aee03371da37b7caec677f02b5b79e382"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "proc-macro2 0.4.20 (registry+https://github.com/rust-lang/crates.io-index)",
  "quote 0.6.9 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1082,8 +1082,8 @@ dependencies = [
  "pulldown-cmark 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "rouille 2.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "time 0.1.40 (registry+https://github.com/rust-lang/crates.io-index)",
- "vulkano 0.10.0 (git+https://github.com/vulkano-rs/vulkano)",
- "vulkano-shaders 0.10.0 (git+https://github.com/vulkano-rs/vulkano)",
+ "vulkano 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "vulkano-shaders 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -1235,10 +1235,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum unreachable 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)" = "382810877fe448991dfc7f0dd6e3ae5d58088fd0ea5e35189655f84e6814fa56"
 "checksum url 1.7.2 (registry+https://github.com/rust-lang/crates.io-index)" = "dd4e7c0d531266369519a4aa4f399d748bd37043b00bde1e4ff1f60a120b355a"
 "checksum version_check 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)" = "914b1a6776c4c929a602fafd8bc742e06365d4bcbe48c30f9cca5824f70dc9dd"
-"checksum vk-sys 0.3.3 (git+https://github.com/vulkano-rs/vulkano)" = "<none>"
+"checksum vk-sys 0.3.4 (registry+https://github.com/rust-lang/crates.io-index)" = "51d964d3437c53da484a46d63e16e3bf4a703219052ce27f2adf807d216c4177"
 "checksum void 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)" = "6a02e4885ed3bc0f2de90ea6dd45ebcbb66dacffe03547fadbb0eeae2770887d"
-"checksum vulkano 0.10.0 (git+https://github.com/vulkano-rs/vulkano)" = "<none>"
-"checksum vulkano-shaders 0.10.0 (git+https://github.com/vulkano-rs/vulkano)" = "<none>"
+"checksum vulkano 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)" = "1ed7ff63568975b422c432a5420283e9b66e87769fbdc41f7fbe9e1fff939bb9"
+"checksum vulkano-shaders 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)" = "93ea332c7ec31962f5611b35314d3599b0286a8330eedabbc41675c3247ff325"
 "checksum winapi 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)" = "92c1eb33641e276cfa214a0522acad57be5c56b10cb348b3c5117db75f3ac4b0"
 "checksum winapi-i686-pc-windows-gnu 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "ac3b87c63620426dd9b991e5ce0329eff545bccbbb34f3be09ff6fb6ab51b7b6"
 "checksum winapi-x86_64-pc-windows-gnu 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"

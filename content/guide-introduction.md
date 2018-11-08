@@ -34,7 +34,7 @@ monitor for you to physically see.
 As with all Rust libraries, add this entry in your Cargo.toml:
 
 ```toml
-vulkano = "0.10"
+vulkano = "0.11"
 ```
 
 And add this to your crate root:
