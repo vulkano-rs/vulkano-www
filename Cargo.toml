@@ -12,9 +12,7 @@ rouille = "2.1"
 
 [dev-dependencies]
 vulkano = { git = "https://github.com/vulkano-rs/vulkano" }
-vulkano-win = { git = "https://github.com/vulkano-rs/vulkano" }
 vulkano-shaders = { git = "https://github.com/vulkano-rs/vulkano" }
 cgmath = "0.16"
 image = "0.19"
-winit = "0.17"
 time = "0.1.37"
