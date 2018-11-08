@@ -16,7 +16,7 @@ In your Cargo.toml:
 
 ```toml
 vulkano-win = "0.10"
-winit = "0.17"
+winit = "0.18"
 ```
 
 And at the crate root:
