@@ -31,6 +31,8 @@ monitor for you to physically see.
 
 ## Setup
 
+You will first need to setup some external dependencies as documented in the [Vulkano readme](https://github.com/vulkano-rs/vulkano/blob/master/README.md#setup).
+
 As with all Rust libraries, add this entry in your Cargo.toml:
 
 ```toml
