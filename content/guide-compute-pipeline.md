@@ -119,7 +119,7 @@ application compile-time*. We'll accomplish this using `vulkano-shaders`, which 
 To use `vulkano-shaders`, we first have to add a dependency:
 
 ```toml
-vulkano-shaders = "0.10.0"
+vulkano-shaders = "0.11"
 ```
 
 And add these lines to our crate root:
