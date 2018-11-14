@@ -7,7 +7,7 @@ body {
     background-color: #222;
     color: white;
     font-family: 'Muli', Verdana, Geneva, Tahoma, sans-serif;
-    font-size: 1.1em;
+    font-size: 1.1rem;
     margin: 0;
     padding: 0;
 }
@@ -42,16 +42,16 @@ header {
 }
 
 header h1 {
-    font-size: 3em;
+    font-size: 3rem;
     margin: 0;
-    padding: 1em 0 0.4em;
+    padding: 1rem 0 0.4rem;
     text-align: center;
 }
 
 header h2 {
-    font-size: 1.4em;
+    font-size: 1.4rem;
     margin: 0;
-    margin-bottom: 1em;
+    margin-bottom: 1rem;
     padding: 0;
     text-align: center;
 }
@@ -59,7 +59,7 @@ header h2 {
 header ul {
     display: block;
     margin: 0;
-    padding: 0.9em 0;
+    padding: 0.9rem 0;
     text-align: center;
 }
 
@@ -91,7 +91,7 @@ header ul li a:hover {
  * Home page
  */
 #home {
-    padding: 2em 0;
+    padding: 2rem 0;
 }
 
 #home #infos {
@@ -101,7 +101,7 @@ header ul li a:hover {
     flex-wrap: wrap;
     text-align: center;
     margin: 0 auto;
-    padding: 3em 0 5em;
+    padding: 3rem 0 5rem;
 }
 
 @media (min-width: 1200px) {
@@ -113,8 +113,8 @@ header ul li a:hover {
 #home #infos > li {
     display: block;
     flex-grow: 1;
-    flex-basis: 10em;
-    padding: 2em 2em;
+    flex-basis: 10rem;
+    padding: 2rem 2rem;
 }
 
 #home #infos > li + li {
@@ -130,8 +130,8 @@ header ul li a:hover {
     border: 10px solid rgba(0, 0, 0, 0.5);
     border-radius: 20px;
     display: inline-block;
-    margin: 0 1em 1em;
-    padding: 1em 2em;
+    margin: 0 1rem 1rem;
+    padding: 1rem 2rem;
     text-decoration: none;
 }
 
@@ -161,8 +161,8 @@ header ul li a:hover {
 
 #guides > nav {
     background-color: #444;
-    font-size: 0.95em;
-    padding: 1em 5em 1em 3em;
+    font-size: 0.95rem;
+    padding: 1rem 5rem 1rem 3rem;
     flex-basis: 10vw;
     flex-grow: 0.05;
 }
@@ -177,26 +177,26 @@ header ul li a:hover {
 }
 
 #guides > nav h2:first-child {
-    margin-top: 0.5em;
+    margin-top: 0.5rem;
 }
 
 #guides > nav ul {
     list-style-type: none;
-    margin: 1.7em 0 0;
+    margin: 1.7rem 0 0;
     padding: 0;
 }
 
 #guides > nav ul li {
     border-left: 2px solid rgba(255, 255, 255, 0.1);
     margin: 0;
-    padding: 0.1em 0;
-    padding-left: 1.7em;
-    text-indent: -1.0em;
+    padding: 0.1rem 0;
+    padding-left: 1.7rem;
+    text-indent: -1.0rem;
 }
 
 #guides > div {
     flex: 1;
     font-family: sans-serif;
-    font-size: 0.9em;
-    padding: 1em 2em;
+    font-size: 0.9rem;
+    padding: 1rem 2rem;
 }
