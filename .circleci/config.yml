@@ -1,7 +1,6 @@
 version: 2
 
 jobs:
-
   test:
     working_directory: ~/tgst
     docker:
@@ -19,4 +18,7 @@ workflows:
   version: 2
   test-and-deploy:
     jobs:
-      - test
+      - test:
+          filters:
+            branches:
+              only: production
