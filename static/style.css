@@ -194,6 +194,11 @@ header ul li a:hover {
     text-indent: -1.0rem;
 }
 
+#guides > nav ul li.current-page a {
+    color: #a6e22e;
+    font-weight: bold;
+}
+
 #guides > div {
     flex: 1;
     font-family: sans-serif;
