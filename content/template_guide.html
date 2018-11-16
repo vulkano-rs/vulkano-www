@@ -85,3 +85,9 @@
 
     <div>{{{body}}}</div>
 </div>
+
+<script type="text/javascript">
+  current_page = document.location.href.split(document.location.host)[1]
+  current_link = document.querySelectorAll('nav > ul > li > a[href="'+current_page+'"]')[0].parentNode
+  current_link.classList.toggle('current-page')
+</script>
