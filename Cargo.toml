@@ -13,6 +13,4 @@ rouille = "2.1"
 [dev-dependencies]
 vulkano = "0.11"
 vulkano-shaders = "0.11"
-cgmath = "0.16"
-image = "0.19"
-time = "0.1.37"
+image = "0.21"
