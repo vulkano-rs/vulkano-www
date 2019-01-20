@@ -27,7 +27,7 @@ multiple attachments, and with various micro-optimizations. Vulkano's API is sui
 simple cases and the complex usages, which is why it may look complex at first.
 
 ```rust
-let render_pass = Arc::new(single_pass_renderpass!(device.clone(),
+let render_pass = Arc::new(vulkano::single_pass_renderpass!(device.clone(),
     attachments: {
         color: {
             load: Clear,

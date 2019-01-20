@@ -24,7 +24,7 @@ struct Vertex {
     position: [f32; 2],
 }
 
-impl_vertex!(Vertex, position);
+vulkano::impl_vertex!(Vertex, position);
 ```
 
 Our struct contains a `position` field which we will use to store the position of the vertex on

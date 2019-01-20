@@ -39,13 +39,6 @@ As with all Rust libraries, add this entry in your Cargo.toml:
 vulkano = "0.11"
 ```
 
-And add this to your crate root:
-
-```rust
-#[macro_use]
-extern crate vulkano;
-```
-
 Note: If you run into any issues with this guide, please [open an issue](https://github.com/vulkano-rs/vulkano-www/issues).
 If you have issues with vulkano itself, please also [open an issue](https://github.com/vulkano-rs/vulkano/issues).
 

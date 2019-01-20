@@ -18,7 +18,14 @@ workflows:
   version: 2
   test-and-deploy:
     jobs:
+      # We need this build job because it magically makes filtering work o.0 https://discuss.circleci.com/t/filters-branches-not-working-properly-with-workflows/23796/5
+      - build:
+          filters:
+            branches:
+              only: production
       - test:
+          requires:
+            - build
           filters:
             branches:
               only: production

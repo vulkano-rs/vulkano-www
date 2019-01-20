@@ -11,9 +11,6 @@
 //!
 //! It is not commented, as the explanations can be found in the guide itself.
 
-extern crate image;
-extern crate vulkano;
-
 use image::ImageBuffer;
 use image::Rgba;
 use vulkano::buffer::BufferUsage;

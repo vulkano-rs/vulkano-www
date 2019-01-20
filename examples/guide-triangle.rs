@@ -11,11 +11,6 @@
 //!
 //! It is not commented, as the explanations can be found in the guide itself.
 
-extern crate image;
-#[macro_use]
-extern crate vulkano;
-extern crate vulkano_shaders;
-
 use std::sync::Arc;
 use image::ImageBuffer;
 use image::Rgba;
@@ -67,14 +62,15 @@ fn main() {
     struct Vertex {
         position: [f32; 2],
     }
-    impl_vertex!(Vertex, position);
+    vulkano::impl_vertex!(Vertex, position);
+
     let vertex1 = Vertex { position: [-0.5, -0.5] };
     let vertex2 = Vertex { position: [ 0.0,  0.5] };
     let vertex3 = Vertex { position: [ 0.5, -0.25] };
     let vertex_buffer = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(),
                                                     vec![vertex1, vertex2, vertex3].into_iter()).unwrap();
                                                     
-    let render_pass = Arc::new(single_pass_renderpass!(device.clone(),
+    let render_pass = Arc::new(vulkano::single_pass_renderpass!(device.clone(),
         attachments: {
             color: {
                 load: Clear,
