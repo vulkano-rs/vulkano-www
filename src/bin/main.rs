@@ -7,8 +7,6 @@
 // notice may not be copied, modified, or distributed except
 // according to those terms.
 
-extern crate vulkano_www;
-
 use std::env;
 
 fn main() {

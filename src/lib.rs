@@ -7,12 +7,7 @@
 // notice may not be copied, modified, or distributed except
 // according to those terms.
 
-#[macro_use]
-extern crate lazy_static;
-extern crate mustache;
-extern crate pulldown_cmark;
-#[macro_use]
-extern crate rouille;
+#[macro_use] extern crate rouille;
 
 use rouille::Request;
 use rouille::Response;
@@ -140,7 +135,7 @@ fn routes(request: &Request) -> Response {
 fn main_template<S>(body: S) -> Response
     where S: Into<String>
 {
-    lazy_static! {
+    lazy_static::lazy_static! {
         static ref MAIN_TEMPLATE: mustache::Template = {
             mustache::compile_str(&include_str!("../content/template_main.html")).unwrap()
         };
@@ -172,7 +167,7 @@ fn main_template<S>(body: S) -> Response
 fn guide_template<S>(body: S) -> Response
     where S: Into<String>
 {
-    lazy_static! {
+    lazy_static::lazy_static! {
         static ref GUIDE_TEMPLATE: mustache::Template = {
             mustache::compile_str(&include_str!("../content/template_guide.html")).unwrap()
         };
@@ -203,7 +198,7 @@ fn guide_template<S>(body: S) -> Response
 fn guide_template_markdown<S>(body: S) -> Response
     where S: Into<String>
 {
-    lazy_static! {
+    lazy_static::lazy_static! {
         static ref CACHE: Mutex<HashMap<String, String>> = Mutex::new(HashMap::new());
     }
 

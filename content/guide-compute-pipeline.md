@@ -122,12 +122,6 @@ To use `vulkano-shaders`, we first have to add a dependency:
 vulkano-shaders = "0.11"
 ```
 
-And add these lines to our crate root:
-
-```rust
-extern crate vulkano_shaders;
-```
-
 Here is the syntax:
 
 ```rust

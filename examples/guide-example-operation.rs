@@ -11,8 +11,6 @@
 //!
 //! It is not commented, as the explanations can be found in the guide itself.
 
-extern crate vulkano;
-
 use vulkano::buffer::BufferUsage;
 use vulkano::buffer::CpuAccessibleBuffer;
 use vulkano::command_buffer::AutoCommandBufferBuilder;

@@ -56,12 +56,6 @@ Let's add it to our Cargo.toml:
 image = "0.21"
 ```
 
-And to our crate root:
-
-```rust
-extern crate image;
-```
-
 In this library the main type that represents an image is the `ImageBuffer`. It can be created
 from a slice:
 

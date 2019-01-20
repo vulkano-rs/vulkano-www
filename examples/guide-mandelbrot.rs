@@ -11,10 +11,6 @@
 //!
 //! It is not commented, as the explanations can be found in the guide itself.
 
-extern crate image;
-extern crate vulkano;
-extern crate vulkano_shaders;
-
 use std::sync::Arc;
 use image::ImageBuffer;
 use image::Rgba;

@@ -19,14 +19,7 @@ vulkano-win = "0.11"
 winit = "0.18"
 ```
 
-And at the crate root:
-
-```rust
-extern crate vulkano_win;
-extern crate winit;
-```
-
-I encourage you to browse a bit [the documentation of `winit`](https://docs.rs/winit).
+I encourage you to browse [the documentation of `winit`](https://docs.rs/winit).
 Let's start by creating a window with it:
 
 ```rust
@@ -43,7 +36,7 @@ that represents the surface of that window whenever the Vulkan API is concerned.
 Calling `surface.window()` will return an object that allows you to manipulate the window.
 
 However, if you try to run this code you will notice that the `build_vk_surface` returns an error.
-The reason is that surfaces are actually not part of Vulkan itself, but of one of several
+The reason is that surfaces are actually not part of Vulkan itself, but one of several
 *extension*s to the Vulkan API. These extensions are disabled by default and need to be manually
 enabled when creating the instance before one can use their capabilities.
 
