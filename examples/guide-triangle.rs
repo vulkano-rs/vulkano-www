@@ -58,7 +58,7 @@ fn main() {
                                              (0 .. 1024 * 1024 * 4).map(|_| 0u8))
                                              .expect("failed to create buffer");
 
-    #[derive(Copy, Clone)]
+    #[derive(Default, Copy, Clone)]
     struct Vertex {
         position: [f32; 2],
     }
