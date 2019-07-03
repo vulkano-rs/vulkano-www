@@ -19,7 +19,7 @@ done, the shape of our triangle is going to be a buffer whose content is an arra
 `Vertex` objects.
 
 ```rust
-#[derive(Copy, Clone)]
+#[derive(Default, Copy, Clone)]
 struct Vertex {
     position: [f32; 2],
 }
