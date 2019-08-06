@@ -13,6 +13,7 @@ what we are going to do by asking the GPU to fill our image with a specific colo
 *clearing* an image.
 
 ```rust
+use vulkano::command_buffer::AutoCommandBufferBuilder;
 use vulkano::format::ClearValue;
 
 let command_buffer = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap()
