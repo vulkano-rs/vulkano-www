@@ -12,7 +12,7 @@ jobs:
             apt-get update
             apt-get install -yq sudo curl wget git file g++ cmake pkg-config bison flex unzip lib32stdc++6 lib32z1
       - checkout
-      - run: cargo test
+      - run: cargo test --locked
 
 workflows:
   version: 2
