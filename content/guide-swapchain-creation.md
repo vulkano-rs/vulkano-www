@@ -39,11 +39,11 @@ let format = caps.supported_formats[0].0;
 We can now create the swapchain:
 
 ```rust
-use vulkano::swapchain::{Swapchain, SurfaceTransform, PresentMode};
+use vulkano::swapchain::{Swapchain, SurfaceTransform, PresentMode, ColorSpace};
 
 let (swapchain, images) = Swapchain::new(device.clone(), surface.clone(),
     caps.min_image_count, format, dimensions, 1, caps.supported_usage_flags, &queue,
-    SurfaceTransform::Identity, alpha, PresentMode::Fifo, true, None)
+    SurfaceTransform::Identity, alpha, PresentMode::Fifo, true, ColorSpace::SrgbNonLinear)
     .expect("failed to create swapchain");
 ```
 
