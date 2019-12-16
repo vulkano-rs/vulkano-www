@@ -37,7 +37,8 @@ fn main() {
         .expect("couldn't find a compute queue family");
 
     let (device, mut queues) = {
-        Device::new(physical, &Features::none(), &DeviceExtensions::none(),
+        Device::new(physical, &Features::none(), 
+            &DeviceExtensions{khr_storage_buffer_storage_class:true, ..DeviceExtensions::none()},
                     [(queue_family, 0.5)].iter().cloned()).expect("failed to create device")
     };
 
