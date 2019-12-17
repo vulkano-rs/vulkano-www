@@ -11,6 +11,8 @@ of the image to the buffer.
 
 > **Note**: You can find the [full source code of this section
 > here](https://github.com/vulkano-rs/vulkano-www/blob/master/examples/guide-image-clear.rs).
+>
+> **Note**: This time the device need a device extension for the use of storage buffers, see the line 41 of the full source code.
 
 ## Copying from the image to the buffer
 
