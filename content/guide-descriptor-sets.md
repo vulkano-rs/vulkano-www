@@ -33,16 +33,17 @@ all represent a descriptor set. Here we are going to use a `PersistentDescriptor
 ```rust
 use vulkano::descriptor::descriptor_set::PersistentDescriptorSet;
 
-let set = Arc::new(PersistentDescriptorSet::start(compute_pipeline.clone(), 0)
+let layout = pipeline.layout().descriptor_set_layout(0).unwrap();
+let set = Arc::new(PersistentDescriptorSet::start(layout.clone())
     .add_buffer(data_buffer.clone()).unwrap()
     .build().unwrap()
 );
 ```
 
-The first parameter of the `start` function is the pipeline for which we create this set, and the
-second parameter is the index of the set in the pipeline. Since `compute_pipeline` is an `Arc`, cloning it
-just clones the `Arc` and is not an expensive operation. For once it is not the *device* that we
-pass as first parameter, because the device is determined from `compute_pipeline`.
+In order to create a descriptor set, you'll need to know the layout that it is targeting. We do this by
+calling `layout()` on our pipeline to obtain the pipeline's layout. Next we'll fetch the layout
+specfic to the pass that we want to target by using `descriptor_set_layout(0)` where zero indicates the
+index of the pass that we are targeting.
 
 Once you have created a descriptor set, you may also use it with other pipelines, as long as the
 bindings' types match those the pipelines' shaders expect. But Vulkan requires that you provide a

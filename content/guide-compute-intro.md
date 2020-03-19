@@ -59,7 +59,7 @@ similar to what we already did twice:
 
 ```rust
 let data_iter = 0 .. 65536;
-let data_buffer = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(),
+let data_buffer = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false,
                                                  data_iter).expect("failed to create buffer");
 ```
 

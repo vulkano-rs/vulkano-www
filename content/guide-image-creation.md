@@ -8,7 +8,7 @@ An *image* in the context of Vulkan designates a multidimensional array of pixel
 There are various hardcoded formats that the pixels of an image can use.
 
 <center>
-![](/guide-image-creation-1.png)
+<img src="/guide-image-creation-1.png" />
 
 *Example: the various images used by a Vulkan-using<br />
 application, as seen from a debugger*
@@ -43,7 +43,7 @@ of one to four values. The four components are named, in order, R, G, B and A.
 > that we can store arbitrary data in this format instead of colors.
 
 You can check [the list of available formats
-here](https://docs.rs/vulkano/0.10/vulkano/format/enum.Format.html).
+here](https://docs.rs/vulkano/0.18.0/vulkano/format/enum.Format.html).
 
 For example if you create an image with the format `R8Sint`, then it will only have one component.
 But with the format `A2R10G10B10SscaledPack32`, you have all four components. The first part of the

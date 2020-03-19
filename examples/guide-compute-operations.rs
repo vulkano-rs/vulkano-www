@@ -25,6 +25,7 @@ use vulkano::instance::InstanceExtensions;
 use vulkano::instance::PhysicalDevice;
 use vulkano::pipeline::ComputePipeline;
 use vulkano::sync::GpuFuture;
+use vulkano::descriptor::pipeline_layout::PipelineLayoutAbstract;
 
 fn main() {
     let instance = Instance::new(None, &InstanceExtensions::none(), None)
@@ -46,7 +47,7 @@ fn main() {
 
     // Introduction to compute operations
     let data_iter = 0 .. 65536;
-    let data_buffer = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(),
+    let data_buffer = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false,
                                                     data_iter).expect("failed to create buffer");
 
     // Compute pipelines
@@ -75,7 +76,7 @@ void main() {
         .expect("failed to create compute pipeline"));
 
     // Descriptor sets
-    let set = Arc::new(PersistentDescriptorSet::start(compute_pipeline.clone(), 0)
+    let set = Arc::new(PersistentDescriptorSet::start(compute_pipeline.layout().descriptor_set_layout(0).unwrap().clone())
         .add_buffer(data_buffer.clone()).unwrap()
         .build().unwrap()
     );

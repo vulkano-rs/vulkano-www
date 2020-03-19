@@ -51,7 +51,7 @@ fn main() {
                                   Format::R8G8B8A8Unorm, Some(queue.family())).unwrap();
 
     // Clearing an image
-    let buf = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(),
+    let buf = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false,
                                              (0 .. 1024 * 1024 * 4).map(|_| 0u8))
                                              .expect("failed to create buffer");
 

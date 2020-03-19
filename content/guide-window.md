@@ -15,8 +15,8 @@ going to add a dependency to the `vulkano-win` crate which is a link between vul
 In your Cargo.toml:
 
 ```toml
-vulkano-win = "0.14"
-winit = "0.19"
+vulkano-win = "0.18"
+winit = "0.22"
 ```
 
 I encourage you to browse [the documentation of `winit`](https://docs.rs/winit).
@@ -24,10 +24,10 @@ Let's start by creating a window with it:
 
 ```rust
 use vulkano_win::VkSurfaceBuild;
-use winit::EventsLoop;
+use winit::EventLoop;
 use winit::WindowBuilder;
 
-let mut events_loop = EventsLoop::new();
+let events_loop = EventLoop::new();
 let surface = WindowBuilder::new().build_vk_surface(&events_loop, instance.clone()).unwrap();
 ```
 
@@ -62,12 +62,12 @@ window's events. This is typically done after initialization, and right before t
 `main` function.
 
 ```rust
-events_loop.run_forever(|event| {
+events_loop.run(|event, _, control_flow| {
     match event {
         winit::Event::WindowEvent { event: winit::WindowEvent::CloseRequested, .. } => {
-            winit::ControlFlow::Break
+            *control_flow = ControlFlow::Exit;
         },
-        _ => winit::ControlFlow::Continue,
+        _ => ()
     }
 });
 ```
@@ -77,7 +77,7 @@ loop (which we used to create our window) receives an event. These events includ
 that are tied to our window, such a mouse movements.
 
 When the user wants to close the window, a `Closed` event is received, which makes our closure
-return `ControlFlow::Break`. This stops the `run_forever` function.
+set the `control_flow` to `ControlFlow::Exit` which signals to winit that we want an exit.
 
 ## Conclusion
 
