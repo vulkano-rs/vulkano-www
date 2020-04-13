@@ -54,7 +54,7 @@ fn main() {
     let image = StorageImage::new(device.clone(), Dimensions::Dim2d { width: 1024, height: 1024 },
                                   Format::R8G8B8A8Unorm, Some(queue.family())).unwrap();
 
-    let buf = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(),
+    let buf = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false,
                                              (0 .. 1024 * 1024 * 4).map(|_| 0u8))
                                              .expect("failed to create buffer");
 
@@ -67,7 +67,7 @@ fn main() {
     let vertex1 = Vertex { position: [-0.5, -0.5] };
     let vertex2 = Vertex { position: [ 0.0,  0.5] };
     let vertex3 = Vertex { position: [ 0.5, -0.25] };
-    let vertex_buffer = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(),
+    let vertex_buffer = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false,
                                                     vec![vertex1, vertex2, vertex3].into_iter()).unwrap();
                                                     
     let render_pass = Arc::new(vulkano::single_pass_renderpass!(device.clone(),
@@ -162,4 +162,3 @@ void main() {
     let image = ImageBuffer::<Rgba<u8>, _>::from_raw(1024, 1024, &buffer_content[..]).unwrap();
     image.save("image.png").unwrap();
 }
-

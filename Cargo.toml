@@ -8,10 +8,10 @@ publish = false
 [dependencies]
 lazy_static = "1.1"
 mustache = "0.9"
-pulldown-cmark = "0.1"
-rouille = "2.1"
+pulldown-cmark = "0.7.0"
+rouille = "3.0.0"
 
 [dev-dependencies]
-vulkano = "0.16"
-vulkano-shaders = "0.16"
-image = "0.21"
+vulkano = "0.18"
+vulkano-shaders = "0.18"
+image = "0.23"

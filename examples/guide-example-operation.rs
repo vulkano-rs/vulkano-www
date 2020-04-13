@@ -44,11 +44,11 @@ fn main() {
 
     // Example operation
     let source_content = 0 .. 64;
-    let source = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(),
+    let source = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false,
                                                 source_content).expect("failed to create buffer");
 
     let dest_content = (0 .. 64).map(|_| 0);
-    let dest = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(),
+    let dest = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false,
                                               dest_content).expect("failed to create buffer");
 
     let command_buffer = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap()

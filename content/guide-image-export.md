@@ -22,7 +22,7 @@ contains four unsigned 8-bit values, and the image dimensions are 1024 by 1024 p
 the number of elements in the buffer is `1024 * 1024 * 4`.
 
 ```rust
-let buf = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(),
+let buf = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false,
                                          (0 .. 1024 * 1024 * 4).map(|_| 0u8))
                                          .expect("failed to create buffer");
 ```
@@ -55,7 +55,7 @@ file. The Rust ecosystem has a crate named `image` that can do this.
 Let's add it to our Cargo.toml:
 
 ```toml
-image = "0.21"
+image = "0.23"
 ```
 
 In this library the main type that represents an image is the `ImageBuffer`. It can be created

@@ -137,7 +137,8 @@ Then a descriptor set, in order to bind that image to the shader. This time we u
 function instead of `add_buffer`.
 
 ```rust
-let set = Arc::new(PersistentDescriptorSet::start(compute_pipeline.clone(), 0)
+let layout = compute_pipeline.layout().descriptor_set_layout(0).unwrap();
+let set = Arc::new(PersistentDescriptorSet::start(layout.clone())
     .add_image(image.clone()).unwrap()
     .build().unwrap()
 );
@@ -146,7 +147,7 @@ let set = Arc::new(PersistentDescriptorSet::start(compute_pipeline.clone(), 0)
 Then we create a buffer where to write the output:
 
 ```rust
-let buf = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(),
+let buf = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false,
                                          (0 .. 1024 * 1024 * 4).map(|_| 0u8))
                                          .expect("failed to create buffer");
 ```

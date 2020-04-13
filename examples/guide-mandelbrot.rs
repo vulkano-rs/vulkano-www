@@ -30,6 +30,7 @@ use vulkano::instance::InstanceExtensions;
 use vulkano::instance::PhysicalDevice;
 use vulkano::pipeline::ComputePipeline;
 use vulkano::sync::GpuFuture;
+use vulkano::descriptor::pipeline_layout::PipelineLayoutAbstract;
 
 fn main() {
     let instance = Instance::new(None, &InstanceExtensions::none(), None)
@@ -90,12 +91,14 @@ void main() {
     let compute_pipeline = Arc::new(ComputePipeline::new(device.clone(), &shader.main_entry_point(), &())
         .expect("failed to create compute pipeline"));
 
-    let set = Arc::new(PersistentDescriptorSet::start(compute_pipeline.clone(), 0)
+    let set = Arc::new(PersistentDescriptorSet::start(
+        compute_pipeline.layout().descriptor_set_layout(0).unwrap().clone()
+    )
         .add_image(image.clone()).unwrap()
         .build().unwrap()
     );
 
-    let buf = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(),
+    let buf = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false,
                                              (0 .. 1024 * 1024 * 4).map(|_| 0u8))
                                              .expect("failed to create buffer");
 
