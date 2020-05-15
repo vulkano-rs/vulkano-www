@@ -23,7 +23,7 @@ use vulkano::buffer::BufferUsage;
 use vulkano::buffer::CpuAccessibleBuffer;
 
 let data = 12;
-let buffer = CpuAccessibleBuffer::from_data(device.clone(), BufferUsage::all(), false
+let buffer = CpuAccessibleBuffer::from_data(device.clone(), BufferUsage::all(), false,
                                             data).expect("failed to create buffer");
 ```
 
@@ -63,7 +63,7 @@ struct MyStruct {
 
 let data = MyStruct { a: 5, b: true };
 
-let buffer = CpuAccessibleBuffer::from_data(device.clone(), BufferUsage::all(), false
+let buffer = CpuAccessibleBuffer::from_data(device.clone(), BufferUsage::all(), false,
                                             data).unwrap();
 ```
 
@@ -85,7 +85,7 @@ is only known at runtime.
 
 ```rust
 let iter = (0 .. 128).map(|_| 5u8);
-let buffer = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false
+let buffer = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false,
                                             iter).unwrap();
 ```
 
