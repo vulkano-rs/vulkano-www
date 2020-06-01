@@ -30,39 +30,65 @@ use vulkano::instance::PhysicalDevice;
 use vulkano::sync::GpuFuture;
 
 fn main() {
-    let instance = Instance::new(None, &InstanceExtensions::none(), None)
-        .expect("failed to create instance");
+    let instance =
+        Instance::new(None, &InstanceExtensions::none(), None).expect("failed to create instance");
 
-    let physical = PhysicalDevice::enumerate(&instance).next().expect("no device available");
+    let physical = PhysicalDevice::enumerate(&instance)
+        .next()
+        .expect("no device available");
 
-    let queue_family = physical.queue_families()
+    let queue_family = physical
+        .queue_families()
         .find(|&q| q.supports_graphics())
         .expect("couldn't find a graphical queue family");
 
     let (device, mut queues) = {
-        Device::new(physical, &Features::none(), &DeviceExtensions::none(),
-                    [(queue_family, 0.5)].iter().cloned()).expect("failed to create device")
+        Device::new(
+            physical,
+            &Features::none(),
+            &DeviceExtensions::none(),
+            [(queue_family, 0.5)].iter().cloned(),
+        )
+        .expect("failed to create device")
     };
 
     let queue = queues.next().unwrap();
 
     // Image creation
-    let image = StorageImage::new(device.clone(), Dimensions::Dim2d { width: 1024, height: 1024 },
-                                  Format::R8G8B8A8Unorm, Some(queue.family())).unwrap();
+    let image = StorageImage::new(
+        device.clone(),
+        Dimensions::Dim2d {
+            width: 1024,
+            height: 1024,
+        },
+        Format::R8G8B8A8Unorm,
+        Some(queue.family()),
+    )
+    .unwrap();
 
     // Clearing an image
-    let buf = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false,
-                                             (0 .. 1024 * 1024 * 4).map(|_| 0u8))
-                                             .expect("failed to create buffer");
+    let buf = CpuAccessibleBuffer::from_iter(
+        device.clone(),
+        BufferUsage::all(),
+        false,
+        (0..1024 * 1024 * 4).map(|_| 0u8),
+    )
+    .expect("failed to create buffer");
 
-    let command_buffer = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap()
-        .clear_color_image(image.clone(), ClearValue::Float([0.0, 0.0, 1.0, 1.0])).unwrap()
-        .copy_image_to_buffer(image.clone(), buf.clone()).unwrap()
-        .build().unwrap();
+    let mut builder = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap();
+    builder
+        .clear_color_image(image.clone(), ClearValue::Float([0.0, 0.0, 1.0, 1.0]))
+        .unwrap()
+        .copy_image_to_buffer(image.clone(), buf.clone())
+        .unwrap();
+    let command_buffer = builder.build().unwrap();
 
     let finished = command_buffer.execute(queue.clone()).unwrap();
-    finished.then_signal_fence_and_flush().unwrap()
-        .wait(None).unwrap();
+    finished
+        .then_signal_fence_and_flush()
+        .unwrap()
+        .wait(None)
+        .unwrap();
 
     // Exporting the result
     let buffer_content = buf.read().unwrap();

@@ -51,9 +51,9 @@ Here is how you create a command buffer:
 ```rust
 use vulkano::command_buffer::AutoCommandBufferBuilder;
 
-let command_buffer = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap()
-    .copy_buffer(source.clone(), dest.clone()).unwrap()
-    .build().unwrap();
+let mut builder = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap();
+builder.copy_buffer(source.clone(), dest.clone()).unwrap();
+let command_buffer = builder.build().unwrap();
 ```
 
 As you can see, it is very straight-forward. We create a *builder*, add a copy command to it with

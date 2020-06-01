@@ -112,7 +112,9 @@ let dynamic_state = DynamicState {
     .. DynamicState::none()
 };
 
-let command_buffer = AutoCommandBufferBuilder::primary_one_time_submit(device.clone(), queue.family()).unwrap()
+let mut builder = AutoCommandBufferBuilder::primary_one_time_submit(device.clone(), queue.family()).unwrap();
+
+builder
     .begin_render_pass(framebuffer.clone(), false, vec![[0.0, 0.0, 1.0, 1.0].into()])
     .unwrap()
 
@@ -133,10 +135,9 @@ example](/guide/mandelbrot) and write the image to a PNG file.
 
 ```rust
     .copy_image_to_buffer(image.clone(), buf.clone())
-    .unwrap()
-
-    .build()
     .unwrap();
+
+let command_buffer = builder.build().unwrap();
 
 let finished = command_buffer.execute(queue.clone()).unwrap();
 finished.then_signal_fence_and_flush().unwrap()

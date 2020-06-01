@@ -30,10 +30,11 @@ let buf = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), fal
 And let's modify the command buffer we created in the previous section to add the copy operation:
 
 ```rust
-let command_buffer = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap()
+let mut builder = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap();
+builder
     .clear_color_image(image.clone(), ClearValue::Float([0.0, 0.0, 1.0, 1.0])).unwrap()
-    .copy_image_to_buffer(image.clone(), buf.clone()).unwrap()
-    .build().unwrap();
+    .copy_image_to_buffer(image.clone(), buf.clone()).unwrap();
+let command_buffer = builder.build().unwrap();
 ```
 
 Since this is a memory transfer operation, this time the image values are *not* interpreted as
