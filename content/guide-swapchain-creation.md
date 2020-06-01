@@ -40,9 +40,10 @@ We can now create the swapchain:
 
 ```rust
 use vulkano::swapchain::{Swapchain, SurfaceTransform, PresentMode, ColorSpace, FullscreenExclusive};
+use vulkano::image::ImageUsage;
 
 let (swapchain, images) = Swapchain::new(device.clone(), surface.clone(),
-    caps.min_image_count, format, dimensions, 1, caps.supported_usage_flags, &queue,
+    caps.min_image_count, format, dimensions, 1, ImageUsage::color_attachment(), &queue,
     SurfaceTransform::Identity, alpha, PresentMode::Fifo, FullscreenExclusive::Default,
 	true, ColorSpace::SrgbNonLinear)
     .expect("failed to create swapchain");

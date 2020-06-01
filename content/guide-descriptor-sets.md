@@ -32,8 +32,9 @@ all represent a descriptor set. Here we are going to use a `PersistentDescriptor
 
 ```rust
 use vulkano::descriptor::descriptor_set::PersistentDescriptorSet;
+use vulkano::descriptor::PipelineLayoutAbstract;
 
-let layout = pipeline.layout().descriptor_set_layout(0).unwrap();
+let layout = compute_pipeline.layout().descriptor_set_layout(0).unwrap();
 let set = Arc::new(PersistentDescriptorSet::start(layout.clone())
     .add_buffer(data_buffer.clone()).unwrap()
     .build().unwrap()

@@ -116,7 +116,7 @@ let command_buffer = AutoCommandBufferBuilder::primary_one_time_submit(device.cl
     .begin_render_pass(framebuffer.clone(), false, vec![[0.0, 0.0, 1.0, 1.0].into()])
     .unwrap()
 
-    .draw(pipeline.clone(), dynamic_state, vertex_buffer.clone(), (), ())
+    .draw(pipeline.clone(), &dynamic_state, vertex_buffer.clone(), (), ())
     .unwrap()
 
     .end_render_pass()
@@ -150,7 +150,7 @@ image.save("triangle.png").unwrap();
 And here is what you should get:
 
 <center>
-![](/guide-graphics-pipeline-creation-1.png)
+<img src="/guide-graphics-pipeline-creation-1.png" />
 </center>
 
 Next: [Windowing](/guide/window)

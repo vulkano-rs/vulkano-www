@@ -77,7 +77,7 @@ image.save("image.png").unwrap();
 And that's it! When running your program, a blue image named `image.png` should appear.
 
 <center>
-![](/guide-image-export-1.png)
+<img src="/guide-image-export-1.png" />
 
 *Here it is.*
 </center>
