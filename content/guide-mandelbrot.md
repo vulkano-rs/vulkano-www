@@ -178,7 +178,7 @@ image.save("image.png").unwrap();
 And here is what you should get:
 
 <center>
-![](/guide-mandelbrot-1.png)
+<img src="/guide-mandelbrot-1.png" />
 </center>
 
 Next: [Graphics pipeline introduction](/guide/what-graphics-pipeline)

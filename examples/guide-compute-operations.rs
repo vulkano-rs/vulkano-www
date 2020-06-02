@@ -26,6 +26,7 @@ use vulkano::instance::InstanceExtensions;
 use vulkano::instance::PhysicalDevice;
 use vulkano::pipeline::ComputePipeline;
 use vulkano::sync::GpuFuture;
+use vulkano::descriptor::PipelineLayoutAbstract;
 
 fn main() {
     let instance =
