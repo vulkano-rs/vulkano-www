@@ -155,10 +155,11 @@ let buf = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), fal
 The command buffer contains a dispatch command followed with a copy-image-to-buffer command:
 
 ```rust
-let command_buffer = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap()
+let mut builder = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap();
+builder
     .dispatch([1024 / 8, 1024 / 8, 1], compute_pipeline.clone(), set.clone(), ()).unwrap()
-    .copy_image_to_buffer(image.clone(), buf.clone()).unwrap()
-    .build().unwrap();
+    .copy_image_to_buffer(image.clone(), buf.clone()).unwrap();
+let command_buffer = builder.build().unwrap();
 ```
 
 And finally just like in [the previous section](/guide/image-export) we execute the command buffer

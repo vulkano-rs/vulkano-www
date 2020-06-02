@@ -7,9 +7,9 @@ Creating a command buffer is similar to [the example operation in a previous
 section](/guide/example-operation).
 
 ```rust
-let command_buffer = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap()
-    .dispatch([1024, 1, 1], compute_pipeline.clone(), set.clone(), ()).unwrap()
-    .build().unwrap();
+let mut builder = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap();
+builder.dispatch([1024, 1, 1], compute_pipeline.clone(), set.clone(), ()).unwrap();
+let command_buffer = builder.build().unwrap();
 ```
 
 As explained in [the compute pipeline section](/guide/compute-pipeline), we want to spawn 1024
