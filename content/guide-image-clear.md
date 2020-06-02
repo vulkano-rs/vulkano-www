@@ -15,9 +15,9 @@ what we are going to do by asking the GPU to fill our image with a specific colo
 ```rust
 use vulkano::format::ClearValue;
 
-let command_buffer = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap()
-    .clear_color_image(image.clone(), ClearValue::Float([0.0, 0.0, 1.0, 1.0])).unwrap()
-    .build().unwrap();
+let mut builder = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap();
+builder.clear_color_image(image.clone(), ClearValue::Float([0.0, 0.0, 1.0, 1.0])).unwrap();
+let command_buffer = builder.build().unwrap();
 ```
 
 > **Note**: The function is called clearing a *color* image, as opposed to depth and/or stencil
