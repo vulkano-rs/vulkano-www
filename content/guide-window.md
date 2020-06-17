@@ -24,8 +24,8 @@ Let's start by creating a window with it:
 
 ```rust
 use vulkano_win::VkSurfaceBuild;
-use winit::EventLoop;
-use winit::WindowBuilder;
+use winit::event_loop::EventLoop;
+use winit::window::WindowBuilder;
 
 let events_loop = EventLoop::new();
 let surface = WindowBuilder::new().build_vk_surface(&events_loop, instance.clone()).unwrap();
