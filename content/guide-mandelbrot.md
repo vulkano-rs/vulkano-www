@@ -93,7 +93,7 @@ for (i = 0.0; i < 1.0; i += 0.005) {
 }
 ```
 
-We now want to find out whether the complex number that we are manipulating (ie. `c`) is within the
+We now want to find out whether the complex number that we are manipulating (i.e. `c`) is within the
 Mandelbrot set. The definition of the Mandelbrot set says that a number `c` is within the set if
 the function `f(z) = z² + c` diverges when iterated from `z = 0` (`z` being a complex number).
 

@@ -24,9 +24,9 @@ but it is essential to understand it if you want to render images in an efficien
 ## Quick introduction
 
 The purpose of the graphics pipeline is to draw a certain shape on an image. This shape can be as
-simple as a single triangle, or can be complex like a human body for example.
+simple as a single triangle, or as complex as a mountain range.
 
-In order to start a graphical operation (ie. an operation that uses the graphics pipeline), you
+In order to start a graphical operation (i.e. an operation that uses the graphics pipeline), you
 will need the following elements:
 
 - A **graphics pipeline object** that describes the way the GPU should behave, similar to the
