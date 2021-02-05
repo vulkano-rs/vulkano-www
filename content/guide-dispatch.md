@@ -8,16 +8,20 @@ section](/guide/example-operation).
 
 ```rust
 let mut builder = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap();
-builder.dispatch([1024, 1, 1], compute_pipeline.clone(), set.clone(), ()).unwrap();
+builder.dispatch([1024, 1, 1], compute_pipeline.clone(), set.clone(), (), vec![]).unwrap();
 let command_buffer = builder.build().unwrap();
 ```
 
 As explained in [the compute pipeline section](/guide/compute-pipeline), we want to spawn 1024
 *work groups*. This value is indicated when we add the command to the command buffer.
 
-> **Note**: The last parameter contains the *push constants*, which we haven't covered yet.
+> **Note**: The second-to-last parameter contains the *push constants*, which we haven't covered yet.
 > Push constants are a way to pass a small amount of data to a shader, as an alternative to
 > putting this data in a buffer in a descriptor set.
+
+> **Note**: The last parameter contains the *dynamic offsets*, which we also haven't covered yet.
+> Dynamic offsets allow reading one buffer object from a large buffer containing data for
+> multiple draw/dispatch calls, as an alternative to storing data for each call in its own buffer.
 
 Just like we already covered, we submit the command buffer:
 

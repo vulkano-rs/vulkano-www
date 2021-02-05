@@ -16,7 +16,7 @@ use image::Rgba;
 use std::sync::Arc;
 use vulkano::buffer::BufferUsage;
 use vulkano::buffer::CpuAccessibleBuffer;
-use vulkano::command_buffer::AutoCommandBufferBuilder;
+use vulkano::command_buffer::{AutoCommandBufferBuilder, SubpassContents};
 use vulkano::command_buffer::CommandBuffer;
 use vulkano::command_buffer::DynamicState;
 use vulkano::device::Device;
@@ -184,7 +184,7 @@ void main() {
     builder
         .begin_render_pass(
             framebuffer.clone(),
-            false,
+            SubpassContents::Inline,
             vec![[0.0, 0.0, 1.0, 1.0].into()],
         )
         .unwrap()
@@ -194,6 +194,7 @@ void main() {
             vertex_buffer.clone(),
             (),
             (),
+            vec![],
         )
         .unwrap()
         .end_render_pass()

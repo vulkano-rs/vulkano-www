@@ -118,7 +118,7 @@ builder
     .begin_render_pass(framebuffer.clone(), false, vec![[0.0, 0.0, 1.0, 1.0].into()])
     .unwrap()
 
-    .draw(pipeline.clone(), &dynamic_state, vertex_buffer.clone(), (), ())
+    .draw(pipeline.clone(), &dynamic_state, vertex_buffer.clone(), (), (), vec![])
     .unwrap()
 
     .end_render_pass()

@@ -12,6 +12,11 @@ pulldown-cmark = "0.7.0"
 rouille = "3.0.0"
 
 [dev-dependencies]
-vulkano = "0.18"
-vulkano-shaders = "0.18"
+vulkano = "0.20"
+vulkano-shaders = "0.20"
 image = "0.23"
+
+# FIXME: remove when vulkano gets updated
+[patch.crates-io]
+vulkano = { git = "https://github.com/vulkano-rs/vulkano" }
+vulkano-shaders = { git = "https://github.com/vulkano-rs/vulkano" }

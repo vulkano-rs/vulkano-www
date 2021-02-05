@@ -26,7 +26,6 @@ use vulkano::instance::InstanceExtensions;
 use vulkano::instance::PhysicalDevice;
 use vulkano::pipeline::ComputePipeline;
 use vulkano::sync::GpuFuture;
-use vulkano::descriptor::PipelineLayoutAbstract;
 
 fn main() {
     let instance =
@@ -84,7 +83,7 @@ void main() {
 
     let shader = cs::Shader::load(device.clone()).expect("failed to create shader module");
     let compute_pipeline = Arc::new(
-        ComputePipeline::new(device.clone(), &shader.main_entry_point(), &())
+        ComputePipeline::new(device.clone(), &shader.main_entry_point(), &(), None)
             .expect("failed to create compute pipeline"),
     );
 
@@ -106,7 +105,7 @@ void main() {
     // Dispatch
     let mut builder = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap();
     builder
-        .dispatch([1024, 1, 1], compute_pipeline.clone(), set.clone(), ())
+        .dispatch([1024, 1, 1], compute_pipeline.clone(), set.clone(), (), vec![])
         .unwrap();
     let command_buffer = builder.build().unwrap();
 
