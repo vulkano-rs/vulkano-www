@@ -105,7 +105,13 @@ void main() {
     // Dispatch
     let mut builder = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap();
     builder
-        .dispatch([1024, 1, 1], compute_pipeline.clone(), set.clone(), (), vec![])
+        .dispatch(
+            [1024, 1, 1],
+            compute_pipeline.clone(),
+            set.clone(),
+            (),
+            vec![],
+        )
         .unwrap();
     let command_buffer = builder.build().unwrap();
 
