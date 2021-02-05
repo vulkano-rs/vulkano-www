@@ -115,7 +115,11 @@ let dynamic_state = DynamicState {
 let mut builder = AutoCommandBufferBuilder::primary_one_time_submit(device.clone(), queue.family()).unwrap();
 
 builder
-    .begin_render_pass(framebuffer.clone(), false, vec![[0.0, 0.0, 1.0, 1.0].into()])
+    .begin_render_pass(
+        framebuffer.clone(),
+        SubpassContents::Inline,
+        vec![[0.0, 0.0, 1.0, 1.0].into()]
+    )
     .unwrap()
 
     .draw(pipeline.clone(), &dynamic_state, vertex_buffer.clone(), (), (), vec![])
