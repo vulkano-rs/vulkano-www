@@ -7,19 +7,21 @@
 // notice may not be copied, modified, or distributed except
 // according to those terms.
 
-#[macro_use] extern crate rouille;
+#[macro_use]
+extern crate rouille;
 
 use rouille::Request;
 use rouille::Response;
-use std::collections::HashMap;
 use std::collections::hash_map::Entry;
+use std::collections::HashMap;
 use std::io;
 use std::net::ToSocketAddrs;
 use std::sync::Mutex;
 
 /// Runs the HTTP server forever on the given address.
 pub fn start<A>(addr: A)
-    where A: ToSocketAddrs
+where
+    A: ToSocketAddrs,
 {
     rouille::start_server(addr, move |request| {
         rouille::content_encoding::apply(
@@ -28,8 +30,10 @@ pub fn start<A>(addr: A)
                 {
                     let mut r = rouille::match_assets(request, "./static");
                     if r.is_success() {
-                        r.headers.push(("Cache-Control".into(),
-                                        format!("max-age={}", 2 * 60 * 60).into()));
+                        r.headers.push((
+                            "Cache-Control".into(),
+                            format!("max-age={}", 2 * 60 * 60).into(),
+                        ));
                         return r;
                     }
                 }
@@ -133,7 +137,8 @@ fn routes(request: &Request) -> Response {
 // `body` is expected to be HTML code. Puts `body` inside of the main template and builds a
 // `Response` that contains the whole.
 fn main_template<S>(body: S) -> Response
-    where S: Into<String>
+where
+    S: Into<String>,
 {
     lazy_static::lazy_static! {
         static ref MAIN_TEMPLATE: mustache::Template = {
@@ -156,7 +161,7 @@ fn main_template<S>(body: S) -> Response
             let mut out = Vec::new();
             MAIN_TEMPLATE.render_data(&mut out, &data).unwrap();
             e.insert(String::from_utf8(out).unwrap())
-        },
+        }
     };
 
     Response::html(html.clone())
@@ -165,7 +170,8 @@ fn main_template<S>(body: S) -> Response
 // `body` is expected to be HTML code. Puts `body` inside of the guide template and builds a
 // `Response` that contains the whole.
 fn guide_template<S>(body: S) -> Response
-    where S: Into<String>
+where
+    S: Into<String>,
 {
     lazy_static::lazy_static! {
         static ref GUIDE_TEMPLATE: mustache::Template = {
@@ -188,7 +194,7 @@ fn guide_template<S>(body: S) -> Response
             let mut out = Vec::new();
             GUIDE_TEMPLATE.render_data(&mut out, &data).unwrap();
             e.insert(String::from_utf8(out).unwrap())
-        },
+        }
     };
 
     main_template(html.clone())
@@ -196,7 +202,8 @@ fn guide_template<S>(body: S) -> Response
 
 // `body` is expected to be markdown. Turns it into HTML and calls `guide_template`.
 fn guide_template_markdown<S>(body: S) -> Response
-    where S: Into<String>
+where
+    S: Into<String>,
 {
     lazy_static::lazy_static! {
         static ref CACHE: Mutex<HashMap<String, String>> = Mutex::new(HashMap::new());
@@ -211,7 +218,7 @@ fn guide_template_markdown<S>(body: S) -> Response
             let mut html = String::new();
             pulldown_cmark::html::push_html(&mut html, pulldown_cmark::Parser::new(e.key()));
             e.insert(html)
-        },
+        }
     };
 
     guide_template(html.clone())

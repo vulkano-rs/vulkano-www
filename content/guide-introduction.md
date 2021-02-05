@@ -36,7 +36,7 @@ You will first need to setup some external dependencies as documented in the [Vu
 As with all Rust libraries, add this entry in your Cargo.toml:
 
 ```toml
-vulkano = "0.19"
+vulkano = "0.20"
 ```
 
 Note: If you run into any issues with this guide, please [open an issue](https://github.com/vulkano-rs/vulkano-www/issues).

@@ -157,7 +157,7 @@ The command buffer contains a dispatch command followed with a copy-image-to-buf
 ```rust
 let mut builder = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap();
 builder
-    .dispatch([1024 / 8, 1024 / 8, 1], compute_pipeline.clone(), set.clone(), ()).unwrap()
+    .dispatch([1024 / 8, 1024 / 8, 1], compute_pipeline.clone(), set.clone(), (), vec![]).unwrap()
     .copy_image_to_buffer(image.clone(), buf.clone()).unwrap();
 let command_buffer = builder.build().unwrap();
 ```

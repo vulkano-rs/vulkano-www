@@ -119,7 +119,7 @@ application compile-time*. We'll accomplish this using `vulkano-shaders`, which 
 To use `vulkano-shaders`, we first have to add a dependency:
 
 ```toml
-vulkano-shaders = "0.18"
+vulkano-shaders = "0.20"
 ```
 
 Here is the syntax:
@@ -162,7 +162,7 @@ the compute operation that we are going to perform.
 use std::sync::Arc;
 use vulkano::pipeline::ComputePipeline;
 
-let compute_pipeline = Arc::new(ComputePipeline::new(device.clone(), &shader.main_entry_point(), &())
+let compute_pipeline = Arc::new(ComputePipeline::new(device.clone(), &shader.main_entry_point(), &(), None)
     .expect("failed to create compute pipeline"));
 ```
 
