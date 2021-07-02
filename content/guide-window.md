@@ -15,8 +15,8 @@ going to add a dependency to the `vulkano-win` crate which is a link between vul
 In your Cargo.toml:
 
 ```toml
-vulkano-win = "0.19"
-winit = "0.22"
+vulkano-win = "0.24"
+winit = "0.25"
 ```
 
 I encourage you to browse [the documentation of `winit`](https://docs.rs/winit).
