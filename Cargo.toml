@@ -12,6 +12,6 @@ pulldown-cmark = "0.7.0"
 rouille = "3.0.0"
 
 [dev-dependencies]
-vulkano = "0.18"
-vulkano-shaders = "0.18"
+vulkano = "0.24"
+vulkano-shaders = "0.24"
 image = "0.23"

@@ -17,24 +17,25 @@ use std::sync::Arc;
 use vulkano::buffer::BufferUsage;
 use vulkano::buffer::CpuAccessibleBuffer;
 use vulkano::command_buffer::AutoCommandBufferBuilder;
-use vulkano::command_buffer::CommandBuffer;
+use vulkano::command_buffer::PrimaryCommandBuffer;
+use vulkano::sync::GpuFuture;
 use vulkano::descriptor::descriptor_set::PersistentDescriptorSet;
-use vulkano::descriptor::pipeline_layout::PipelineLayoutAbstract;
 use vulkano::device::Device;
 use vulkano::device::DeviceExtensions;
 use vulkano::device::Features;
 use vulkano::format::Format;
-use vulkano::image::Dimensions;
-use vulkano::image::StorageImage;
+use vulkano::image::{StorageImage, ImageDimensions};
 use vulkano::instance::Instance;
 use vulkano::instance::InstanceExtensions;
 use vulkano::instance::PhysicalDevice;
-use vulkano::pipeline::ComputePipeline;
-use vulkano::sync::GpuFuture;
+use vulkano::pipeline::{ComputePipeline, ComputePipelineAbstract};
+use vulkano::Version;
+use vulkano::image::view::ImageView;
+use vulkano::command_buffer::CommandBufferUsage::OneTimeSubmit;
 
 fn main() {
     let instance =
-        Instance::new(None, &InstanceExtensions::none(), None).expect("failed to create instance");
+        Instance::new(None, Version::V1_2, &InstanceExtensions::none(), None).expect("failed to create instance");
 
     let physical = PhysicalDevice::enumerate(&instance)
         .next()
@@ -59,9 +60,10 @@ fn main() {
 
     let image = StorageImage::new(
         device.clone(),
-        Dimensions::Dim2d {
+        ImageDimensions::Dim2d {
             width: 1024,
             height: 1024,
+            array_layers: 1
         },
         Format::R8G8B8A8Unorm,
         Some(queue.family()),
@@ -105,7 +107,7 @@ void main() {
     let shader = cs::Shader::load(device.clone()).expect("failed to create shader module");
 
     let compute_pipeline = Arc::new(
-        ComputePipeline::new(device.clone(), &shader.main_entry_point(), &())
+        ComputePipeline::new(device.clone(), &shader.main_entry_point(), &(), None)
             .expect("failed to create compute pipeline"),
     );
 
@@ -117,7 +119,7 @@ void main() {
                 .unwrap()
                 .clone(),
         )
-        .add_image(image.clone())
+        .add_image(ImageView::new(image.clone()).unwrap())
         .unwrap()
         .build()
         .unwrap(),
@@ -131,13 +133,14 @@ void main() {
     )
     .expect("failed to create buffer");
 
-    let mut builder = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap();
+    let mut builder = AutoCommandBufferBuilder::primary(device.clone(), queue.family(), OneTimeSubmit).unwrap();
     builder
         .dispatch(
             [1024 / 8, 1024 / 8, 1],
             compute_pipeline.clone(),
             set.clone(),
             (),
+            std::iter::empty()
         )
         .unwrap()
         .copy_image_to_buffer(image.clone(), buf.clone())

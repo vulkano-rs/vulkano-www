@@ -16,22 +16,24 @@ use image::Rgba;
 use vulkano::buffer::BufferUsage;
 use vulkano::buffer::CpuAccessibleBuffer;
 use vulkano::command_buffer::AutoCommandBufferBuilder;
-use vulkano::command_buffer::CommandBuffer;
+use vulkano::command_buffer::PrimaryCommandBuffer;
 use vulkano::device::Device;
 use vulkano::device::DeviceExtensions;
 use vulkano::device::Features;
 use vulkano::format::ClearValue;
 use vulkano::format::Format;
-use vulkano::image::Dimensions;
+use vulkano::image::ImageDimensions;
 use vulkano::image::StorageImage;
 use vulkano::instance::Instance;
 use vulkano::instance::InstanceExtensions;
 use vulkano::instance::PhysicalDevice;
 use vulkano::sync::GpuFuture;
+use vulkano::command_buffer::CommandBufferUsage::OneTimeSubmit;
+use vulkano::Version;
 
 fn main() {
     let instance =
-        Instance::new(None, &InstanceExtensions::none(), None).expect("failed to create instance");
+        Instance::new(None, Version::V1_2, &InstanceExtensions::none(), None).expect("failed to create instance");
 
     let physical = PhysicalDevice::enumerate(&instance)
         .next()
@@ -57,9 +59,10 @@ fn main() {
     // Image creation
     let image = StorageImage::new(
         device.clone(),
-        Dimensions::Dim2d {
+        ImageDimensions::Dim2d {
             width: 1024,
             height: 1024,
+            array_layers: 1
         },
         Format::R8G8B8A8Unorm,
         Some(queue.family()),
@@ -75,7 +78,7 @@ fn main() {
     )
     .expect("failed to create buffer");
 
-    let mut builder = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap();
+    let mut builder = AutoCommandBufferBuilder::primary(device.clone(), queue.family(), OneTimeSubmit).unwrap();
     builder
         .clear_color_image(image.clone(), ClearValue::Float([0.0, 0.0, 1.0, 1.0]))
         .unwrap()

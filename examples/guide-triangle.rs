@@ -16,27 +16,28 @@ use image::Rgba;
 use std::sync::Arc;
 use vulkano::buffer::BufferUsage;
 use vulkano::buffer::CpuAccessibleBuffer;
-use vulkano::command_buffer::AutoCommandBufferBuilder;
-use vulkano::command_buffer::CommandBuffer;
+use vulkano::command_buffer::{AutoCommandBufferBuilder, SubpassContents};
 use vulkano::command_buffer::DynamicState;
+use vulkano::command_buffer::CommandBufferUsage::OneTimeSubmit;
+use vulkano::command_buffer::PrimaryCommandBuffer;
 use vulkano::device::Device;
 use vulkano::device::DeviceExtensions;
 use vulkano::device::Features;
 use vulkano::format::Format;
-use vulkano::framebuffer::Framebuffer;
-use vulkano::framebuffer::Subpass;
-use vulkano::image::Dimensions;
-use vulkano::image::StorageImage;
+use vulkano::image::{StorageImage, ImageDimensions};
 use vulkano::instance::Instance;
 use vulkano::instance::InstanceExtensions;
 use vulkano::instance::PhysicalDevice;
 use vulkano::pipeline::viewport::Viewport;
 use vulkano::pipeline::GraphicsPipeline;
 use vulkano::sync::GpuFuture;
+use vulkano::Version;
+use vulkano::render_pass::{Framebuffer, Subpass};
+use vulkano::image::view::ImageView;
 
 fn main() {
     let instance =
-        Instance::new(None, &InstanceExtensions::none(), None).expect("failed to create instance");
+        Instance::new(None, Version::V1_2, &InstanceExtensions::none(), None).expect("failed to create instance");
 
     let physical = PhysicalDevice::enumerate(&instance)
         .next()
@@ -61,9 +62,10 @@ fn main() {
 
     let image = StorageImage::new(
         device.clone(),
-        Dimensions::Dim2d {
+        ImageDimensions::Dim2d {
             width: 1024,
             height: 1024,
+            array_layers: 1
         },
         Format::R8G8B8A8Unorm,
         Some(queue.family()),
@@ -121,7 +123,7 @@ fn main() {
 
     let framebuffer = Arc::new(
         Framebuffer::start(render_pass.clone())
-            .add(image.clone())
+            .add(ImageView::new(image.clone()).unwrap())
             .unwrap()
             .build()
             .unwrap(),
@@ -179,12 +181,12 @@ void main() {
     };
 
     let mut builder =
-        AutoCommandBufferBuilder::primary_one_time_submit(device.clone(), queue.family()).unwrap();
+        AutoCommandBufferBuilder::primary(device.clone(), queue.family(), OneTimeSubmit).unwrap();
 
     builder
         .begin_render_pass(
             framebuffer.clone(),
-            false,
+            SubpassContents::Inline,
             vec![[0.0, 0.0, 1.0, 1.0].into()],
         )
         .unwrap()
@@ -194,6 +196,7 @@ void main() {
             vertex_buffer.clone(),
             (),
             (),
+            std::iter::empty()
         )
         .unwrap()
         .end_render_pass()
