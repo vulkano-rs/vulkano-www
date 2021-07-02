@@ -48,7 +48,7 @@ Therefore in order to make this work, we need to modify the way the instance is 
 ```rust
 let instance = {
     let extensions = vulkano_win::required_extensions();
-    Instance::new(None, &extensions, None).expect("failed to create Vulkan instance")
+    Instance::new(None, Version::V1_2, &extensions, None).expect("failed to create Vulkan instance")
 };
 ```
 

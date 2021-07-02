@@ -162,7 +162,7 @@ the compute operation that we are going to perform.
 use std::sync::Arc;
 use vulkano::pipeline::ComputePipeline;
 
-let compute_pipeline = Arc::new(ComputePipeline::new(device.clone(), &shader.main_entry_point(), &())
+let compute_pipeline = Arc::new(ComputePipeline::new(device.clone(), &shader.main_entry_point(), &(), None)
     .expect("failed to create compute pipeline"));
 ```
 
