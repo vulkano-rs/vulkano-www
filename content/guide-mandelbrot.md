@@ -129,7 +129,7 @@ Now that the shader is written, the rest should be straight-forward. We start by
 as seen before:
 
 ```rust
-let image = StorageImage::new(device.clone(), Dimensions::Dim2d { width: 1024, height: 1024 },
+let image = StorageImage::new(device.clone(), ImageDimensions::Dim2d { width: 1024, height: 1024, array_layers: 1 },
                               Format::R8G8B8A8Unorm, Some(queue.family())).unwrap();
 ```
 
@@ -139,7 +139,7 @@ function instead of `add_buffer`.
 ```rust
 let layout = compute_pipeline.layout().descriptor_set_layout(0).unwrap();
 let set = Arc::new(PersistentDescriptorSet::start(layout.clone())
-    .add_image(image.clone()).unwrap()
+    .add_image(ImageView::new(image.clone()).unwrap()).unwrap()
     .build().unwrap()
 );
 ```
@@ -155,7 +155,7 @@ let buf = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), fal
 The command buffer contains a dispatch command followed with a copy-image-to-buffer command:
 
 ```rust
-let mut builder = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap();
+let mut builder = AutoCommandBufferBuilder::primary(device.clone(), queue.family(), OneTimeSubmit).unwrap();
 builder
     .dispatch([1024 / 8, 1024 / 8, 1], compute_pipeline.clone(), set.clone(), ()).unwrap()
     .copy_image_to_buffer(image.clone(), buf.clone()).unwrap();

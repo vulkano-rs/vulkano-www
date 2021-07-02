@@ -90,9 +90,9 @@ topic.
 As a demonstration, let's just enter a render pass and leave it immediately after:
 
 ```rust
-let mut builder = AutoCommandBufferBuilder::primary_one_time_submit(device.clone(), queue.family()).unwrap();
+let mut builder = AutoCommandBufferBuilder::primary(device.clone(), queue.family(), OneTimeSubmit).unwrap();
 builder
-    .begin_render_pass(framebuffer.clone(), false, vec![[0.0, 0.0, 1.0, 1.0].into()])
+    .begin_render_pass(framebuffer.clone(), SubpassContents::Inline, vec![[0.0, 0.0, 1.0, 1.0].into()])
     .unwrap()
     .end_render_pass()
     .unwrap();

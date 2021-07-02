@@ -6,15 +6,16 @@ Before you can start using any function from Vulkan and vulkano, the first thing
 an *instance*. Creating an instance tries to load Vulkan from the system and reads the list of
 available implementations.
 
-Creating an instance takes three optional parameters which we aren't going to cover for now. You can
+Creating an instance takes four parameters (three are optional) which we aren't going to cover for now. You can
 check [the documentation of `Instance`](https://docs.rs/vulkano/0.18.0/vulkano/instance/struct.Instance.html)
 for more information.
 
 ```rust
 use vulkano::instance::Instance;
 use vulkano::instance::InstanceExtensions;
+use vulkano::Version;
 
-let instance = Instance::new(None, &InstanceExtensions::none(), None)
+let instance = Instance::new(None, Version::V1_2, &InstanceExtensions::none(), None)
     .expect("failed to create instance");
 ```
 

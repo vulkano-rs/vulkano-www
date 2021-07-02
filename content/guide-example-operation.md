@@ -50,8 +50,9 @@ Here is how you create a command buffer:
 
 ```rust
 use vulkano::command_buffer::AutoCommandBufferBuilder;
+use vulkano::command_buffer::CommandBufferUsage::OneTimeSubmit;
 
-let mut builder = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap();
+let mut builder = AutoCommandBufferBuilder::primary(device.clone(), queue.family(), OneTimeSubmit).unwrap();
 builder.copy_buffer(source.clone(), dest.clone()).unwrap();
 let command_buffer = builder.build().unwrap();
 ```
@@ -61,7 +62,7 @@ As you can see, it is very straight-forward. We create a *builder*, add a copy c
 [the buffers creation section](/guide/buffer-creation), we call `clone()` multiple times but we
  only clone `Arc`s.
 
-One thing to notice is that the `AutoCommandBufferBuilder::new()` method takes as
+One thing to notice is that the `AutoCommandBufferBuilder::primary()` method takes as
 parameter a queue family. This must be the queue family that the command buffer is going to run on.
 In this example we don't have much choice anyway (as we only use one queue and thus one queue
 family), but when you design a real program you have to be aware of this requirement.
@@ -71,7 +72,7 @@ family), but when you design a real program you have to be aware of this require
 And now we submit the command buffer so that it gets executed:
 
 ```rust
-use vulkano::command_buffer::CommandBuffer;
+use vulkano::command_buffer::PrimaryCommandBuffer;
 let finished = command_buffer.execute(queue.clone()).unwrap();
 ```
 

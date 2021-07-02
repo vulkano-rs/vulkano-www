@@ -7,7 +7,7 @@ Creating a command buffer is similar to [the example operation in a previous
 section](/guide/example-operation).
 
 ```rust
-let mut builder = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap();
+let mut builder = AutoCommandBufferBuilder::primary(device.clone(), queue.family(), OneTimeSubmit).unwrap();
 builder.dispatch([1024, 1, 1], compute_pipeline.clone(), set.clone(), ()).unwrap();
 let command_buffer = builder.build().unwrap();
 ```

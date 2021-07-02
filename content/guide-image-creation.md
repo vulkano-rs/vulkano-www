@@ -63,10 +63,10 @@ represent images. Here we are going to use a *StorageImage*, which is a general-
 
 ```rust
 use vulkano::format::Format;
-use vulkano::image::Dimensions;
+use vulkano::image::ImageDimensions;
 use vulkano::image::StorageImage;
 
-let image = StorageImage::new(device.clone(), Dimensions::Dim2d { width: 1024, height: 1024 },
+let image = StorageImage::new(device.clone(), ImageDimensions::Dim2d { width: 1024, height: 1024, array_layers: 1 },
                               Format::R8G8B8A8Unorm, Some(queue.family())).unwrap();
 ```
 

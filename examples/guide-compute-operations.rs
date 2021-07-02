@@ -15,22 +15,22 @@ use std::sync::Arc;
 use vulkano::buffer::BufferUsage;
 use vulkano::buffer::CpuAccessibleBuffer;
 use vulkano::command_buffer::AutoCommandBufferBuilder;
-use vulkano::command_buffer::CommandBuffer;
+use vulkano::command_buffer::PrimaryCommandBuffer;
 use vulkano::descriptor::descriptor_set::PersistentDescriptorSet;
-use vulkano::descriptor::pipeline_layout::PipelineLayoutAbstract;
 use vulkano::device::Device;
 use vulkano::device::DeviceExtensions;
 use vulkano::device::Features;
 use vulkano::instance::Instance;
 use vulkano::instance::InstanceExtensions;
 use vulkano::instance::PhysicalDevice;
-use vulkano::pipeline::ComputePipeline;
+use vulkano::pipeline::{ComputePipeline, ComputePipelineAbstract};
 use vulkano::sync::GpuFuture;
-use vulkano::descriptor::PipelineLayoutAbstract;
+use vulkano::Version;
+use vulkano::command_buffer::CommandBufferUsage::OneTimeSubmit;
 
 fn main() {
     let instance =
-        Instance::new(None, &InstanceExtensions::none(), None).expect("failed to create instance");
+        Instance::new(None, Version::V1_2, &InstanceExtensions::none(), None).expect("failed to create instance");
 
     let physical = PhysicalDevice::enumerate(&instance)
         .next()
@@ -84,7 +84,7 @@ void main() {
 
     let shader = cs::Shader::load(device.clone()).expect("failed to create shader module");
     let compute_pipeline = Arc::new(
-        ComputePipeline::new(device.clone(), &shader.main_entry_point(), &())
+        ComputePipeline::new(device.clone(), &shader.main_entry_point(), &(), None)
             .expect("failed to create compute pipeline"),
     );
 
@@ -104,9 +104,9 @@ void main() {
     );
 
     // Dispatch
-    let mut builder = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap();
+    let mut builder = AutoCommandBufferBuilder::primary(device.clone(), queue.family(), OneTimeSubmit).unwrap();
     builder
-        .dispatch([1024, 1, 1], compute_pipeline.clone(), set.clone(), ())
+        .dispatch([1024, 1, 1], compute_pipeline.clone(), set.clone(), (), std::iter::empty())
         .unwrap();
     let command_buffer = builder.build().unwrap();
 

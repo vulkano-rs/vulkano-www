@@ -15,8 +15,8 @@ going to add a dependency to the `vulkano-win` crate which is a link between vul
 In your Cargo.toml:
 
 ```toml
-vulkano-win = "0.19"
-winit = "0.22"
+vulkano-win = "0.24"
+winit = "0.25"
 ```
 
 I encourage you to browse [the documentation of `winit`](https://docs.rs/winit).
@@ -48,7 +48,7 @@ Therefore in order to make this work, we need to modify the way the instance is 
 ```rust
 let instance = {
     let extensions = vulkano_win::required_extensions();
-    Instance::new(None, &extensions, None).expect("failed to create Vulkan instance")
+    Instance::new(None, Version::V1_2, &extensions, None).expect("failed to create Vulkan instance")
 };
 ```
 

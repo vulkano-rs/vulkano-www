@@ -14,7 +14,7 @@
 use vulkano::buffer::BufferUsage;
 use vulkano::buffer::CpuAccessibleBuffer;
 use vulkano::command_buffer::AutoCommandBufferBuilder;
-use vulkano::command_buffer::CommandBuffer;
+use vulkano::command_buffer::PrimaryCommandBuffer;
 use vulkano::device::Device;
 use vulkano::device::DeviceExtensions;
 use vulkano::device::Features;
@@ -22,11 +22,13 @@ use vulkano::instance::Instance;
 use vulkano::instance::InstanceExtensions;
 use vulkano::instance::PhysicalDevice;
 use vulkano::sync::GpuFuture;
+use vulkano::Version;
+use vulkano::command_buffer::CommandBufferUsage::OneTimeSubmit;
 
 fn main() {
     // Initialization
     let instance =
-        Instance::new(None, &InstanceExtensions::none(), None).expect("failed to create instance");
+        Instance::new(None, Version::V1_2, &InstanceExtensions::none(), None).expect("failed to create instance");
 
     let physical = PhysicalDevice::enumerate(&instance)
         .next()
@@ -61,7 +63,7 @@ fn main() {
         CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false, dest_content)
             .expect("failed to create buffer");
 
-    let mut builder = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap();
+    let mut builder = AutoCommandBufferBuilder::primary(device.clone(), queue.family(), OneTimeSubmit).unwrap();
     builder.copy_buffer(source.clone(), dest.clone()).unwrap();
     let command_buffer = builder.build().unwrap();
 
