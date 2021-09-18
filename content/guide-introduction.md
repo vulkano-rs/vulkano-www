@@ -1,3 +1,11 @@
+# Disclaimer: This guide is outdated.
+
+It is suggested that you view the repo's examples instead. You can find those
+[here](https://github.com/vulkano-rs/vulkano/tree/master/examples). To view the current release's examples
+you'll need to switch to a version tag. On the branch dropdown click the tags tab. There you'll find all
+released versions. master will contain examples that are updated continiously to match changes that are
+unreleased. You should only use the master branch if you using vulkano as a git dependency.
+
 # Introduction
 
 Welcome to the vulkano guide!
