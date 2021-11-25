@@ -59,7 +59,7 @@ Then we can create the graphics pipeline by using a builder.
 
 ```rust
 use vulkano::pipeline::GraphicsPipeline;
-use vulkano::framebuffer::Subpass;
+use vulkano::render_pass::Subpass;
 
 let pipeline = Arc::new(GraphicsPipeline::start()
     // Defines what kind of vertex input is expected.
@@ -92,41 +92,54 @@ a new pipeline object if we wanted to draw to another image of a different size.
 
 # Drawing
 
-Now that we have all the ingredients, it is time to insert a call to `draw()` inside of our render
-pass.
+Now that we have all the ingredients, it is time to bind everything and insert a draw call inside of
+our render pass.
 
-The `draw` method takes as parameter the pipeline object, the dynamic state that contains our
-viewport, the buffer that contains our shape, and the descriptor sets and push constants. The
-descriptor sets and push constants are the same thing as for compute shaders.
+To draw the triangle, we need to pass the viewport, the pipeline, the vertex_buffer and the actual
+draw command:
 
 ```rust
-use vulkano::command_buffer::DynamicState;
 use vulkano::pipeline::viewport::Viewport;
 
-let dynamic_state = DynamicState {
-    viewports: Some(vec![Viewport {
-        origin: [0.0, 0.0],
-        dimensions: [1024.0, 1024.0],
-        depth_range: 0.0 .. 1.0,
-    }]),
-    .. DynamicState::none()
+let mut builder = AutoCommandBufferBuilder::primary(
+    device.clone(),
+    queue.family(),
+    CommandBufferUsage::OneTimeSubmit,
+)
+.unwrap();
+
+let viewport = Viewport {
+    origin: [0.0, 0.0],
+    dimensions: [1024.0, 1024.0],
+    depth_range: 0.0..1.0,
 };
 
-let mut builder = AutoCommandBufferBuilder::primary_one_time_submit(device.clone(), queue.family()).unwrap();
-
 builder
-    .begin_render_pass(framebuffer.clone(), false, vec![[0.0, 0.0, 1.0, 1.0].into()])
+    .begin_render_pass(
+        framebuffer.clone(),
+        SubpassContents::Inline,
+        vec![[0.0, 0.0, 1.0, 1.0].into()],
+    )
     .unwrap()
 
-    .draw(pipeline.clone(), &dynamic_state, vertex_buffer.clone(), (), ())
+    // new stuff
+    .set_viewport(0, [viewport])
+    .bind_pipeline_graphics(pipeline.clone())
+    .bind_vertex_buffers(0, vertex_buffer.clone())
+    .draw(
+        3, 1, 0, 0, // 3 is the number of vertices, 1 is the number of instances
+    )
+    
     .unwrap()
-
     .end_render_pass()
     .unwrap()
 
 // (continued below)
 ```
 
+The first parameter of the `.draw()` method is the number of vertices of our shape. All the other
+constants are in the case of drawing on multiple viewports or drawing multiple objects with instancing
+(we won't cover that here).
 > **Note**: If you wanted to draw multiple objects, the most straight-forward method is to call
 > `draw()` multiple time in a row.
 
@@ -134,18 +147,21 @@ Once we have finished drawing, let's do the same thing as [in the mandelbrot
 example](/guide/mandelbrot) and write the image to a PNG file.
 
 ```rust
-    .copy_image_to_buffer(image.clone(), buf.clone())
+    .copy_image_to_buffer(image, buf.clone())
     .unwrap();
 
 let command_buffer = builder.build().unwrap();
 
-let finished = command_buffer.execute(queue.clone()).unwrap();
-finished.then_signal_fence_and_flush().unwrap()
-    .wait(None).unwrap();
+let future = sync::now(device.clone())
+    .then_execute(queue.clone(), command_buffer)
+    .unwrap()
+    .then_signal_fence_and_flush()
+    .unwrap();
+future.wait(None).unwrap();
 
 let buffer_content = buf.read().unwrap();
 let image = ImageBuffer::<Rgba<u8>, _>::from_raw(1024, 1024, &buffer_content[..]).unwrap();
-image.save("triangle.png").unwrap();
+image.save("image.png").unwrap();
 ```
 
 And here is what you should get:

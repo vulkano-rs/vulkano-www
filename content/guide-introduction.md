@@ -1,4 +1,4 @@
-# Disclaimer: This guide is outdated.
+# Disclaimer: Part of this guide is outdated.
 
 It is suggested that you view the repo's examples instead. You can find those
 [here](https://github.com/vulkano-rs/vulkano/tree/master/examples). To view the current release's examples
@@ -44,7 +44,7 @@ You will first need to setup some external dependencies as documented in the [Vu
 As with all Rust libraries, add this entry in your Cargo.toml:
 
 ```toml
-vulkano = "0.19"
+vulkano = "0.26.0"
 ```
 
 Note: If you run into any issues with this guide, please [open an issue](https://github.com/vulkano-rs/vulkano-www/issues).

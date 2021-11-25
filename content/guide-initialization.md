@@ -6,15 +6,15 @@ Before you can start using any function from Vulkan and vulkano, the first thing
 an *instance*. Creating an instance tries to load Vulkan from the system and reads the list of
 available implementations.
 
-Creating an instance takes three optional parameters which we aren't going to cover for now. You can
-check [the documentation of `Instance`](https://docs.rs/vulkano/0.18.0/vulkano/instance/struct.Instance.html)
+Creating an instance takes four optional parameters which we aren't going to cover for now. You can
+check [the documentation](https://docs.rs/vulkano/0.26.0/vulkano/instance/struct.Instance.html)
 for more information.
 
 ```rust
-use vulkano::instance::Instance;
-use vulkano::instance::InstanceExtensions;
+use vulkano::instance::{Instance, InstanceExtensions};
+use vulkano::Version;
 
-let instance = Instance::new(None, &InstanceExtensions::none(), None)
+let instance = Instance::new(None, Version::V1_1, &InstanceExtensions::none(), None)
     .expect("failed to create instance");
 ```
 
@@ -47,7 +47,7 @@ Consequently the best thing to do in practice is to choose one physical device w
 everything:
 
 ```rust
-use vulkano::instance::PhysicalDevice;
+use vulkano::device::physical::PhysicalDevice
 
 let physical = PhysicalDevice::enumerate(&instance).next().expect("no device available");
 ```

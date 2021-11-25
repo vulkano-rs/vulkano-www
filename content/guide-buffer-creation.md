@@ -19,12 +19,11 @@ The most simple kind of buffer that exists is the `CpuAccessibleBuffer`, which c
 like this:
 
 ```rust
-use vulkano::buffer::BufferUsage;
-use vulkano::buffer::CpuAccessibleBuffer;
+use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
 
 let data = 12;
-let buffer = CpuAccessibleBuffer::from_data(device.clone(), BufferUsage::all(), false,
-                                            data).expect("failed to create buffer");
+let buffer = CpuAccessibleBuffer::from_data(device.clone(), BufferUsage::all(), false, data)
+    .expect("failed to create buffer");
 ```
 
 We have to indicate several things when creating the buffer. The first parameter is the device
@@ -33,7 +32,7 @@ which shouldn't be expensive. You should get used to passing the device as param
 need to do so for most of the Vulkan objects that you create.
 
 The second parameter indicates [which purpose we are creating the
-buffer](https://docs.rs/vulkano/0.18.0/vulkano/buffer/struct.BufferUsage.html) for, which can help the
+buffer](https://docs.rs/vulkano/0.26.0/vulkano/buffer/struct.BufferUsage.html) for, which can help the
 implementation perform some optimizations. Trying to use a buffer in a way that wasn't indicated in
 its constructor will result in an error. For the sake of the example, we just create a
 `BufferUsage` that allows all possible usages.
@@ -56,6 +55,7 @@ But you can put any type you want in a buffer, there is no restriction. You can,
 this:
 
 ```rust
+#[derive(Copy, Clone)] // it still needs to implement the Copy trait
 struct MyStruct {
     a: u32,
     b: bool,
@@ -67,8 +67,8 @@ let buffer = CpuAccessibleBuffer::from_data(device.clone(), BufferUsage::all(), 
                                             data).unwrap();
 ```
 
-> **Note**: While you can put any type you want in a buffer, using a type that doesn't implement
-> the `Send`, `Sync` and `Copy` traits or that isn't `'static` will restrict what you can do with
+> **Note**: While you can put any type that implements the `Copy` trait you want in a buffer, using a type that doesn't implement
+> the `Send` and `Sync` traits or that isn't `'static` will restrict what you can do with
 > that buffer.
 
 While it is sometimes useful to use a buffer that contains a single struct, in practice it is very

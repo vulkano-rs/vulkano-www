@@ -27,20 +27,23 @@ multiple attachments, and with various micro-optimizations. Vulkano's API is sui
 simple cases and the complex usages, which is why it may look complex at first.
 
 ```rust
-let render_pass = Arc::new(vulkano::single_pass_renderpass!(device.clone(),
-    attachments: {
-        color: {
-            load: Clear,
-            store: Store,
-            format: Format::R8G8B8A8Unorm,
-            samples: 1,
+let render_pass = Arc::new(
+    vulkano::single_pass_renderpass!(device.clone(),
+        attachments: {
+            color: {
+                load: Clear,
+                store: Store,
+                format: Format::R8G8B8A8_UNORM,
+                samples: 1,
+            }
+        },
+        pass: {
+            color: [color],
+            depth_stencil: {}
         }
-    },
-    pass: {
-        color: [color],
-        depth_stencil: {}
-    }
-).unwrap());
+    )
+    .unwrap(),
+);
 ```
 
 A render pass is made of **attachments** and **passes**. Here we declare one attachment whose name
@@ -66,33 +69,50 @@ bad idea to keep the framebuffer objects alive between frames, but it won't kill
 performances to create and destroy a few framebuffer objects during some frames.
 
 ```rust
-use vulkano::framebuffer::Framebuffer;
+use vulkano::render_pass::Framebuffer;
 
-let framebuffer = Arc::new(Framebuffer::start(render_pass.clone())
-    .add(image.clone()).unwrap()
-    .build().unwrap());
+let view = ImageView::new(image.clone()).unwrap();
+let framebuffer = Arc::new(
+    Framebuffer::start(render_pass.clone())
+        .add(view)
+        .unwrap()
+        .build()
+        .unwrap(),
+);
 ```
 
 We are now ready the enter drawing mode!
 
 This is done by calling the `begin_render_pass` function on the command buffer builder.
-This function takes as parameter the framebuffer, a boolean, and a `Vec` that contains the colors
+This function takes as parameter the framebuffer, a enum, and a `Vec` that contains the colors
 to fill the attachments with. Since we have only one single attachment, this `Vec` contains only
 one element.
 
 Clearing our attachment has exactly the same effect as the `clear_color_image` function we covered
 previously, except that this time it is done by the rendering engine.
 
-The boolean passed as second parameter indicates whether we are going to directly invoke draw
+The enum passed as second parameter descbribes whether we are going to directly invoke draw
 commands or use secondary command buffers instead. Secondary command buffers are a more advanced
-topic.
+topic. Be we are using only direct commands, we will leave it as `::Inline`
 
 As a demonstration, let's just enter a render pass and leave it immediately after:
 
 ```rust
-let mut builder = AutoCommandBufferBuilder::primary_one_time_submit(device.clone(), queue.family()).unwrap();
+use vulkano::command_buffer::SubpassContents;
+
+let mut builder = AutoCommandBufferBuilder::primary(
+    device.clone(),
+    queue.family(),
+    CommandBufferUsage::OneTimeSubmit,
+)
+.unwrap();
+
 builder
-    .begin_render_pass(framebuffer.clone(), false, vec![[0.0, 0.0, 1.0, 1.0].into()])
+    .begin_render_pass(
+        framebuffer.clone(),
+        SubpassContents::Inline,
+        vec![[0.0, 0.0, 1.0, 1.0].into()],
+    )
     .unwrap()
     .end_render_pass()
     .unwrap();

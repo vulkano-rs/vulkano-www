@@ -129,36 +129,83 @@ Now that the shader is written, the rest should be straight-forward. We start by
 as seen before:
 
 ```rust
-let image = StorageImage::new(device.clone(), Dimensions::Dim2d { width: 1024, height: 1024 },
-                              Format::R8G8B8A8Unorm, Some(queue.family())).unwrap();
+let image = StorageImage::new(
+    device.clone(),
+    ImageDimensions::Dim2d {
+        width: 1024,
+        height: 1024,
+        array_layers: 1,
+    },
+    Format::R8G8B8A8_UNORM,
+    Some(queue.family()),
+)
+.unwrap();
 ```
 
-Then a descriptor set, in order to bind that image to the shader. This time we use the `add_image`
-function instead of `add_buffer`.
+First, let's create the descriptor set builder:
 
 ```rust
-let layout = compute_pipeline.layout().descriptor_set_layout(0).unwrap();
-let set = Arc::new(PersistentDescriptorSet::start(layout.clone())
-    .add_image(image.clone()).unwrap()
-    .build().unwrap()
-);
+let layout = compute_pipeline
+    .layout()
+    .descriptor_set_layouts()
+    .get(0)
+    .unwrap();
+let mut set_builder = PersistentDescriptorSet::start(layout.clone());
 ```
 
-Then we create a buffer where to write the output:
+This time we can't just clear the image like we did earlier. To actually pass the image
+to the gpu shader, we first need to create a `ImageView` of it. You can think of relating
+to the image in a same way a string slice relates to a `String`. Here, we want a view of the
+entire image, so it isn't very difficult:
 
 ```rust
-let buf = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false,
-                                         (0 .. 1024 * 1024 * 4).map(|_| 0u8))
-                                         .expect("failed to create buffer");
+use vulkano::image::view::ImageView;
+
+let view = ImageView::new(image.clone()).unwrap();
+```
+
+With the image view, we can add it and build the descriptor set:
+
+```rust
+set_builder.add_image(view).unwrap();
+
+let set = set_builder.build().unwrap();
+```
+
+Next we can create a buffer where to write the output:
+
+```rust
+let buf = CpuAccessibleBuffer::from_iter(
+    device.clone(),
+    BufferUsage::all(),
+    false,
+    (0..1024 * 1024 * 4).map(|_| 0u8),
+)
+.expect("failed to create buffer");
 ```
 
 The command buffer contains a dispatch command followed with a copy-image-to-buffer command:
 
 ```rust
-let mut builder = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap();
+let mut builder = AutoCommandBufferBuilder::primary(
+    device.clone(),
+    queue.family(),
+    CommandBufferUsage::OneTimeSubmit,
+)
+.unwrap();
 builder
-    .dispatch([1024 / 8, 1024 / 8, 1], compute_pipeline.clone(), set.clone(), ()).unwrap()
-    .copy_image_to_buffer(image.clone(), buf.clone()).unwrap();
+    .bind_pipeline_compute(compute_pipeline.clone())
+    .bind_descriptor_sets(
+        PipelineBindPoint::Compute,
+        compute_pipeline.layout().clone(),
+        0,
+        set,
+    )
+    .dispatch([1024 / 8, 1024 / 8, 1])
+    .unwrap()
+    .copy_image_to_buffer(image.clone(), buf.clone())
+    .unwrap();
+
 let command_buffer = builder.build().unwrap();
 ```
 
@@ -166,9 +213,13 @@ And finally just like in [the previous section](/guide/image-export) we execute 
 and export the image as a PNG file:
 
 ```rust
-let finished = command_buffer.execute(queue.clone()).unwrap();
-finished.then_signal_fence_and_flush().unwrap()
-    .wait(None).unwrap();
+let future = sync::now(device.clone())
+    .then_execute(queue.clone(), command_buffer)
+    .unwrap()
+    .then_signal_fence_and_flush()
+    .unwrap();
+
+future.wait(None).unwrap();
 
 let buffer_content = buf.read().unwrap();
 let image = ImageBuffer::<Rgba<u8>, _>::from_raw(1024, 1024, &buffer_content[..]).unwrap();

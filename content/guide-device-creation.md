@@ -48,9 +48,7 @@ Creating a device returns two things: the device itself, but also a list of *que
 will later allow us to submit operations.
 
 ```rust
-use vulkano::device::Device;
-use vulkano::device::DeviceExtensions;
-use vulkano::device::Features;
+use vulkano::device::{Device, DeviceExtensions, Features};
 
 let (device, mut queues) = {
     Device::new(physical, &Features::none(), &DeviceExtensions::none(),

@@ -119,7 +119,8 @@ application compile-time*. We'll accomplish this using `vulkano-shaders`, which 
 To use `vulkano-shaders`, we first have to add a dependency:
 
 ```toml
-vulkano-shaders = "0.18"
+# Notice that it uses the same version as vulkano
+vulkano-shaders = "0.26.0"
 ```
 
 Here is the syntax:
@@ -156,14 +157,24 @@ let shader = cs::Shader::load(device.clone())
 
 This feeds the shader to the Vulkan implementation. The last step to perform at runtime is to
 create a ***compute pipeline*** object from that shader. This is the object that actually describes
-the compute operation that we are going to perform.
+the compute operation that we are going to perform. We won't cover the last three parameters, but
+you can search about them
+[here](https://docs.rs/vulkano/0.26.0/vulkano/pipeline/struct.ComputePipeline.html).
 
 ```rust
 use std::sync::Arc;
 use vulkano::pipeline::ComputePipeline;
 
-let compute_pipeline = Arc::new(ComputePipeline::new(device.clone(), &shader.main_entry_point(), &())
-    .expect("failed to create compute pipeline"));
+let compute_pipeline = Arc::new(
+    ComputePipeline::new(
+        device.clone(),
+        &shader.main_entry_point(),
+        &(),
+        None,
+        |_| {},
+    )
+    .expect("failed to create compute pipeline"),
+);
 ```
 
 Before invoking that compute pipeline, we need to bind a buffer to it. This is covered by [the

@@ -11,32 +11,23 @@
 //!
 //! It is not commented, as the explanations can be found in the guide itself.
 
-use image::ImageBuffer;
-use image::Rgba;
+use image::{ImageBuffer, Rgba};
 use std::sync::Arc;
-use vulkano::buffer::BufferUsage;
-use vulkano::buffer::CpuAccessibleBuffer;
-use vulkano::command_buffer::AutoCommandBufferBuilder;
-use vulkano::command_buffer::CommandBuffer;
-use vulkano::command_buffer::DynamicState;
-use vulkano::device::Device;
-use vulkano::device::DeviceExtensions;
-use vulkano::device::Features;
+use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
+use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage, SubpassContents};
+use vulkano::device::{physical::PhysicalDevice, Device, DeviceExtensions, Features};
 use vulkano::format::Format;
-use vulkano::framebuffer::Framebuffer;
-use vulkano::framebuffer::Subpass;
-use vulkano::image::Dimensions;
-use vulkano::image::StorageImage;
-use vulkano::instance::Instance;
-use vulkano::instance::InstanceExtensions;
-use vulkano::instance::PhysicalDevice;
-use vulkano::pipeline::viewport::Viewport;
-use vulkano::pipeline::GraphicsPipeline;
+use vulkano::image::{view::ImageView, ImageDimensions, StorageImage};
+use vulkano::instance::{Instance, InstanceExtensions};
+use vulkano::pipeline::{viewport::Viewport, GraphicsPipeline};
+use vulkano::render_pass::{Framebuffer, Subpass};
+use vulkano::sync;
 use vulkano::sync::GpuFuture;
+use vulkano::Version;
 
 fn main() {
-    let instance =
-        Instance::new(None, &InstanceExtensions::none(), None).expect("failed to create instance");
+    let instance = Instance::new(None, Version::V1_1, &InstanceExtensions::none(), None)
+        .expect("failed to create instance");
 
     let physical = PhysicalDevice::enumerate(&instance)
         .next()
@@ -61,11 +52,12 @@ fn main() {
 
     let image = StorageImage::new(
         device.clone(),
-        Dimensions::Dim2d {
+        ImageDimensions::Dim2d {
             width: 1024,
             height: 1024,
+            array_layers: 1,
         },
-        Format::R8G8B8A8Unorm,
+        Format::R8G8B8A8_UNORM,
         Some(queue.family()),
     )
     .unwrap();
@@ -107,7 +99,7 @@ fn main() {
                 color: {
                     load: Clear,
                     store: Store,
-                    format: Format::R8G8B8A8Unorm,
+                    format: Format::R8G8B8A8_UNORM,
                     samples: 1,
                 }
             },
@@ -119,9 +111,10 @@ fn main() {
         .unwrap(),
     );
 
+    let view = ImageView::new(image.clone()).unwrap();
     let framebuffer = Arc::new(
         Framebuffer::start(render_pass.clone())
-            .add(image.clone())
+            .add(view)
             .unwrap()
             .build()
             .unwrap(),
@@ -169,46 +162,46 @@ void main() {
             .unwrap(),
     );
 
-    let dynamic_state = DynamicState {
-        viewports: Some(vec![Viewport {
-            origin: [0.0, 0.0],
-            dimensions: [1024.0, 1024.0],
-            depth_range: 0.0..1.0,
-        }]),
-        ..DynamicState::none()
-    };
+    let mut builder = AutoCommandBufferBuilder::primary(
+        device.clone(),
+        queue.family(),
+        CommandBufferUsage::OneTimeSubmit,
+    )
+    .unwrap();
 
-    let mut builder =
-        AutoCommandBufferBuilder::primary_one_time_submit(device.clone(), queue.family()).unwrap();
+    let viewport = Viewport {
+        origin: [0.0, 0.0],
+        dimensions: [1024.0, 1024.0],
+        depth_range: 0.0..1.0,
+    };
 
     builder
         .begin_render_pass(
             framebuffer.clone(),
-            false,
+            SubpassContents::Inline,
             vec![[0.0, 0.0, 1.0, 1.0].into()],
         )
         .unwrap()
+        .set_viewport(0, [viewport])
+        .bind_pipeline_graphics(pipeline.clone())
+        .bind_vertex_buffers(0, vertex_buffer.clone())
         .draw(
-            pipeline.clone(),
-            &dynamic_state,
-            vertex_buffer.clone(),
-            (),
-            (),
+            3, 1, 0, 0, // 3 is the number of vertices, 1 is the number of instances
         )
         .unwrap()
         .end_render_pass()
         .unwrap()
-        .copy_image_to_buffer(image.clone(), buf.clone())
+        .copy_image_to_buffer(image, buf.clone())
         .unwrap();
 
     let command_buffer = builder.build().unwrap();
 
-    let finished = command_buffer.execute(queue.clone()).unwrap();
-    finished
-        .then_signal_fence_and_flush()
+    let future = sync::now(device.clone())
+        .then_execute(queue.clone(), command_buffer)
         .unwrap()
-        .wait(None)
+        .then_signal_fence_and_flush()
         .unwrap();
+    future.wait(None).unwrap();
 
     let buffer_content = buf.read().unwrap();
     let image = ImageBuffer::<Rgba<u8>, _>::from_raw(1024, 1024, &buffer_content[..]).unwrap();

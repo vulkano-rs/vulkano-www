@@ -43,12 +43,12 @@ of one to four values. The four components are named, in order, R, G, B and A.
 > that we can store arbitrary data in this format instead of colors.
 
 You can check [the list of available formats
-here](https://docs.rs/vulkano/0.18.0/vulkano/format/enum.Format.html).
+here](https://docs.rs/vulkano/0.26.0/vulkano/format/enum.Format.html).
 
-For example if you create an image with the format `R8Sint`, then it will only have one component.
-But with the format `A2R10G10B10SscaledPack32`, you have all four components. The first part of the
+For example if you create an image with the format `R8_SINT`, then it will only have one component.
+But with the format `A2R10G10B10_SSCALED_PACK32`, you have all four components. The first part of the
 name of each format corresponds to the memory layout of the four components. For example with
-`B10G11R11UfloatPack32`, each pixel is 32 bits long where the first 10 bits is the blue component,
+`B10G11R11_UFLOAT_PACK32`, each pixel is 32 bits long where the first 10 bits is the blue component,
 the next 11 bits are the green component, and the last 11 bits are the red component. Don't worry
 if you are confused, as we will only use the most simple formats in this guide.
 
@@ -62,19 +62,26 @@ represent images. Here we are going to use a *StorageImage*, which is a general-
 > usage in shaders, like you would use a buffer. It is not recommended for storing actual images.
 
 ```rust
+use vulkano::image::{ImageDimensions, StorageImage};
 use vulkano::format::Format;
-use vulkano::image::Dimensions;
-use vulkano::image::StorageImage;
 
-let image = StorageImage::new(device.clone(), Dimensions::Dim2d { width: 1024, height: 1024 },
-                              Format::R8G8B8A8Unorm, Some(queue.family())).unwrap();
+let image = StorageImage::new(
+    device.clone(),
+    ImageDimensions::Dim2d {
+        width: 1024,
+        height: 1024,
+        array_layers: 1, // images can be arrays of layers
+    },
+    Format::R8G8B8A8_UNORM,
+    Some(queue.family()),
+)
+.unwrap();
 ```
 
-As explained above we pass the dimensions of the image and its format. The queue family to use is
-similar to the parameter when creating a buffer. It indicates which queue families are going to
-access the image.
+We pass the dimensions of the image and the desired format. The queue family to use is similar to the
+parameter when creating a buffer. It indicates which queue families are going to access the image.
 
-> **Note**: Images also have usage flags similar to buffers, but this precise constructor doesn't
-> require them.
+> **Note**: Images can be made of layers, but for this example we only have one layer. Also, images have
+> usage flags similar to buffers, but this precise constructor doesn't require them.
 
 Next: [Clearing an image](/guide/image-clear)

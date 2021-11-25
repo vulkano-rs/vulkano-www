@@ -12,7 +12,7 @@ of the image to the buffer.
 > **Note**: You can find the [full source code of this section
 > here](https://github.com/vulkano-rs/vulkano-www/blob/master/examples/guide-image-clear.rs).
 >
-> **Note**: This time the device need a device extension for the use of storage buffers, see the line 41 of the full source code.
+> **Note**: This time the device need a device extension for the use of storage buffers, see the line 36 of the full source code.
 
 ## Copying from the image to the buffer
 
@@ -22,19 +22,23 @@ contains four unsigned 8-bit values, and the image dimensions are 1024 by 1024 p
 the number of elements in the buffer is `1024 * 1024 * 4`.
 
 ```rust
-let buf = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false,
-                                         (0 .. 1024 * 1024 * 4).map(|_| 0u8))
-                                         .expect("failed to create buffer");
+let buf = CpuAccessibleBuffer::from_iter(
+    device.clone(),
+    BufferUsage::all(),
+    false,
+    (0..1024 * 1024 * 4).map(|_| 0u8),
+)
+.expect("failed to create buffer");
 ```
 
 And let's modify the command buffer we created in the previous section to add the copy operation:
 
 ```rust
-let mut builder = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap();
 builder
-    .clear_color_image(image.clone(), ClearValue::Float([0.0, 0.0, 1.0, 1.0])).unwrap()
-    .copy_image_to_buffer(image.clone(), buf.clone()).unwrap();
-let command_buffer = builder.build().unwrap();
+    .clear_color_image(image.clone(), ClearValue::Float([0.0, 0.0, 1.0, 1.0]))
+    .unwrap()
+    .copy_image_to_buffer(image.clone(), buf.clone()) // new
+    .unwrap();
 ```
 
 Since this is a memory transfer operation, this time the image values are *not* interpreted as
@@ -44,9 +48,13 @@ to the buffer.
 Let's not forget to execute the command buffer and block until the operation is finished:
 
 ```rust
-let finished = command_buffer.execute(queue.clone()).unwrap();
-finished.then_signal_fence_and_flush().unwrap()
-    .wait(None).unwrap();
+let future = sync::now(device.clone())
+    .then_execute(queue.clone(), command_buffer)
+    .unwrap()
+    .then_signal_fence_and_flush()
+    .unwrap();
+
+future.wait(None).unwrap();
 ```
 
 ## Turning the image into a PNG
