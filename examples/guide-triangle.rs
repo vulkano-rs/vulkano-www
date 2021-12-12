@@ -12,14 +12,16 @@
 //! It is not commented, as the explanations can be found in the guide itself.
 
 use image::{ImageBuffer, Rgba};
-use std::sync::Arc;
 use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
 use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage, SubpassContents};
 use vulkano::device::{physical::PhysicalDevice, Device, DeviceExtensions, Features};
 use vulkano::format::Format;
 use vulkano::image::{view::ImageView, ImageDimensions, StorageImage};
 use vulkano::instance::{Instance, InstanceExtensions};
-use vulkano::pipeline::{viewport::Viewport, GraphicsPipeline};
+use vulkano::pipeline::graphics::input_assembly::InputAssemblyState;
+use vulkano::pipeline::graphics::vertex_input::BuffersDefinition;
+use vulkano::pipeline::graphics::viewport::{Viewport, ViewportState};
+use vulkano::pipeline::GraphicsPipeline;
 use vulkano::render_pass::{Framebuffer, Subpass};
 use vulkano::sync;
 use vulkano::sync::GpuFuture;
@@ -93,32 +95,28 @@ fn main() {
     )
     .unwrap();
 
-    let render_pass = Arc::new(
-        vulkano::single_pass_renderpass!(device.clone(),
-            attachments: {
-                color: {
-                    load: Clear,
-                    store: Store,
-                    format: Format::R8G8B8A8_UNORM,
-                    samples: 1,
-                }
-            },
-            pass: {
-                color: [color],
-                depth_stencil: {}
+    let render_pass = vulkano::single_pass_renderpass!(device.clone(),
+        attachments: {
+            color: {
+                load: Clear,
+                store: Store,
+                format: Format::R8G8B8A8_UNORM,
+                samples: 1,
             }
-        )
-        .unwrap(),
-    );
+        },
+        pass: {
+            color: [color],
+            depth_stencil: {}
+        }
+    )
+    .unwrap();
 
     let view = ImageView::new(image.clone()).unwrap();
-    let framebuffer = Arc::new(
-        Framebuffer::start(render_pass.clone())
-            .add(view)
-            .unwrap()
-            .build()
-            .unwrap(),
-    );
+    let framebuffer = Framebuffer::start(render_pass.clone())
+        .add(view)
+        .unwrap()
+        .build()
+        .unwrap();
 
     mod vs {
         vulkano_shaders::shader! {
@@ -148,19 +146,24 @@ void main() {
         }
     }
 
-    let vs = vs::Shader::load(device.clone()).expect("failed to create shader module");
-    let fs = fs::Shader::load(device.clone()).expect("failed to create shader module");
+    let vs = vs::load(device.clone()).expect("failed to create shader module");
+    let fs = fs::load(device.clone()).expect("failed to create shader module");
 
-    let pipeline = Arc::new(
-        GraphicsPipeline::start()
-            .vertex_input_single_buffer::<Vertex>()
-            .vertex_shader(vs.main_entry_point(), ())
-            .viewports_dynamic_scissors_irrelevant(1)
-            .fragment_shader(fs.main_entry_point(), ())
-            .render_pass(Subpass::from(render_pass.clone(), 0).unwrap())
-            .build(device.clone())
-            .unwrap(),
-    );
+    let viewport = Viewport {
+        origin: [0.0, 0.0],
+        dimensions: [1024.0, 1024.0],
+        depth_range: 0.0..1.0,
+    };
+
+    let pipeline = GraphicsPipeline::start()
+        .vertex_input_state(BuffersDefinition::new().vertex::<Vertex>())
+        .vertex_shader(vs.entry_point("main").unwrap(), ())
+        .input_assembly_state(InputAssemblyState::new())
+        .viewport_state(ViewportState::viewport_fixed_scissor_irrelevant([viewport]))
+        .fragment_shader(fs.entry_point("main").unwrap(), ())
+        .render_pass(Subpass::from(render_pass.clone(), 0).unwrap())
+        .build(device.clone())
+        .unwrap();
 
     let mut builder = AutoCommandBufferBuilder::primary(
         device.clone(),
@@ -169,12 +172,6 @@ void main() {
     )
     .unwrap();
 
-    let viewport = Viewport {
-        origin: [0.0, 0.0],
-        dimensions: [1024.0, 1024.0],
-        depth_range: 0.0..1.0,
-    };
-
     builder
         .begin_render_pass(
             framebuffer.clone(),
@@ -182,7 +179,6 @@ void main() {
             vec![[0.0, 0.0, 1.0, 1.0].into()],
         )
         .unwrap()
-        .set_viewport(0, [viewport])
         .bind_pipeline_graphics(pipeline.clone())
         .bind_vertex_buffers(0, vertex_buffer.clone())
         .draw(

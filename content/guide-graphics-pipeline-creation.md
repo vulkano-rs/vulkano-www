@@ -51,30 +51,44 @@ void main() {
     }
 }
 
-let vs = vs::Shader::load(device.clone()).expect("failed to create shader module");
-let fs = fs::Shader::load(device.clone()).expect("failed to create shader module");
+let vs = vs::load(device.clone()).expect("failed to create shader module");
+let fs = fs::load(device.clone()).expect("failed to create shader module");
 ```
 
 Then we can create the graphics pipeline by using a builder.
 
 ```rust
+use vulkano::pipeline::graphics::input_assembly::InputAssemblyState;
+use vulkano::pipeline::graphics::vertex_input::BuffersDefinition;
+use vulkano::pipeline::graphics::viewport::{Viewport, ViewportState};
 use vulkano::pipeline::GraphicsPipeline;
+use vulkano::pipeline::viewport::Viewport;
 use vulkano::render_pass::Subpass;
 
-let pipeline = Arc::new(GraphicsPipeline::start()
-    // Defines what kind of vertex input is expected.
-    .vertex_input_single_buffer::<Vertex>()
-    // The vertex shader.
-    .vertex_shader(vs.main_entry_point(), ())
-    // Defines the viewport (explanations below).
-    .viewports_dynamic_scissors_irrelevant(1)
-    // The fragment shader.
-    .fragment_shader(fs.main_entry_point(), ())
+// More on this latter
+let viewport = Viewport {
+    origin: [0.0, 0.0],
+    dimensions: [1024.0, 1024.0],
+    depth_range: 0.0..1.0,
+};
+
+let pipeline = GraphicsPipeline::start()
+    // Describes the layout of the vertex input and how should it behave
+    .vertex_input_state(BuffersDefinition::new().vertex::<Vertex>())
+    // A Vulkan shader can in theory contain multiple entry points, so we have to specify
+    // which one.
+    .vertex_shader(vs.entry_point("main").unwrap(), ())
+    // Indicate the type of the primitives (the default is a list of triangles)
+    .input_assembly_state(InputAssemblyState::new())
+    // Set the fixed viewport
+    .viewport_state(ViewportState::viewport_fixed_scissor_irrelevant([viewport]))
+    // Same as the vertex input, but this for the fragment input
+    .fragment_shader(fs.entry_point("main").unwrap(), ())
     // This graphics pipeline object concerns the first pass of the render pass.
     .render_pass(Subpass::from(render_pass.clone(), 0).unwrap())
     // Now that everything is specified, we call `build`.
     .build(device.clone())
-    .unwrap());
+    .unwrap();
 ```
 
 When we draw, we have the possibility to draw only to a specific rectangle of the screen called a
@@ -82,10 +96,12 @@ When we draw, we have the possibility to draw only to a specific rectangle of th
 we covered in [the vertex input section of the guide](/guide/vertex-input). Any part of the shape
 that ends up outside of this rectangle will be discarded.
 
-The call to `viewports_dynamic_scissors_irrelevant(1)` configures the builder so that we use one
-viewport, and that the state of this viewport is *dynamic*. This makes it possible to change the
-viewport for each draw command. If the viewport state wasn't dynamic, then we would have to create
-a new pipeline object if we wanted to draw to another image of a different size.
+The state `ViewportState::viewport_fixed_scissor_irrelevant()` configures the builder so that we use one
+specific viewport, and that the state of this viewport is *fixed*. This makes it not possible to change the
+viewport for each draw command, but adds more performance. Because we are drawing only one image and not
+changing the viewport between draws, this is the optimal approach. If you wanted to draw to another image
+of a different size, you would have to create a new pipeline object. Another approach would be to use a
+dynamic viewport, where you would pass your viewport in the command buffer instead.
 
 > **Note**: If you configure multiple viewports, you can use geometry shaders to choose which
 > viewport the shape is going to be drawn to. This topic isn't covered here.
@@ -95,24 +111,15 @@ a new pipeline object if we wanted to draw to another image of a different size.
 Now that we have all the ingredients, it is time to bind everything and insert a draw call inside of
 our render pass.
 
-To draw the triangle, we need to pass the viewport, the pipeline, the vertex_buffer and the actual
-draw command:
+To draw the triangle, we need to pass the pipeline, the vertex_buffer and the actual draw command:
 
 ```rust
-use vulkano::pipeline::viewport::Viewport;
-
 let mut builder = AutoCommandBufferBuilder::primary(
     device.clone(),
     queue.family(),
     CommandBufferUsage::OneTimeSubmit,
 )
 .unwrap();
-
-let viewport = Viewport {
-    origin: [0.0, 0.0],
-    dimensions: [1024.0, 1024.0],
-    depth_range: 0.0..1.0,
-};
 
 builder
     .begin_render_pass(
@@ -123,7 +130,6 @@ builder
     .unwrap()
 
     // new stuff
-    .set_viewport(0, [viewport])
     .bind_pipeline_graphics(pipeline.clone())
     .bind_vertex_buffers(0, vertex_buffer.clone())
     .draw(

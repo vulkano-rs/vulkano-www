@@ -1,6 +1,6 @@
 [package]
 name = "vulkano-www"
-version = "0.26.0"
+version = "0.27.1"
 edition = "2021"
 authors = ["Pierre Krieger <pierre.krieger1708@gmail.com>"]
 publish = false
@@ -12,6 +12,6 @@ pulldown-cmark = "0.8.0"
 rouille = "3.0.0"
 
 [dev-dependencies]
-vulkano = "0.26.0"
-vulkano-shaders = "0.26.0"
-image = "0.23"
+vulkano = "0.27.1"
+vulkano-shaders = "0.27.1"
+image = "0.23.14"

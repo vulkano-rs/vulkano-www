@@ -11,13 +11,13 @@
 //!
 //! It is not commented, as the explanations can be found in the guide itself.
 
-use std::sync::Arc;
 use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
 use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage};
 use vulkano::descriptor_set::PersistentDescriptorSet;
 use vulkano::device::physical::PhysicalDevice;
 use vulkano::device::{Device, DeviceExtensions, Features};
 use vulkano::instance::{Instance, InstanceExtensions};
+use vulkano::pipeline::Pipeline;
 use vulkano::pipeline::{ComputePipeline, PipelineBindPoint};
 use vulkano::sync;
 use vulkano::sync::GpuFuture;
@@ -77,17 +77,15 @@ void main() {
         }
     }
 
-    let shader = cs::Shader::load(device.clone()).expect("failed to create shader module");
-    let compute_pipeline = Arc::new(
-        ComputePipeline::new(
-            device.clone(),
-            &shader.main_entry_point(),
-            &(),
-            None,
-            |_| {},
-        )
-        .expect("failed to create compute pipeline"),
-    );
+    let shader = cs::load(device.clone()).expect("failed to create shader module");
+    let compute_pipeline = ComputePipeline::new(
+        device.clone(),
+        shader.entry_point("main").unwrap(),
+        &(),
+        None,
+        |_| {},
+    )
+    .expect("failed to create compute pipeline");
 
     let layout = compute_pipeline
         .layout()

@@ -13,7 +13,6 @@
 
 use image::ImageBuffer;
 use image::Rgba;
-use std::sync::Arc;
 use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
 use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage};
 use vulkano::descriptor_set::PersistentDescriptorSet;
@@ -21,6 +20,7 @@ use vulkano::device::{physical::PhysicalDevice, Device, DeviceExtensions, Featur
 use vulkano::format::Format;
 use vulkano::image::{view::ImageView, ImageDimensions, StorageImage};
 use vulkano::instance::{Instance, InstanceExtensions};
+use vulkano::pipeline::Pipeline;
 use vulkano::pipeline::{ComputePipeline, PipelineBindPoint};
 use vulkano::sync;
 use vulkano::sync::GpuFuture;
@@ -85,18 +85,16 @@ void main() {
         }
     }
 
-    let shader = cs::Shader::load(device.clone()).expect("failed to create shader module");
+    let shader = cs::load(device.clone()).expect("failed to create shader module");
 
-    let compute_pipeline = Arc::new(
-        ComputePipeline::new(
-            device.clone(),
-            &shader.main_entry_point(),
-            &(),
-            None,
-            |_| {},
-        )
-        .expect("failed to create compute pipeline"),
-    );
+    let compute_pipeline = ComputePipeline::new(
+        device.clone(),
+        shader.entry_point("main").unwrap(),
+        &(),
+        None,
+        |_| {},
+    )
+    .expect("failed to create compute pipeline");
 
     let image = StorageImage::new(
         device.clone(),

@@ -70,7 +70,7 @@ As you can see, it is very straight-forward. We create a *builder*, add a copy c
 
 <!-- todo: Explain about secondary command buffers -->
 Vulkan supports primary and secondary command buffers. We won't cover them here, but you can read
- more about them [here](https://docs.rs/vulkano/0.26.0/vulkano/command_buffer/index.html).
+ more about them [here](https://docs.rs/vulkano/0.27.1/vulkano/command_buffer/index.html).
 
 One thing to notice is that the `AutoCommandBufferBuilder::primary()` method takes as
 parameter a queue family. This must be the queue family that the command buffer is going to run on.

@@ -31,6 +31,7 @@ Just like there exist multiple kinds of buffers, there also exist multiple diffe
 all represent a descriptor set. For our application, we are going to use a `PersistentDescriptorSet`:
 
 ```rust
+use vulkano::pipeline::Pipeline;
 use vulkano::descriptor_set::PersistentDescriptorSet;
 
 let layout = compute_pipeline
@@ -44,8 +45,8 @@ set_builder.add_buffer(data_buffer.clone()).unwrap();
 let set = set_builder.build().unwrap();
 ```
 
-In order to create a descriptor set, you'll need to know the layout that it is targeting. We do this by
-calling `.layout()` on our pipeline to obtain the pipeline's layout. Next we'll fetch the layout
+In order to create a descriptor set, you'll need to know the layout that it is targeting. We do this by using the "Pipeline" trait
+and calling `.layout()` on our pipeline to obtain the pipeline's layout. Next we'll fetch the layout
 specific to the pass that we want to target by using `.descriptor_set_layouts().get(0)` where zero indicates the
 first index of the pass that we are targeting.
 

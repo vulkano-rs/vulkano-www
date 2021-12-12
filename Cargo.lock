@@ -1052,9 +1052,9 @@ dependencies = [
 
 [[package]]
 name = "vulkano"
-version = "0.26.0"
+version = "0.27.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4e0c9cc7471d065c6066b2a0daaae4232a100fdb6f0aad2a4b12652a2bd8ede0"
+checksum = "9b9901caa88a0d312e9c5bbf000a864798ffc23f689463779275427f1aa84d42"
 dependencies = [
  "ash",
  "crossbeam-queue",
@@ -1076,10 +1076,12 @@ dependencies = [
 
 [[package]]
 name = "vulkano-shaders"
-version = "0.26.0"
+version = "0.27.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e097b198fe4fe15adeeae709a7d2d209259cfb9035c05e0c3726e34c1177a646"
+checksum = "f416d43d3ce75ae3f407fbce90d4bee54ce64004e755438bb83dbcec8b4c4974"
 dependencies = [
+ "fnv",
+ "heck",
  "proc-macro2",
  "quote",
  "shaderc",
@@ -1089,7 +1091,7 @@ dependencies = [
 
 [[package]]
 name = "vulkano-www"
-version = "0.26.0"
+version = "0.27.1"
 dependencies = [
  "image",
  "lazy_static",
