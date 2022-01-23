@@ -28,23 +28,27 @@ descriptor set to that slot.
 ## Creating a descriptor set
 
 Just like there exist multiple kinds of buffers, there also exist multiple different structs that
-all represent a descriptor set. Here we are going to use a `PersistentDescriptorSet`:
+all represent a descriptor set. For our application, we are going to use a `PersistentDescriptorSet`:
 
 ```rust
-use vulkano::descriptor::descriptor_set::PersistentDescriptorSet;
-use vulkano::descriptor::PipelineLayoutAbstract;
+use vulkano::pipeline::Pipeline;
+use vulkano::descriptor_set::PersistentDescriptorSet;
 
-let layout = compute_pipeline.layout().descriptor_set_layout(0).unwrap();
-let set = Arc::new(PersistentDescriptorSet::start(layout.clone())
-    .add_buffer(data_buffer.clone()).unwrap()
-    .build().unwrap()
-);
+let layout = compute_pipeline
+    .layout()
+    .descriptor_set_layouts()
+    .get(0)
+    .unwrap();
+let mut set_builder = PersistentDescriptorSet::start(layout.clone());
+set_builder.add_buffer(data_buffer.clone()).unwrap();
+
+let set = set_builder.build().unwrap();
 ```
 
-In order to create a descriptor set, you'll need to know the layout that it is targeting. We do this by
-calling `layout()` on our pipeline to obtain the pipeline's layout. Next we'll fetch the layout
-specfic to the pass that we want to target by using `descriptor_set_layout(0)` where zero indicates the
-index of the pass that we are targeting.
+In order to create a descriptor set, you'll need to know the layout that it is targeting. We do this by using the "Pipeline" trait
+and calling `.layout()` on our pipeline to obtain the pipeline's layout. Next we'll fetch the layout
+specific to the pass that we want to target by using `.descriptor_set_layouts().get(0)` where zero indicates the
+first index of the pass that we are targeting.
 
 Once you have created a descriptor set, you may also use it with other pipelines, as long as the
 bindings' types match those the pipelines' shaders expect. But Vulkan requires that you provide a

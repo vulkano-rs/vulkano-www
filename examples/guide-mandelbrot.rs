@@ -13,28 +13,22 @@
 
 use image::ImageBuffer;
 use image::Rgba;
-use std::sync::Arc;
-use vulkano::buffer::BufferUsage;
-use vulkano::buffer::CpuAccessibleBuffer;
-use vulkano::command_buffer::AutoCommandBufferBuilder;
-use vulkano::command_buffer::CommandBuffer;
-use vulkano::descriptor::descriptor_set::PersistentDescriptorSet;
-use vulkano::descriptor::pipeline_layout::PipelineLayoutAbstract;
-use vulkano::device::Device;
-use vulkano::device::DeviceExtensions;
-use vulkano::device::Features;
+use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
+use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage};
+use vulkano::descriptor_set::PersistentDescriptorSet;
+use vulkano::device::{physical::PhysicalDevice, Device, DeviceExtensions, Features};
 use vulkano::format::Format;
-use vulkano::image::Dimensions;
-use vulkano::image::StorageImage;
-use vulkano::instance::Instance;
-use vulkano::instance::InstanceExtensions;
-use vulkano::instance::PhysicalDevice;
-use vulkano::pipeline::ComputePipeline;
+use vulkano::image::{view::ImageView, ImageDimensions, StorageImage};
+use vulkano::instance::{Instance, InstanceExtensions};
+use vulkano::pipeline::Pipeline;
+use vulkano::pipeline::{ComputePipeline, PipelineBindPoint};
+use vulkano::sync;
 use vulkano::sync::GpuFuture;
+use vulkano::Version;
 
 fn main() {
-    let instance =
-        Instance::new(None, &InstanceExtensions::none(), None).expect("failed to create instance");
+    let instance = Instance::new(None, Version::V1_1, &InstanceExtensions::none(), None)
+        .expect("failed to create instance");
 
     let physical = PhysicalDevice::enumerate(&instance)
         .next()
@@ -56,17 +50,6 @@ fn main() {
     };
 
     let queue = queues.next().unwrap();
-
-    let image = StorageImage::new(
-        device.clone(),
-        Dimensions::Dim2d {
-            width: 1024,
-            height: 1024,
-        },
-        Format::R8G8B8A8Unorm,
-        Some(queue.family()),
-    )
-    .unwrap();
 
     mod cs {
         vulkano_shaders::shader! {
@@ -102,26 +85,39 @@ void main() {
         }
     }
 
-    let shader = cs::Shader::load(device.clone()).expect("failed to create shader module");
+    let shader = cs::load(device.clone()).expect("failed to create shader module");
 
-    let compute_pipeline = Arc::new(
-        ComputePipeline::new(device.clone(), &shader.main_entry_point(), &())
-            .expect("failed to create compute pipeline"),
-    );
+    let compute_pipeline = ComputePipeline::new(
+        device.clone(),
+        shader.entry_point("main").unwrap(),
+        &(),
+        None,
+        |_| {},
+    )
+    .expect("failed to create compute pipeline");
 
-    let set = Arc::new(
-        PersistentDescriptorSet::start(
-            compute_pipeline
-                .layout()
-                .descriptor_set_layout(0)
-                .unwrap()
-                .clone(),
-        )
-        .add_image(image.clone())
-        .unwrap()
-        .build()
-        .unwrap(),
-    );
+    let image = StorageImage::new(
+        device.clone(),
+        ImageDimensions::Dim2d {
+            width: 1024,
+            height: 1024,
+            array_layers: 1,
+        },
+        Format::R8G8B8A8_UNORM,
+        Some(queue.family()),
+    )
+    .unwrap();
+
+    let layout = compute_pipeline
+        .layout()
+        .descriptor_set_layouts()
+        .get(0)
+        .unwrap();
+    let mut set_builder = PersistentDescriptorSet::start(layout.clone());
+
+    let view = ImageView::new(image.clone()).unwrap();
+    set_builder.add_image(view).unwrap();
+    let set = set_builder.build().unwrap();
 
     let buf = CpuAccessibleBuffer::from_iter(
         device.clone(),
@@ -131,25 +127,34 @@ void main() {
     )
     .expect("failed to create buffer");
 
-    let mut builder = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap();
+    let mut builder = AutoCommandBufferBuilder::primary(
+        device.clone(),
+        queue.family(),
+        CommandBufferUsage::OneTimeSubmit,
+    )
+    .unwrap();
     builder
-        .dispatch(
-            [1024 / 8, 1024 / 8, 1],
-            compute_pipeline.clone(),
-            set.clone(),
-            (),
+        .bind_pipeline_compute(compute_pipeline.clone())
+        .bind_descriptor_sets(
+            PipelineBindPoint::Compute,
+            compute_pipeline.layout().clone(),
+            0,
+            set,
         )
+        .dispatch([1024 / 8, 1024 / 8, 1])
         .unwrap()
         .copy_image_to_buffer(image.clone(), buf.clone())
         .unwrap();
+
     let command_buffer = builder.build().unwrap();
 
-    let finished = command_buffer.execute(queue.clone()).unwrap();
-    finished
-        .then_signal_fence_and_flush()
+    let future = sync::now(device.clone())
+        .then_execute(queue.clone(), command_buffer)
         .unwrap()
-        .wait(None)
+        .then_signal_fence_and_flush()
         .unwrap();
+
+    future.wait(None).unwrap();
 
     let buffer_content = buf.read().unwrap();
     let image = ImageBuffer::<Rgba<u8>, _>::from_raw(1024, 1024, &buffer_content[..]).unwrap();

@@ -11,27 +11,20 @@
 //!
 //! It is not commented, as the explanations can be found in the guide itself.
 
-use image::ImageBuffer;
-use image::Rgba;
-use vulkano::buffer::BufferUsage;
-use vulkano::buffer::CpuAccessibleBuffer;
-use vulkano::command_buffer::AutoCommandBufferBuilder;
-use vulkano::command_buffer::CommandBuffer;
-use vulkano::device::Device;
-use vulkano::device::DeviceExtensions;
-use vulkano::device::Features;
-use vulkano::format::ClearValue;
-use vulkano::format::Format;
-use vulkano::image::Dimensions;
-use vulkano::image::StorageImage;
-use vulkano::instance::Instance;
-use vulkano::instance::InstanceExtensions;
-use vulkano::instance::PhysicalDevice;
+use image::{ImageBuffer, Rgba};
+use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
+use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage};
+use vulkano::device::{physical::PhysicalDevice, Device, DeviceExtensions, Features};
+use vulkano::format::{ClearValue, Format};
+use vulkano::image::{ImageDimensions, StorageImage};
+use vulkano::instance::{Instance, InstanceExtensions};
+use vulkano::sync;
 use vulkano::sync::GpuFuture;
+use vulkano::Version;
 
 fn main() {
-    let instance =
-        Instance::new(None, &InstanceExtensions::none(), None).expect("failed to create instance");
+    let instance = Instance::new(None, Version::V1_1, &InstanceExtensions::none(), None)
+        .expect("failed to create instance");
 
     let physical = PhysicalDevice::enumerate(&instance)
         .next()
@@ -57,16 +50,16 @@ fn main() {
     // Image creation
     let image = StorageImage::new(
         device.clone(),
-        Dimensions::Dim2d {
+        ImageDimensions::Dim2d {
             width: 1024,
             height: 1024,
+            array_layers: 1, // images can be arrays of layers
         },
-        Format::R8G8B8A8Unorm,
+        Format::R8G8B8A8_UNORM,
         Some(queue.family()),
     )
     .unwrap();
 
-    // Clearing an image
     let buf = CpuAccessibleBuffer::from_iter(
         device.clone(),
         BufferUsage::all(),
@@ -75,7 +68,12 @@ fn main() {
     )
     .expect("failed to create buffer");
 
-    let mut builder = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap();
+    let mut builder = AutoCommandBufferBuilder::primary(
+        device.clone(),
+        queue.family(),
+        CommandBufferUsage::OneTimeSubmit,
+    )
+    .unwrap();
     builder
         .clear_color_image(image.clone(), ClearValue::Float([0.0, 0.0, 1.0, 1.0]))
         .unwrap()
@@ -83,12 +81,13 @@ fn main() {
         .unwrap();
     let command_buffer = builder.build().unwrap();
 
-    let finished = command_buffer.execute(queue.clone()).unwrap();
-    finished
-        .then_signal_fence_and_flush()
+    let future = sync::now(device.clone())
+        .then_execute(queue.clone(), command_buffer)
         .unwrap()
-        .wait(None)
+        .then_signal_fence_and_flush()
         .unwrap();
+
+    future.wait(None).unwrap();
 
     // Exporting the result
     let buffer_content = buf.read().unwrap();

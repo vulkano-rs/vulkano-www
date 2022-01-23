@@ -1,3 +1,11 @@
+# Disclaimer: From now on, this guide is unfinished and outdated
+
+As stated in the introduction, now it is a great time to take a look at the
+[examples](https://github.com/vulkano-rs/vulkano/tree/master/examples)
+(more information [here](/guide/introduction)). This part of guide is still a
+work in progress, so it may not even work. If you want to contribute to this guide,
+take a look [at this guide repository](https://github.com/vulkano-rs/vulkano-www).
+
 # Windowing
 
 Up until now, we have only created applications that perform one quick action then exit. What

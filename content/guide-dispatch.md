@@ -7,29 +7,52 @@ Creating a command buffer is similar to [the example operation in a previous
 section](/guide/example-operation).
 
 ```rust
-let mut builder = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap();
-builder.dispatch([1024, 1, 1], compute_pipeline.clone(), set.clone(), ()).unwrap();
+use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage};
+use vulkano::pipeline::PipelineBindPoint;
+
+let mut builder = AutoCommandBufferBuilder::primary(
+    device.clone(),
+    queue.family(),
+    CommandBufferUsage::OneTimeSubmit,
+)
+.unwrap();
+
+builder
+    .bind_pipeline_compute(compute_pipeline.clone())
+    .bind_descriptor_sets(
+        PipelineBindPoint::Compute,
+        compute_pipeline.layout().clone(),
+        0, // 0 is the index of our set
+        set,
+    )
+    .dispatch([1024, 1, 1])
+    .unwrap();
+
 let command_buffer = builder.build().unwrap();
 ```
 
-As explained in [the compute pipeline section](/guide/compute-pipeline), we want to spawn 1024
-*work groups*. This value is indicated when we add the command to the command buffer.
+First, we bind the pipeline and then the descriptior sets, indicating the type of set, the layout
+and the descriptor sets we are going to use. Here "set" could have actually been many, were we wold
+indicated our desired with an index. Because we only have one, the index is 0.
 
-> **Note**: The last parameter contains the *push constants*, which we haven't covered yet.
-> Push constants are a way to pass a small amount of data to a shader, as an alternative to
-> putting this data in a buffer in a descriptor set.
+As explained in [the compute pipeline section](/guide/compute-pipeline), we want to spawn 1024
+*work groups*. This value is indicated by the actuall `.dispatch()` method.
 
 Just like we already covered, we submit the command buffer:
 
 ```rust
-let finished = command_buffer.execute(queue.clone()).unwrap();
+let future = sync::now(device.clone())
+    .then_execute(queue.clone(), command_buffer)
+    .unwrap()
+    .then_signal_fence_and_flush()
+    .unwrap();
 ```
 
-This just schedules the operation for execution. We have to wait for it to complete:
+This just schedules the operation for execution and tells the GPU to signal when finished.
+We have to wait for it to complete:
 
 ```rust
-finished.then_signal_fence_and_flush().unwrap()
-    .wait(None).unwrap();
+future.wait(None).unwrap();
 ```
 
 Once complete, we can check that the pipeline has been correctly executed:

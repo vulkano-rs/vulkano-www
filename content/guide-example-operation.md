@@ -15,13 +15,13 @@ The first step is to create two `CpuAccessibleBuffer`s: the source and the desti
 was covered in [the previous section](/guide/buffer-creation).
 
 ```rust
-let source_content = 0 .. 64;
-let source = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false,
-                                            source_content).expect("failed to create buffer");
+let source_content = 0..64;
+let source = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false, source_content)
+    .expect("failed to create buffer");
 
-let dest_content = (0 .. 64).map(|_| 0);
-let dest = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false,
-                                          dest_content).expect("failed to create buffer");
+let destination_content = (0..64).map(|_| 0);
+let destination = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false, destination_content)
+    .expect("failed to create buffer");
 ```
 
 The iterators might look a bit tricky. The `source_content` iterator produces 64 values ranging
@@ -49,10 +49,17 @@ execute.
 Here is how you create a command buffer:
 
 ```rust
-use vulkano::command_buffer::AutoCommandBufferBuilder;
+use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage};
 
-let mut builder = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap();
+let mut builder = AutoCommandBufferBuilder::primary(
+    device.clone(),
+    queue.family(),
+    CommandBufferUsage::OneTimeSubmit,
+)
+.unwrap();
+
 builder.copy_buffer(source.clone(), dest.clone()).unwrap();
+
 let command_buffer = builder.build().unwrap();
 ```
 
@@ -61,52 +68,71 @@ As you can see, it is very straight-forward. We create a *builder*, add a copy c
 [the buffers creation section](/guide/buffer-creation), we call `clone()` multiple times but we
  only clone `Arc`s.
 
-One thing to notice is that the `AutoCommandBufferBuilder::new()` method takes as
+<!-- todo: Explain about secondary command buffers -->
+Vulkan supports primary and secondary command buffers. We won't cover them here, but you can read
+ more about them [here](https://docs.rs/vulkano/0.27.1/vulkano/command_buffer/index.html).
+
+One thing to notice is that the `AutoCommandBufferBuilder::primary()` method takes as
 parameter a queue family. This must be the queue family that the command buffer is going to run on.
 In this example we don't have much choice anyway (as we only use one queue and thus one queue
 family), but when you design a real program you have to be aware of this requirement.
 
 ## Submission and synchronization
 
-And now we submit the command buffer so that it gets executed:
+And "now" we submit the command buffer so that it gets executed:
 
 ```rust
-use vulkano::command_buffer::CommandBuffer;
-let finished = command_buffer.execute(queue.clone()).unwrap();
+use vulkano::sync;
+use vulkano::sync::GpuFuture;
+
+sync::now(device.clone())
+    .then_execute(queue.clone(), command_buffer)
+    .unwrap();
 ```
 
-The `execute` function returns an object that represents the execution of the command buffer.
+The `.then_execute()` method returns an object that represents the execution of the command buffer.
 
 After submitting the command buffer, we might be tempted to try to read the content of the
 `destination` buffer as demonstrated in [the previous section](/guide/buffer-creation). However
-calling `destination.read()` now would return an error, because the buffer is maybe currently being
-written by the GPU.
+calling `destination.read()` now would sometimes return an error, because in that cases the buffer will
+still be being written by the GPU.
 
 Submitting an operation doesn't wait for the operation to be complete. Instead it just sends some
 kind of signal to the GPU to instruct it that it must start processing the command buffer, and the
 actual processing is performed asynchronously.
 
 In order to read the content of `destination` and make sure that our copy succeeded, we need to
-wait until the operation is complete. This is done by making use of the `finished` object that
-was returned by `execute`:
+wait until the operation is complete.
+
+First, we need to tell the gpu that it should signal when it's finished:
 
 ```rust
-use vulkano::sync::GpuFuture;
-
-finished.then_signal_fence_and_flush().unwrap()
-    .wait(None).unwrap();
+let future = sync::now(device.clone())
+    .then_execute(queue.clone(), command_buffer)
+    .unwrap()
+    .then_signal_fence_and_flush()
+    .unwrap();
 ```
 
-This may look a bit complicated, but we will cover what a *fence* is in a later section of the
-guide and what signalling it means. The `wait()` function blocks the current thread until the GPU
-has finished execution.
+We will better cover what a *fence* is in a later section of the guide and what signalling it means.
+The "future" object will store the information about the execution.
 
-Only after this is done can we call `destination.read()` and check that our copy succeeded.
+Next, we wait for the GPU to finish executing:
+
+```rust
+future.wait(None).unwrap();
+```
+
+The `None` parameter is an optional timeout.
+> **Note**: We can only do this because we called `.then_signal_fence_and_flush()` earlier. If we
+> didn't do that, the .wait() method woudn't even exist.
+
+Only after this is done can we safely call `destination.read()` and check that our copy succeeded.
 
 ```rust
 let src_content = source.read().unwrap();
-let dest_content = dest.read().unwrap();
-assert_eq!(&*src_content, &*dest_content);
+let destination_content = destination.read().unwrap();
+assert_eq!(&*src_content, &*destination_content);
 ```
 
 Next: [Introduction to compute operations](/guide/compute-intro)

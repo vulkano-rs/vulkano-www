@@ -119,7 +119,8 @@ application compile-time*. We'll accomplish this using `vulkano-shaders`, which 
 To use `vulkano-shaders`, we first have to add a dependency:
 
 ```toml
-vulkano-shaders = "0.18"
+# Notice that it uses the same version as vulkano
+vulkano-shaders = "0.27.1"
 ```
 
 Here is the syntax:
@@ -146,24 +147,31 @@ void main() {
 ```
 
 As you can see, we specify some "fields" in the `vulkano_shaders::shader!` macro to specify our shader.
-The macro will then compile the GLSL code (outputting compilation errors if any) and generate several structs and methods, including one named `Shader` that provides a method named `load`.
+The macro will then compile the GLSL code (outputting compilation errors if any) and generate several structs and methods, including one named `load`.
 This is the method that we have to use next:
 
 ```rust
-let shader = cs::Shader::load(device.clone())
+let shader = cs::load(device.clone())
     .expect("failed to create shader module");
 ```
 
 This feeds the shader to the Vulkan implementation. The last step to perform at runtime is to
 create a ***compute pipeline*** object from that shader. This is the object that actually describes
-the compute operation that we are going to perform.
+the compute operation that we are going to perform. We won't cover the last three parameters, but
+you can search about them
+[here](https://docs.rs/vulkano/0.27.1/vulkano/pipeline/compute/struct.ComputePipeline.html).
 
 ```rust
-use std::sync::Arc;
 use vulkano::pipeline::ComputePipeline;
 
-let compute_pipeline = Arc::new(ComputePipeline::new(device.clone(), &shader.main_entry_point(), &())
-    .expect("failed to create compute pipeline"));
+let compute_pipeline = ComputePipeline::new(
+    device.clone(),
+    shader.entry_point("main").unwrap(),
+    &(),
+    None,
+    |_| {},
+)
+.expect("failed to create compute pipeline");
 ```
 
 Before invoking that compute pipeline, we need to bind a buffer to it. This is covered by [the

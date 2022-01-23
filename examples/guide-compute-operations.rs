@@ -11,26 +11,21 @@
 //!
 //! It is not commented, as the explanations can be found in the guide itself.
 
-use std::sync::Arc;
-use vulkano::buffer::BufferUsage;
-use vulkano::buffer::CpuAccessibleBuffer;
-use vulkano::command_buffer::AutoCommandBufferBuilder;
-use vulkano::command_buffer::CommandBuffer;
-use vulkano::descriptor::descriptor_set::PersistentDescriptorSet;
-use vulkano::descriptor::pipeline_layout::PipelineLayoutAbstract;
-use vulkano::device::Device;
-use vulkano::device::DeviceExtensions;
-use vulkano::device::Features;
-use vulkano::instance::Instance;
-use vulkano::instance::InstanceExtensions;
-use vulkano::instance::PhysicalDevice;
-use vulkano::pipeline::ComputePipeline;
+use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
+use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage};
+use vulkano::descriptor_set::PersistentDescriptorSet;
+use vulkano::device::physical::PhysicalDevice;
+use vulkano::device::{Device, DeviceExtensions, Features};
+use vulkano::instance::{Instance, InstanceExtensions};
+use vulkano::pipeline::Pipeline;
+use vulkano::pipeline::{ComputePipeline, PipelineBindPoint};
+use vulkano::sync;
 use vulkano::sync::GpuFuture;
-use vulkano::descriptor::PipelineLayoutAbstract;
+use vulkano::Version;
 
 fn main() {
-    let instance =
-        Instance::new(None, &InstanceExtensions::none(), None).expect("failed to create instance");
+    let instance = Instance::new(None, Version::V1_1, &InstanceExtensions::none(), None)
+        .expect("failed to create instance");
 
     let physical = PhysicalDevice::enumerate(&instance)
         .next()
@@ -82,40 +77,51 @@ void main() {
         }
     }
 
-    let shader = cs::Shader::load(device.clone()).expect("failed to create shader module");
-    let compute_pipeline = Arc::new(
-        ComputePipeline::new(device.clone(), &shader.main_entry_point(), &())
-            .expect("failed to create compute pipeline"),
-    );
+    let shader = cs::load(device.clone()).expect("failed to create shader module");
+    let compute_pipeline = ComputePipeline::new(
+        device.clone(),
+        shader.entry_point("main").unwrap(),
+        &(),
+        None,
+        |_| {},
+    )
+    .expect("failed to create compute pipeline");
 
-    // Descriptor sets
-    let set = Arc::new(
-        PersistentDescriptorSet::start(
-            compute_pipeline
-                .layout()
-                .descriptor_set_layout(0)
-                .unwrap()
-                .clone(),
-        )
-        .add_buffer(data_buffer.clone())
-        .unwrap()
-        .build()
-        .unwrap(),
-    );
+    let layout = compute_pipeline
+        .layout()
+        .descriptor_set_layouts()
+        .get(0)
+        .unwrap();
+    let mut set_builder = PersistentDescriptorSet::start(layout.clone());
+    set_builder.add_buffer(data_buffer.clone()).unwrap();
 
-    // Dispatch
-    let mut builder = AutoCommandBufferBuilder::new(device.clone(), queue.family()).unwrap();
+    let set = set_builder.build().unwrap();
+
+    let mut builder = AutoCommandBufferBuilder::primary(
+        device.clone(),
+        queue.family(),
+        CommandBufferUsage::OneTimeSubmit,
+    )
+    .unwrap();
     builder
-        .dispatch([1024, 1, 1], compute_pipeline.clone(), set.clone(), ())
+        .bind_pipeline_compute(compute_pipeline.clone())
+        .bind_descriptor_sets(
+            PipelineBindPoint::Compute,
+            compute_pipeline.layout().clone(),
+            0, // 0 is the index of our set
+            set,
+        )
+        .dispatch([1024, 1, 1])
         .unwrap();
     let command_buffer = builder.build().unwrap();
 
-    let finished = command_buffer.execute(queue.clone()).unwrap();
-    finished
-        .then_signal_fence_and_flush()
+    let future = sync::now(device.clone())
+        .then_execute(queue.clone(), command_buffer)
         .unwrap()
-        .wait(None)
+        .then_signal_fence_and_flush()
         .unwrap();
+
+    future.wait(None).unwrap();
 
     let content = data_buffer.read().unwrap();
     for (n, val) in content.iter().enumerate() {
