@@ -15,20 +15,34 @@ going to add a dependency to the `vulkano-win` crate which is a link between vul
 In your Cargo.toml:
 
 ```toml
-vulkano-win = "0.19"
-winit = "0.22"
+vulkano = "0.27"
+vulkano-win = "0.27"
+winit = "0.26"
 ```
 
 I encourage you to browse [the documentation of `winit`](https://docs.rs/winit).
 Let's start by creating a window with it:
 
 ```rust
-use vulkano_win::VkSurfaceBuild;
-use winit::EventLoop;
-use winit::WindowBuilder;
+use vulkano::instance::Instance;
+use vulkano::instance::Version;
+use vulkano_win::create_vk_surface_from_handle;
+use winit::event_loop::EventLoop;
+use winit::window::WindowBuilder;
 
-let events_loop = EventLoop::new();
-let surface = WindowBuilder::new().build_vk_surface(&events_loop, instance.clone()).unwrap();
+fn main() {
+    let instance = Instance::new(
+        None,
+        Version::V1_1,
+        &vulkano_win::required_extensions(),
+        None,
+    )
+    .expect("failed to create Vulkan instance");
+
+    let events_loop = EventLoop::new();
+    let window = WindowBuilder::new().build(&events_loop).unwrap();
+    let _surface = create_vk_surface_from_handle(window, instance).unwrap();
+}
 ```
 
 This code creates a window with the default parameters, and also builds a Vulkan *surface* object
