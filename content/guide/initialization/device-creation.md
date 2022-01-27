@@ -1,6 +1,6 @@
 # Device creation
 
-In [the previous section](/guide/instance) we created an instance and chose a physical
+In [the previous section](/guide/introduction) we created an instance and chose a physical
 device from this instance.
 
 But initialization isn't finished yet. Before being able to do anything, we have to create a

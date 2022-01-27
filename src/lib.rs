@@ -57,21 +57,18 @@ fn routes(request: &Request) -> Response {
         (GET) (/guide/introduction) => {
             guide_template_markdown(include_str!("../content/guide/introduction/introduction.md"))
         },
-        (GET) (/guide/instance) => {
-            guide_template_markdown(include_str!("../content/guide/initialization/instance.md"))
+        (GET) (/guide/initialization) => {
+            guide_template_markdown(include_str!("../content/guide/initialization/initialization.md"))
         },
-        (GET) (/guide/physical-device) => {
-            guide_template_markdown(include_str!("../content/guide/initialization/physical_device.md"))
-        },
-        (GET) (/guide/logical-device) => {
-            guide_template_markdown(include_str!("../content/guide/initialization/logical_device.md"))
+        (GET) (/guide/device-creation) => {
+            guide_template_markdown(include_str!("../content/guide/initialization/device-creation.md"))
         },
 
         (GET) (/guide/buffer-creation) => {
-            guide_template_markdown(include_str!("../content/guide/buffer_creation/simple_buffers.md"))
+            guide_template_markdown(include_str!("../content/guide/buffer_creation/buffer_creation.md"))
         },
         (GET) (/guide/example-operation) => {
-            guide_template_markdown(include_str!("../content/guide/buffer_creation/command_buffers.md"))
+            guide_template_markdown(include_str!("../content/guide/buffer_creation/example_operation.md"))
         },
 
         (GET) (/guide/compute-intro) => {

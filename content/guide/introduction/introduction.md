@@ -50,4 +50,4 @@ vulkano = "0.27.1"
 Note: If you run into any issues with this guide, please [open an issue](https://github.com/vulkano-rs/vulkano-www/issues).
 If you have issues with vulkano itself, please also [open an issue](https://github.com/vulkano-rs/vulkano/issues).
 
-You are now ready to [get started](/guide/instance)!
+You are now ready to [get started](/guide/initialization)!
