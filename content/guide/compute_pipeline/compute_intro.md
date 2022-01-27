@@ -17,7 +17,7 @@ by one, a GPU can perform it on multiple values at once.
 
 > **Note**: See also [SIMD](https://en.wikipedia.org/wiki/SIMD).
 
-> **Note**: In [a previous section](/guide/device-creation) we talked about *queues*. These queues
+> **Note**: In [a previous section](/guide/logical-device) we talked about *queues*. These queues
 > are usually foremost *software* queues, and not actual hardware constructs.
 
 > **Note**: You can find the [full source code of this section

@@ -60,4 +60,4 @@ Keep in mind that the list of physical devices can be empty. This happens if Vul
 on the system, but none of the physical devices of the machine are capable of supporting Vulkan. In
 a real-world application you are encouraged to handle this situation properly as well.
 
-Next: [Device creation](/guide/device-creation)
+Next: [Device creation](/guide/logical-device)
