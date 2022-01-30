@@ -53,79 +53,86 @@ fn routes(request: &Request) -> Response {
         (GET) (/donate) => {
             main_template(include_str!("../content/donate.html"))
         },
+
         (GET) (/guide/introduction) => {
-            guide_template_markdown(include_str!("../content/guide-introduction.md"))
+            guide_template_markdown(include_str!("../content/guide/introduction/introduction.md"))
         },
         (GET) (/guide/initialization) => {
-            guide_template_markdown(include_str!("../content/guide-initialization.md"))
+            guide_template_markdown(include_str!("../content/guide/initialization/initialization.md"))
         },
         (GET) (/guide/device-creation) => {
-            guide_template_markdown(include_str!("../content/guide-device-creation.md"))
+            guide_template_markdown(include_str!("../content/guide/initialization/device-creation.md"))
         },
+
         (GET) (/guide/buffer-creation) => {
-            guide_template_markdown(include_str!("../content/guide-buffer-creation.md"))
+            guide_template_markdown(include_str!("../content/guide/buffer_creation/buffer_creation.md"))
         },
         (GET) (/guide/example-operation) => {
-            guide_template_markdown(include_str!("../content/guide-example-operation.md"))
+            guide_template_markdown(include_str!("../content/guide/buffer_creation/example_operation.md"))
         },
+
         (GET) (/guide/compute-intro) => {
-            guide_template_markdown(include_str!("../content/guide-compute-intro.md"))
+            guide_template_markdown(include_str!("../content/guide/compute_pipeline/compute_intro.md"))
         },
         (GET) (/guide/compute-pipeline) => {
-            guide_template_markdown(include_str!("../content/guide-compute-pipeline.md"))
+            guide_template_markdown(include_str!("../content/guide/compute_pipeline/compute_pipeline.md"))
         },
         (GET) (/guide/descriptor-sets) => {
-            guide_template_markdown(include_str!("../content/guide-descriptor-sets.md"))
+            guide_template_markdown(include_str!("../content/guide/compute_pipeline/descriptor_sets.md"))
         },
         (GET) (/guide/dispatch) => {
-            guide_template_markdown(include_str!("../content/guide-dispatch.md"))
+            guide_template_markdown(include_str!("../content/guide/compute_pipeline/dispatch.md"))
         },
+
         (GET) (/guide/image-creation) => {
-            guide_template_markdown(include_str!("../content/guide-image-creation.md"))
+            guide_template_markdown(include_str!("../content/guide/images/image_creation.md"))
         },
         (GET) (/guide/image-clear) => {
-            guide_template_markdown(include_str!("../content/guide-image-clear.md"))
+            guide_template_markdown(include_str!("../content/guide/images/image_clear.md"))
         },
         (GET) (/guide/image-export) => {
-            guide_template_markdown(include_str!("../content/guide-image-export.md"))
+            guide_template_markdown(include_str!("../content/guide/images/image_export.md"))
         },
         (GET) (/guide/mandelbrot) => {
-            guide_template_markdown(include_str!("../content/guide-mandelbrot.md"))
+            guide_template_markdown(include_str!("../content/guide/images/mandelbrot.md"))
         },
+
         (GET) (/guide/what-graphics-pipeline) => {
-            guide_template_markdown(include_str!("../content/guide-what-graphics-pipeline.md"))
+            guide_template_markdown(include_str!("../content/guide/graphics_pipeline/introduction.md"))
         },
         (GET) (/guide/vertex-input) => {
-            guide_template_markdown(include_str!("../content/guide-vertex-input.md"))
+            guide_template_markdown(include_str!("../content/guide/graphics_pipeline/vertex_shader.md"))
         },
         (GET) (/guide/fragment-shader) => {
-            guide_template_markdown(include_str!("../content/guide-fragment-shader.md"))
+            guide_template_markdown(include_str!("../content/guide/graphics_pipeline/fragment_shader.md"))
         },
         (GET) (/guide/render-pass-framebuffer) => {
             guide_template_markdown({
-                include_str!("../content/guide-render-pass-framebuffer.md")
+                include_str!("../content/guide/graphics_pipeline/render_pass_framebuffer.md")
             })
         },
         (GET) (/guide/graphics-pipeline-creation) => {
             guide_template_markdown({
-                include_str!("../content/guide-graphics-pipeline-creation.md")
+                include_str!("../content/guide/graphics_pipeline/pipeline_creation.md")
             })
         },
+
         (GET) (/guide/window) => {
             guide_template_markdown({
-                include_str!("../content/guide-window.md")
+                include_str!("../content/guide/windowing/window.md")
             })
         },
         (GET) (/guide/swapchain-creation) => {
             guide_template_markdown({
-                include_str!("../content/guide-swapchain-creation.md")
+                include_str!("../content/guide/windowing/swapchain_creation.md")
             })
         },
         (GET) (/guide/acquire-present) => {
-            guide_template_markdown(include_str!("../content/guide-acquire-present.md"))
+            guide_template_markdown(include_str!("../content/guide/windowing/acquire_present.md"))
         },
+
         (GET) (/guide/memory) => {
-            guide_template_markdown(include_str!("../content/guide-memory.md"))
+            guide_template_markdown(include_str!("../content/guide/wip/memory.md"))
         },
         _ => {
             main_template(include_str!("../content/404.html"))
@@ -175,7 +182,7 @@ where
 {
     lazy_static::lazy_static! {
         static ref GUIDE_TEMPLATE: mustache::Template = {
-            mustache::compile_str(&include_str!("../content/template_guide.html")).unwrap()
+            mustache::compile_str(&include_str!("../content/guide/template.html")).unwrap()
         };
 
         static ref CACHE: Mutex<HashMap<String, String>> = Mutex::new(HashMap::new());
