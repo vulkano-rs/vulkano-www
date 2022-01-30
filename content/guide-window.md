@@ -1,19 +1,13 @@
-# Disclaimer: From now on, this guide is unfinished and outdated
-
-As stated in the introduction, now it is a great time to take a look at the
-[examples](https://github.com/vulkano-rs/vulkano/tree/master/examples)
-(more information [here](/guide/introduction)). This part of guide is still a
-work in progress, so it may not even work. If you want to contribute to this guide,
-take a look [at this guide repository](https://github.com/vulkano-rs/vulkano-www).
-
 # Windowing
 
+This guide is still a work in progress. For more thorough examples, take a look at the [examples](https://github.com/vulkano-rs/vulkano/tree/master/examples).
+
 Up until now, we have only created applications that perform one quick action then exit. What
-we are going to do next is create a window in order to draw graphics on it, and keep our
+we are going to do next is to create a window in order to draw graphics on it, and keep our
 application running forever until the window is closed.
 
 Strictly speaking, creating a window and handling events is **not** covered by vulkano. Vulkano,
-however, is capable of rendering to windows.
+however, is capable of rendering to window(s).
 
 ## Creating a window
 
