@@ -14,11 +14,10 @@ however, is capable of rendering to window(s).
 In order to create a window, we will use the `winit` crate. And while we're at it, we are also
 going to add a dependency to the `vulkano-win` crate which is a link between vulkano and winit.
 
-In your Cargo.toml:
+In your Cargo.toml add:
 
 ```toml
-vulkano = "0.27"
-vulkano-win = "0.27"
+vulkano-win = "0.28.0"
 winit = "0.26"
 ```
 

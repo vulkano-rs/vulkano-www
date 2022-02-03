@@ -64,7 +64,7 @@ file. The Rust ecosystem has a crate named `image` that can do this.
 Let's add it to our Cargo.toml:
 
 ```toml
-image = "0.23"
+image = "0.24"
 ```
 
 In this library the main type that represents an image is the `ImageBuffer`. It can be created
@@ -93,6 +93,6 @@ And that's it! When running your program, a blue image named `image.png` should 
 
 This might look stupid, but think about the fact that it's the GPU that wrote the content of
 the image. In the next sections we will do more than just fill an image with blue, but we will
-continue to retreive the image's content and write it to a PNG file.
+continue to reprieve the image's content and write it to a PNG file.
 
 Next: [Drawing a fractal with a compute shader](/guide/mandelbrot)

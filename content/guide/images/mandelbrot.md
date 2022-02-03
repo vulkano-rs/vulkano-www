@@ -51,7 +51,7 @@ Let's go through this line by line:
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 ```
 
-For better parallelisation, we decided that each invocation of the shader would write a value to a
+For better parallelization, we decided that each invocation of the shader would write a value to a
 pixel of the image. As you can see, this time we use a local size of 8x8, which is two-dimensional.
 We will use the value of `gl_GlobalInvocationID` to decide which pixel we will write.
 
@@ -142,21 +142,10 @@ let image = StorageImage::new(
 .unwrap();
 ```
 
-First, let's create the descriptor set builder:
-
-```rust
-let layout = compute_pipeline
-    .layout()
-    .descriptor_set_layouts()
-    .get(0)
-    .unwrap();
-let mut set_builder = PersistentDescriptorSet::start(layout.clone());
-```
-
 This time we can't just clear the image like we did earlier. To actually pass the image
-to the gpu shader, we first need to create a `ImageView` of it. You can think of relating
-to the image in a same way a string slice relates to a `String`. Here, we want a view of the
-entire image, so it isn't very difficult:
+to the gpu shader, we first need to create a `ImageView` of it. An `ImageView` describes where
+and how the gpu should access or use the image. Here, we want a view of the entire image,
+so the creation isn't very difficult:
 
 ```rust
 use vulkano::image::view::ImageView;
@@ -164,15 +153,22 @@ use vulkano::image::view::ImageView;
 let view = ImageView::new(image.clone()).unwrap();
 ```
 
-With the image view, we can add it and build the descriptor set:
+Now, let's create the descriptor set by adding the image view, like we did earlier:
 
 ```rust
-set_builder.add_image(view).unwrap();
-
-let set = set_builder.build().unwrap();
+let layout = compute_pipeline
+    .layout()
+    .descriptor_set_layouts()
+    .get(0)
+    .unwrap();
+let set = PersistentDescriptorSet::new(
+    layout.clone(),
+    [WriteDescriptorSet::image_view(0, view.clone())], // 0 is the binding
+)
+.unwrap();
 ```
 
-Next we can create a buffer where to write the output:
+Next, we can create a buffer where to write the output:
 
 ```rust
 let buf = CpuAccessibleBuffer::from_iter(
