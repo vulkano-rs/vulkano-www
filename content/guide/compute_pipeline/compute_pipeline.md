@@ -20,7 +20,7 @@ This is done in two steps:
 But first, we need to write the source code of the operation. The GLSL language looks a lot like
 the C programming language, but has some differences.
 
-This guide is not going to cover teaching you GLSL, as it is an entire programming language. As with 
+This guide is not going to cover teaching you GLSL, as it is an entire programming language. As with
 many programming languages, the easiest way to learn GLSL is by looking at examples.
 
 Let's take a look at some GLSL that takes each element of a buffer and multiplies it by 12:
@@ -113,14 +113,14 @@ with 12.
 
 ## Embedding the GLSL code in the Rust code
 
-Now that we've written the shader in GLSL, we're going to be compiling the shaders *at 
-application compile-time*. We'll accomplish this using `vulkano-shaders`, which is a procedural macro that manages the compile-time compilation of GLSL into SPIR-V and generation of assosciated rust code.
+Now that we've written the shader in GLSL, we're going to be compiling the shaders *at
+application compile-time*. We'll accomplish this using `vulkano-shaders`, which is a procedural macro that manages the compile-time compilation of GLSL into SPIR-V and generation of associated rust code.
 
 To use `vulkano-shaders`, we first have to add a dependency:
 
 ```toml
 # Notice that it uses the same version as vulkano
-vulkano-shaders = "0.27.1"
+vulkano-shaders = "0.28.0"
 ```
 
 Here is the syntax:

@@ -31,12 +31,12 @@ builder
 let command_buffer = builder.build().unwrap();
 ```
 
-First, we bind the pipeline and then the descriptior sets, indicating the type of set, the layout
-and the descriptor sets we are going to use. Here "set" could have actually been many, were we wold
+First, we bind the pipeline and then the *descriptor set*s, indicating the type of set, the layout
+and the *descriptor set*s we are going to use. Here "set" could have actually been many, were we wold
 indicated our desired with an index. Because we only have one, the index is 0.
 
 As explained in [the compute pipeline section](/guide/compute-pipeline), we want to spawn 1024
-*work groups*. This value is indicated by the actuall `.dispatch()` method.
+*work groups*. This value is indicated by the actual `.dispatch()` method.
 
 Just like we already covered, we submit the command buffer:
 

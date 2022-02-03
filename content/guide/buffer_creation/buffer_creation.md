@@ -32,14 +32,14 @@ which shouldn't be expensive. You should get used to passing the device as param
 need to do so for most of the Vulkan objects that you create.
 
 The second parameter indicates [which purpose we are creating the
-buffer](https://docs.rs/vulkano/0.27.1/vulkano/buffer/struct.BufferUsage.html) for, which can help the
+buffer](https://docs.rs/vulkano/0.28.0/vulkano/buffer/struct.BufferUsage.html) for, which can help the
 implementation perform some optimizations. Trying to use a buffer in a way that wasn't indicated in
 its constructor will result in an error. For the sake of the example, we just create a
 `BufferUsage` that allows all possible usages.
 
-The third parameter indicates if the buffer should be cpu cached. The should rarely be true for most
-use cases, but in some cases where application is uploading data through this buffer continously,
-setting this paramater to true may yield some performance gain. This parameter should not be true if
+The third parameter indicates if the buffer should be cpu cached. This should rarely be true for most
+use cases, but in some cases where application is uploading data through this buffer continuously,
+setting this parameter to true may yield some performance gain. This parameter should not be true if
 the user intends to read results from the gpu from this buffer as gpu changes may not reflect.
 
 Finally, the fourth parameter is the content of the buffer. Here as you can see we create a buffer

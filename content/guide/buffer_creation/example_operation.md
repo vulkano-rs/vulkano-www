@@ -68,9 +68,11 @@ As you can see, it is very straight-forward. We create a *builder*, add a copy c
 [the buffers creation section](/guide/buffer-creation), we call `clone()` multiple times but we
  only clone `Arc`s.
 
-<!-- todo: Explain about secondary command buffers -->
-Vulkan supports primary and secondary command buffers. We won't cover them here, but you can read
- more about them [here](https://docs.rs/vulkano/0.27.1/vulkano/command_buffer/index.html).
+<!-- todo: Explain more about secondary command buffers -->
+Vulkan supports primary and secondary command buffers. Secondary command buffers allow you to
+store functionality that you can reuse in the primary command buffer, but they can't be sent to
+the gpu directly. We won't cover them here, but you can read
+[more about them](https://docs.rs/vulkano/0.28.0/vulkano/command_buffer/index.html).
 
 One thing to notice is that the `AutoCommandBufferBuilder::primary()` method takes as
 parameter a queue family. This must be the queue family that the command buffer is going to run on.
@@ -94,7 +96,7 @@ The `.then_execute()` method returns an object that represents the execution of 
 
 After submitting the command buffer, we might be tempted to try to read the content of the
 `destination` buffer as demonstrated in [the previous section](/guide/buffer-creation). However
-calling `destination.read()` now would sometimes return an error, because in that cases the buffer will
+calling `destination.read()` now may sometimes return an error, because the buffer could
 still be being written by the GPU.
 
 Submitting an operation doesn't wait for the operation to be complete. Instead it just sends some
@@ -104,13 +106,14 @@ actual processing is performed asynchronously.
 In order to read the content of `destination` and make sure that our copy succeeded, we need to
 wait until the operation is complete.
 
-First, we need to tell the gpu that it should signal when it's finished:
+First, we need to tell the gpu that it should signal when it's finished, by using a special
+object called a *fence*:
 
 ```rust
 let future = sync::now(device.clone())
     .then_execute(queue.clone(), command_buffer)
     .unwrap()
-    .then_signal_fence_and_flush()
+    .then_signal_fence_and_flush()  // signal to the cpu and start executing
     .unwrap();
 ```
 
@@ -125,7 +128,7 @@ future.wait(None).unwrap();
 
 The `None` parameter is an optional timeout.
 > **Note**: We can only do this because we called `.then_signal_fence_and_flush()` earlier. If we
-> didn't do that, the .wait() method woudn't even exist.
+> didn't do that, the .wait() method wouldn't exist.
 
 Only after this is done can we safely call `destination.read()` and check that our copy succeeded.
 
