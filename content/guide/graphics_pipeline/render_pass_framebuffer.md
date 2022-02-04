@@ -87,7 +87,7 @@ one element.
 Clearing our attachment has exactly the same effect as the `clear_color_image` function we covered
 previously, except that this time it is done by the rendering engine.
 
-The enum passed as second parameter descbribes whether we are going to directly invoke draw
+The enum passed as second parameter describes whether we are going to directly invoke draw
 commands or use secondary command buffers instead. Secondary command buffers are a more advanced
 topic. Be we are using only direct commands, we will leave it as `::Inline`
 

@@ -28,21 +28,27 @@ descriptor set to that slot.
 ## Creating a descriptor set
 
 Just like there exist multiple kinds of buffers, there also exist multiple different structs that
-all represent a descriptor set. For our application, we are going to use a `PersistentDescriptorSet`:
+all represent a descriptor set.
+
+For our application, we are going to use a `PersistentDescriptorSet`. When creating this descriptor
+set, we attach to it the result buffer wrapped in a `WriteDescriptorSet`. This object will describe
+how will the buffer be written:
 
 ```rust
 use vulkano::pipeline::Pipeline;
-use vulkano::descriptor_set::PersistentDescriptorSet;
+use vulkano::descriptor_set::{PersistentDescriptorSet, WriteDescriptorSet};
 
 let layout = compute_pipeline
     .layout()
     .descriptor_set_layouts()
     .get(0)
     .unwrap();
-let mut set_builder = PersistentDescriptorSet::start(layout.clone());
-set_builder.add_buffer(data_buffer.clone()).unwrap();
 
-let set = set_builder.build().unwrap();
+let set = PersistentDescriptorSet::new(
+    layout.clone(),
+    [WriteDescriptorSet::buffer(0, data_buffer.clone())], // 0 is the binding
+)
+.unwrap();
 ```
 
 In order to create a descriptor set, you'll need to know the layout that it is targeting. We do this by using the "Pipeline" trait

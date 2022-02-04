@@ -15,7 +15,7 @@ use image::ImageBuffer;
 use image::Rgba;
 use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
 use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage};
-use vulkano::descriptor_set::PersistentDescriptorSet;
+use vulkano::descriptor_set::{PersistentDescriptorSet, WriteDescriptorSet};
 use vulkano::device::{physical::PhysicalDevice, Device, DeviceExtensions, Features};
 use vulkano::format::Format;
 use vulkano::image::{view::ImageView, ImageDimensions, StorageImage};
@@ -108,16 +108,17 @@ void main() {
     )
     .unwrap();
 
+    let view = ImageView::new(image.clone()).unwrap();
     let layout = compute_pipeline
         .layout()
         .descriptor_set_layouts()
         .get(0)
         .unwrap();
-    let mut set_builder = PersistentDescriptorSet::start(layout.clone());
-
-    let view = ImageView::new(image.clone()).unwrap();
-    set_builder.add_image(view).unwrap();
-    let set = set_builder.build().unwrap();
+    let set = PersistentDescriptorSet::new(
+        layout.clone(),
+        [WriteDescriptorSet::image_view(0, view.clone())], // 0 is the binding
+    )
+    .unwrap();
 
     let buf = CpuAccessibleBuffer::from_iter(
         device.clone(),
