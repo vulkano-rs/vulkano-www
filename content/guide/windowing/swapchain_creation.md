@@ -15,7 +15,7 @@ The idea behind a swapchain is to draw to one of its images while another one of
 being shown on the screen. When we are done drawing we ask the swapchain to show the image we have
 just drawn to, and in return the swapchain gives us drawing access to another of its images.
 
-## Optional: Checking for swapchain support
+## (Optional) Checking for swapchain support
 
 As you may recall, previously we just selected the first physical device available:
 
@@ -165,7 +165,7 @@ capabilities of the surface.
 let caps = surface.capabilities(physical_device).expect("failed to get surface capabilities");
 ```
 
-If we don't really care about all these properties, the only things that we need to choose is
+Of all of these properties, we only care about some of them, mainly
 the dimensions of the image (which have to be constrained between a minimum and a maximum), the
 behavior when it comes to transparency (composite alpha), and the format of the images.
 
@@ -175,21 +175,89 @@ let composite_alpha = caps.supported_composite_alpha.iter().next().unwrap();
 let format = caps.supported_formats[0].0;
 ```
 
-Finally, we can create the swapchain:
+Combining everything, we can now create the swapchain:
 
 ```rust
 use vulkano::image::ImageUsage;
 use vulkano::swapchain::Swapchain;
 
 let (swapchain, images) = Swapchain::start(device.clone(), surface.clone())
-    .num_images(caps.min_image_count)
+    .num_images(caps.min_image_count)  // How many buffers to use in the swapchain.
     .format(format)
     .dimensions(dimensions)
-    .usage(ImageUsage::color_attachment())
-    .sharing_mode(&queue)
+    .usage(ImageUsage::color_attachment())  // What the images are going to be used for.
+    .sharing_mode(&queue)  // The queue(s) that the resource will be used
     .composite_alpha(composite_alpha)
     .build()
     .except("failed to create swapchain");
 ```
+
+For additional information, check the
+[swapchain documentation](https://docs.rs/vulkano/0.28.0/vulkano/swapchain/index.html#swapchains).
+
+## Final configurations
+
+Before we finally start rendering in the main loop, the last step is to change our render pass
+and framebuffers to use the newly created swapchain and images.
+
+In the render pass, let's configure it to always use the same format as the
+swapchain, to avoid any invalid format errors. Let's as well move everything to separate
+functions:
+
+```rust
+use vulkano::render_pass::RenderPass;
+
+fn get_render_pass(device: Arc<Device>, swapchain: Arc<Swapchain<Window>>) -> Arc<RenderPass> {
+    vulkano::single_pass_renderpass!(
+        device.clone(),
+        attachments: {
+            color: {
+                load: Clear,
+                store: Store,
+                format: swapchain.format(),  // set the format to use the same as the swapchain
+                samples: 1,
+            }
+        },
+        pass: {
+            color: [color],
+            depth_stencil: {}
+        }
+    )
+    .unwrap()
+}
+```
+
+When we only had one image, we only needed to create one framebuffer for it. However, now we
+need to create a different framebuffer for each of the images:
+
+```rust
+// we will need to reuse this function later
+fn get_framebuffers(
+    images: &[Arc<SwapchainImage<Window>>],
+    render_pass: Arc<RenderPass>,
+) -> Vec<Arc<Framebuffer>> {
+    images
+        .iter()
+        .map(|image| {
+            let view = ImageView::new(image.clone()).unwrap();
+            Framebuffer::start(render_pass.clone())
+                .add(view)
+                .unwrap()
+                .build()
+                .unwrap()
+        })
+        .collect::<Vec<_>>()
+}
+```
+
+As for your `main` function, change it to use your new functions:
+
+```rust
+let render_pass = get_render_pass(device.clone(), swapchain.clone());
+let framebuffers = get_framebuffers(&images, render_pass.clone());
+```
+
+Finally, the initialization is complete. The next step will be to use our
+previously created event loop to present and draw on the swapchain images.
 
 Next: [Acquiring and presenting](/guide/acquire-present)

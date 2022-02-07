@@ -1,4 +1,11 @@
-# Usage of a swapchain
+# Window events handling
+
+Now that you have a swapchain, the next step is to configure the event loop to actually use it.
+
+
+
+
+
 
 In order to use the swapchain, we have to start by *acquiring* an image. This is done with the
 `swapchain::acquire_next_image()` function.
