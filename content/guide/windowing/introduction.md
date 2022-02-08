@@ -1,4 +1,4 @@
-# Windowing
+# Windowing introduction
 
 Up until now, we have only created applications that perform one quick action then exit. What
 we are going to do next is to create a window in order to draw graphics on it, and keep our
@@ -27,8 +27,7 @@ required to draw a window. `vulkano_win` automatically provides them for us, so 
 thing left is to pass them to the instance creation:
 
 ```rust
-use vulkano::instance::Instance;
-use vulkano::instance::Version;
+use vulkano::instance::{Instance, Version};
 
 let required_extensions = vulkano_win::required_extensions();
 let instance = Instance::new(None, Version::V1_1, &required_extensions, None).unwrap();
@@ -37,19 +36,14 @@ let instance = Instance::new(None, Version::V1_1, &required_extensions, None).un
 Now, let's create the actual window:
 
 ```rust
-// crop
 use vulkano_win::VkSurfaceBuild;
 use winit::event_loop::{EventLoop};
 use winit::window::{WindowBuilder};
 
-fn main() {
-    // crop
-
-    let event_loop = EventLoop::new();  // ignore this for now
-    let surface = WindowBuilder::new()
-        .build_vk_surface(&event_loop, instance.clone())
-        .unwrap();
-}
+let event_loop = EventLoop::new();  // ignore this for now
+let surface = WindowBuilder::new()
+    .build_vk_surface(&event_loop, instance.clone())
+    .unwrap();
 ```
 
 As you can see, we created a new object, called *surface*.
@@ -69,6 +63,9 @@ window's events. This is typically done after initialization, and right before t
 `main` function. Using the `event_loop` object:
 
 ```rust
+use winit::event::{Event, WindowEvent};
+use winit::event_loop::ControlFlow;
+
 event_loop.run(|event, _, control_flow| {
     match event {
         Event::WindowEvent {
@@ -94,5 +91,7 @@ set the `control_flow` to `ControlFlow::Exit` which signals to winit that we wan
 > We will change that, however, in the incoming chapters.
 
 Right now, all we're doing is creating a window and keeping our program alive for as long as the
-window isn't closed. The [next section](/guide/swapchain-creation) will show how to initialize what is called a *swapchain* on
+window isn't closed. The next section will show how to initialize what is called a *swapchain* on
 the window's surface.
+
+Next: [Swapchain creation](/guide/windowing/swapchain-creation)

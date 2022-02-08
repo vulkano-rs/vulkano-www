@@ -176,4 +176,4 @@ And here is what you should get:
 <img src="/guide-graphics-pipeline-creation-1.png" />
 </center>
 
-Next: [Windowing](/guide/window)
+Next: [Windowing](/guide/windowing/introduction)

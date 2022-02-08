@@ -114,7 +114,7 @@ fn select_physical_device<'a>(
             PhysicalDeviceType::Cpu => 3,
             PhysicalDeviceType::Other => 4,
         })
-        .expect("no device available")
+        .expect("no device available");
 
     (physical_device, queue_family)
 }
@@ -141,6 +141,9 @@ that can support the swapchain.
 To do that, we need to pass all the previously required extensions:
 
 ```rust
+use vulkano::device::Device;
+use vulkano::device::Features;
+
 let (device, mut queues) = {
     Device::new(
         physical_device,
@@ -152,6 +155,8 @@ let (device, mut queues) = {
     )
     .expect("failed to create device")
 };
+
+let queue = queues.next().unwrap();
 ```
 
 ## Creating the swapchain
@@ -175,89 +180,24 @@ let composite_alpha = caps.supported_composite_alpha.iter().next().unwrap();
 let format = caps.supported_formats[0].0;
 ```
 
-Combining everything, we can now create the swapchain:
+Combining everything, we can create the swapchain:
 
 ```rust
 use vulkano::image::ImageUsage;
 use vulkano::swapchain::Swapchain;
 
 let (swapchain, images) = Swapchain::start(device.clone(), surface.clone())
-    .num_images(caps.min_image_count)  // How many buffers to use in the swapchain.
+    .num_images(caps.min_image_count)  // How many buffers to use in the swapchain
     .format(format)
     .dimensions(dimensions)
-    .usage(ImageUsage::color_attachment())  // What the images are going to be used for.
+    .usage(ImageUsage::color_attachment())  // What the images are going to be used for
     .sharing_mode(&queue)  // The queue(s) that the resource will be used
     .composite_alpha(composite_alpha)
     .build()
-    .except("failed to create swapchain");
+    .expect("failed to create swapchain");
 ```
 
 For additional information, check the
 [swapchain documentation](https://docs.rs/vulkano/0.28.0/vulkano/swapchain/index.html#swapchains).
 
-## Final configurations
-
-Before we finally start rendering in the main loop, the last step is to change our render pass
-and framebuffers to use the newly created swapchain and images.
-
-In the render pass, let's configure it to always use the same format as the
-swapchain, to avoid any invalid format errors. Let's as well move everything to separate
-functions:
-
-```rust
-use vulkano::render_pass::RenderPass;
-
-fn get_render_pass(device: Arc<Device>, swapchain: Arc<Swapchain<Window>>) -> Arc<RenderPass> {
-    vulkano::single_pass_renderpass!(
-        device.clone(),
-        attachments: {
-            color: {
-                load: Clear,
-                store: Store,
-                format: swapchain.format(),  // set the format to use the same as the swapchain
-                samples: 1,
-            }
-        },
-        pass: {
-            color: [color],
-            depth_stencil: {}
-        }
-    )
-    .unwrap()
-}
-```
-
-When we only had one image, we only needed to create one framebuffer for it. However, now we
-need to create a different framebuffer for each of the images:
-
-```rust
-// we will need to reuse this function later
-fn get_framebuffers(
-    images: &[Arc<SwapchainImage<Window>>],
-    render_pass: Arc<RenderPass>,
-) -> Vec<Arc<Framebuffer>> {
-    images
-        .iter()
-        .map(|image| {
-            let view = ImageView::new(image.clone()).unwrap();
-            Framebuffer::start(render_pass.clone())
-                .add(view)
-                .unwrap()
-                .build()
-                .unwrap()
-        })
-        .collect::<Vec<_>>()
-}
-```
-
-As for your `main` function, change it to use your new functions:
-
-```rust
-let render_pass = get_render_pass(device.clone(), swapchain.clone());
-let framebuffers = get_framebuffers(&images, render_pass.clone());
-```
-
-Finally, the initialization is complete. The next step will be to use our
-previously created event loop to present and draw on the swapchain images.
-
-Next: [Acquiring and presenting](/guide/acquire-present)
+Next: [Other initialization](/guide/windowing/other-initialization)
