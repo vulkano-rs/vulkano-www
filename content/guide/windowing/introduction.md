@@ -86,9 +86,10 @@ that are tied to our window, such a mouse movements.
 When the user wants to close the window, a `WindowEvent::CloseRequested` event is received, which makes our closure
 set the `control_flow` to `ControlFlow::Exit` which signals to winit that we want an exit.
 
-> **Note**: Since there is nothing to stop it, the window will try to update as quickly as it can,
+<!-- todo: I don't know if this is actually correct -->
+<!-- > **Note**: Since there is nothing to stop it, the window will try to update as quickly as it can,
 > likely using all the power it can get from one of your cores.
-> We will change that, however, in the incoming chapters.
+> We will change that, however, in the incoming chapters. -->
 
 Right now, all we're doing is creating a window and keeping our program alive for as long as the
 window isn't closed. The next section will show how to initialize what is called a *swapchain* on

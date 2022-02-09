@@ -5,7 +5,7 @@ Now that we have a swapchain to work with, let's add all the missing Vulkan obje
 move some of them to separate functions.
 
 In the render pass, let's configure it to always use the same format as the
-swapchain, to avoid any invalid format errors.
+swapchain, to avoid any invalid format errors:
 
 ```rust
 use vulkano::render_pass::RenderPass;
@@ -17,7 +17,7 @@ fn get_render_pass(device: Arc<Device>, swapchain: Arc<Swapchain<Window>>) -> Ar
             color: {
                 load: Clear,
                 store: Store,
-                format: swapchain.format(),  // set the format to use the same as the swapchain
+                format: swapchain.format(),  // set the format the same as the swapchain
                 samples: 1,
             }
         },
@@ -28,6 +28,9 @@ fn get_render_pass(device: Arc<Device>, swapchain: Arc<Swapchain<Window>>) -> Ar
     )
     .unwrap()
 }
+
+// main()
+let render_pass = get_render_pass(device.clone(), swapchain.clone());
 ```
 
 When we only had one image, we only needed to create one framebuffer for it. However, now we
@@ -54,6 +57,9 @@ fn get_framebuffers(
         })
         .collect::<Vec<_>>()
 }
+
+// main()
+let framebuffers = get_framebuffers(&images, render_pass.clone());
 ```
 
 We don't need to modify anything in the shaders and the vertex buffer
@@ -136,22 +142,45 @@ use vulkano::pipeline::graphics::vertex_input::BuffersDefinition;
 use vulkano::pipeline::graphics::viewport::{Viewport, ViewportState};
 use vulkano::pipeline::GraphicsPipeline;
 use vulkano::render_pass::Subpass;
+use vulkano::shader::ShaderModule;
 
-let mut viewport = Viewport {
-    origin: [0.0, 0.0],
-    dimensions: surface.window().inner_size().into(),
-    depth_range: 0.0..1.0,
-};
+fn get_pipeline(
+    device: Arc<Device>,
+    vs: Arc<ShaderModule>,
+    fs: Arc<ShaderModule>,
+    render_pass: Arc<RenderPass>,
+    viewport: Viewport,
+) -> Arc<GraphicsPipeline> {
+    GraphicsPipeline::start()
+        .vertex_input_state(BuffersDefinition::new().vertex::<Vertex>())
+        .vertex_shader(vs.entry_point("main").unwrap(), ())
+        .input_assembly_state(InputAssemblyState::new())
+        .viewport_state(ViewportState::viewport_fixed_scissor_irrelevant([viewport]))
+        .fragment_shader(fs.entry_point("main").unwrap(), ())
+        .render_pass(Subpass::from(render_pass.clone(), 0).unwrap())
+        .build(device.clone())
+        .unwrap()
+}
 
-let pipeline = GraphicsPipeline::start()
-    .vertex_input_state(BuffersDefinition::new().vertex::<Vertex>())
-    .vertex_shader(vs.entry_point("main").unwrap(), ())
-    .input_assembly_state(InputAssemblyState::new())
-    .viewport_state(ViewportState::viewport_fixed_scissor_irrelevant([viewport]))
-    .fragment_shader(fs.entry_point("main").unwrap(), ())
-    .render_pass(Subpass::from(render_pass.clone(), 0).unwrap())
-    .build(device.clone())
-    .unwrap();
+fn main() {
+    // crop
+
+    let mut viewport = Viewport {
+        origin: [0.0, 0.0],
+        dimensions: surface.window().inner_size().into(),
+        depth_range: 0.0..1.0,
+    };
+
+    let pipeline = get_pipeline(
+        device.clone(),
+        vs.clone(),
+        fs.clone(),
+        render_pass.clone(),
+        viewport.clone(),
+    );
+
+    // crop
+}
 ```
 
 Currently the viewport state is set to `fixed_scissor_irrelevant`, meaning
@@ -185,7 +214,9 @@ fn get_command_buffers(
             let mut builder = AutoCommandBufferBuilder::primary(
                 device.clone(),
                 queue.family(),
-                CommandBufferUsage::MultipleSubmit,  // attention to the command buffer usage
+                // the usage is set to SimultaneousUse
+                // because any command buffer could be used multiple times simultaneously
+                CommandBufferUsage::SimultaneousUse,
             )
             .unwrap();
 
@@ -207,27 +238,41 @@ fn get_command_buffers(
         })
         .collect()
 }
+
+// main()
+let mut command_buffers = get_command_buffers(
+    device.clone(),
+    queue.clone(),
+    pipeline,
+    &framebuffers,
+    vertex_buffer.clone(),
+);
 ```
 
-In the end, your `main` function should look something like this:
+If you have set your pipeline to use a dynamic viewport, don't forget to then
+set the viewport in the command buffers, by using `.set_viewport(0, [viewport.clone()])`.
+
+In the end, the structure of your `main` function should look something like this:
 
 ```rust
 fn main() {
-    // crop
+    // instance
 
-    let render_pass = get_render_pass(device.clone(), swapchain.clone());
-    let framebuffers = get_framebuffers(&images, render_pass.clone());
+    // surface
+
+    // physical device
+    // logical device
+    // queue creation
+
+    // swapchain
+
+    // render pass
+    // framebuffers
     // vertex buffer
-    // shader loading
+    // shaders
     // viewport
     // pipeline
-    let command_buffers = get_command_buffers(
-        device.clone(),
-        queue.clone(),
-        pipeline.clone(),
-        &framebuffers,
-        vertex_buffer.clone(),
-    );
+    // command buffers
 
     // event loop
 }
