@@ -7,6 +7,9 @@ application running forever until the window is closed.
 Strictly speaking, creating a window and handling events is **not** covered by Vulkano. Vulkano,
 however, is capable of rendering to window(s).
 
+> **Note**: The final code of this chapter can be found
+> [here](https://github.com/vulkano-rs/vulkano-www/blob/master/examples/windowing.rs)
+
 ## Creating a window
 
 In order to create a window, we will use the `winit` crate. And while we're at it, we are also

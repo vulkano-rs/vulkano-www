@@ -2,7 +2,7 @@
 
 Now that everything is initialized, let's configure the main loop to actually draw something on the window.
 
-We are going to match for 2 additional events:
+First, let's match two additional events:
 
 ```rust
 let mut window_resized = false;
@@ -20,19 +20,28 @@ event_loop.run(move |event, _, control_flow| match event {
         ..
     } => {
         window_resized = true;
-        recreate_swapchain = true;
     }
-    Event::RedrawEventsCleared => {}
+    Event::MainEventsCleared => {}
     _ => (),
 });
 ```
 
 In some situations, like when the window is resized (as the images of the swapchain will no longer match the
 window's) the swapchain will become invalid by itself. To continue rendering, we will need to recreate the
-swapchain as well as all dependent setup. We will remember to do this for the next loop iteration.
+swapchain as well as all dependent setup. For that, we will use the `recreate_swapchain` variable, and handle
+it before rendering.
 
-Everything that comes after the `RedrawEventsCleared` event will be drawn each frame. Let's start by
-recreating the swapchain when needed:
+The `WindowEvent::WindowResized` will be emitted when the window is, well, resized. For that, when that happens,
+we will need to recreate everything strictly depends on the dimensions the window . Let's set that in the `window_resized`
+variable, and handle that latter.
+
+As stated in the winit docs, the `MainEventsCleared` event "will be emitted when all input events have been processed
+and redraw processing is about to begin". This essentially enables us to write functionality for each frame.
+
+## Handling invalid swapchains and window resizes
+
+Before starting using our swapchain, let's create the logic to actually recreate everything that's needed in case
+of a window resize happens. First, in case of the swapchain becoming invalidated:
 
 ```rust
 use vulkano::swapchain::SwapchainCreationError;
@@ -40,12 +49,12 @@ use vulkano::swapchain::SwapchainCreationError;
 Event::RedrawEventsCleared => {
     if recreate_swapchain {
         recreate_swapchain = false;
-    
-        let new_dimensions: [u32; 2] = surface.window().inner_size().into();
-    
+
+        let new_dimensions = surface.window().inner_size();
+
         let (new_swapchain, new_images) = match swapchain
             .recreate()
-            .dimensions(new_dimensions)
+            .dimensions(new_dimensions.into())
             .build()
         {
             Ok(r) => r,
@@ -54,35 +63,154 @@ Event::RedrawEventsCleared => {
             Err(SwapchainCreationError::UnsupportedDimensions) => return,
             Err(e) => panic!("Failed to recreate swapchain: {:?}", e),
         };
-    
         swapchain = new_swapchain;
-        framebuffers = get_framebuffers(&new_images, render_pass.clone());
+        let new_framebuffers = get_framebuffers(&new_images, render_pass.clone());
     }
 }
 ```
 
+Here, because the framebuffers depend on the swapchain images, we will also recreate them.
 
-
-<!-- todo -->
-
-In order to use the swapchain, we have to start by *acquiring* an image. This is done with the
-`swapchain::acquire_next_image()` function.
+Next, let's recreate everything else that depends on window dimensions. Because the swapchain
+will also become invalidated if that happens, let's add some logic for recreating it as well:
 
 ```rust
-let (image_num, acquire_future) = swapchain::acquire_next_image(swapchain.clone(), None).unwrap();
+if window_resized || recreate_swapchain {
+    recreate_swapchain = false;
+
+    let new_dimensions = surface.window().inner_size();
+
+    let (new_swapchain, new_images) = match swapchain
+        .recreate()
+        .dimensions(new_dimensions.into())
+        .build()
+    {
+        Ok(r) => r,
+        Err(SwapchainCreationError::UnsupportedDimensions) => return,
+        Err(e) => panic!("Failed to recreate swapchain: {:?}", e),
+    };
+    swapchain = new_swapchain;
+    let new_framebuffers = get_framebuffers(&new_images, render_pass.clone());
+
+    if window_resized {
+        window_resized = false;
+
+        viewport.dimensions = new_dimensions.into();
+        let new_pipeline = get_pipeline(
+            device.clone(),
+            vs.clone(),
+            fs.clone(),
+            render_pass.clone(),
+            viewport.clone(),
+        );
+        command_buffers = get_command_buffers(
+            device.clone(),
+            queue.clone(),
+            new_pipeline,
+            &new_framebuffers,
+            vertex_buffer.clone(),
+        );
+    }
+}
 ```
 
-This function call returns a tuple. The first element is a `usize` corresponding to the index of
-the image within the `images` array of the image which is now available to us. The second element
-of the tuple is a *future* that represents the moment when the image will be acquired by the GPU.
+Here we will update the viewport to the new dimensions. Because we set the pipeline to have a fixed
+viewport, we will have to recreate it. The command buffers will depend on the new pipeline and
+on the previously recreated framebuffers, so they will need to be recreated as well.
 
-The `acquire_next_image` function will block until an image is available. This can happen depending
-on the present mode.
+## Acquiring and presenting
 
-*To be finished* - check the [Triangle example](https://github.com/vulkano-rs/vulkano-examples/blob/master/src/bin/triangle.rs) for now.
+To actually start drawing, the first thing that we need to do is to *acquire* an image::
 
-## Clearing the image
+```rust
+let (image_i, suboptimal, acquire_future) =
+    match swapchain::acquire_next_image(swapchain.clone(), None) {
+        Ok(r) => r,
+        Err(AcquireError::OutOfDate) => {
+            recreate_swapchain = true;
+            return;
+        }
+        Err(e) => panic!("Failed to acquire next image: {:?}", e),
+    };
+```
 
-*To be finished*
+The `acquire_next_image()` function returns the image index on which we are allowed to draw, as well as a *future* representing the
+moment when the GPU will gain access to that image.
 
-## Advanced : present modes
+If no image is available (which happens if you submit draw commands too quickly), then the function will
+block and wait until there is. The second parameter is an optional timeout.
+
+Sometimes the function may be suboptimal, were the swapchain image will still work, but may not display currently.
+If this happens, we will signal to recreate the swapchain:
+
+```rust
+if suboptimal {
+    recreate_swapchain = true;
+}
+```
+
+Previously, we just submitted one command to the gpu, and then waited for it to finish.
+Submitting a command produces an object that implements the `GpuFuture` trait,
+which holds the resources for as long as they are in use by the GPU.
+Destroying an object with this trait blocks until the GPU is finished executing it.
+
+Because now things will happen in a loop, instead of destroying the future object right away, we will keep
+it alive between frames. In this way, instead of blocking the cpu side, the gpu can continue working between frames.
+
+To do that, we will start by creating a future representing *now*, and then storing it:
+
+```rust
+let mut previous_frame_end = Some(sync::now(device.clone()).boxed());
+
+event_loop.run(move |event, _, control_flow| match event {
+// crop
+```
+
+Next, let's write the code for the actual future that will be created each frame:
+
+```rust
+let future = previous_frame_end
+    .take()
+    .unwrap()
+    .join(acquire_future)
+    .then_execute(queue.clone(), command_buffers[image_i].clone())
+    .unwrap()
+    .then_swapchain_present(queue.clone(), swapchain.clone(), image_i)
+    .then_signal_fence_and_flush();
+```
+
+First, we join in with the previous frame (so that we don't need to synchronize again).
+Then, execute the respective command buffer and then actually *present* the image to the swapchain.
+All of this will happen on the GPU without cpu interaction. This means that the image will only be
+presented after the gpu finishes executing the command buffer that actually will draw the triangle.
+
+In the end, we signal a *fence* (a signal to the cpu that the gpu has finished) and flush, to actually
+send the instructions to the GPU.
+
+If there are errors, we need to handle them right away. Let's do that:
+
+```rust
+match future {
+    Ok(future) => {
+        previous_frame_end = Some(future.boxed());
+    }
+    Err(FlushError::OutOfDate) => {
+        recreate_swapchain = true;
+        previous_frame_end = Some(sync::now(device.clone()).boxed());
+    }
+    Err(e) => {
+        println!("Failed to flush future: {:?}", e);
+        previous_frame_end = Some(sync::now(device.clone()).boxed());
+    }
+}
+```
+
+Here, we save the future in a case of success, or synchronize and create a new one
+in case of failure.
+
+Your program is finally complete! If you run it, it should display a nice triangle on the screen.
+If you have any problems, take a look at
+[all the code](https://github.com/vulkano-rs/vulkano-www/blob/master/examples/windowing.rs),
+and see if you have missed anything.
+
+Next: Going 3D (coming soon).

@@ -163,7 +163,7 @@ let queue = queues.next().unwrap();
 
 Swapchains have a lot of properties: the format and dimensions of their images, an optional
 transformation, a presentation mode, and so on. We have to specify a value for each of these
-parameters when we create the swapchain. Therefore before we can do so we have to query the
+parameters when we create the swapchain. Therefore, we have to query the
 capabilities of the surface.
 
 ```rust
