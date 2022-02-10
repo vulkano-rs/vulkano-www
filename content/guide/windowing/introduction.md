@@ -1,11 +1,11 @@
 # Windowing introduction
 
-Up until now, we have only created applications that perform one quick action then exit. What
-we are going to do next is to create a window in order to draw graphics on it, and keep our
-application running forever until the window is closed.
+Up until now, we have only created applications that perform one quick action and then exit. What
+we are going to do next is create a window in order to draw graphics on it, and keep our
+application running forever until the window is closed by the user.
 
-Strictly speaking, creating a window and handling events is **not** covered by Vulkano. Vulkano,
-however, is capable of rendering to window(s).
+Specifically speaking, creating a window and handling events is **not** covered by Vulkano. Vulkano,
+however, is capable of rendering the window(s).
 
 > **Note**: The final code of this chapter can be found
 > [here](https://github.com/vulkano-rs/vulkano-www/blob/master/examples/windowing.rs)
@@ -27,7 +27,7 @@ We encourage you to browse [the documentation of `winit`](https://docs.rs/winit)
 Because the objects that come with creating a window are not part of Vulkan itself,
 the first thing that you will need to do is to enable all non-core extensions
 required to draw a window. `vulkano_win` automatically provides them for us, so the only
-thing left is to pass them to the instance creation:
+thing left is to pass them on to the instance creation:
 
 ```rust
 use vulkano::instance::{Instance, Version};
@@ -51,17 +51,17 @@ let surface = WindowBuilder::new()
 
 As you can see, we created a new object, called *surface*.
 
-The *surface* is an cross-platform abstraction over the actual window object, that Vulkano
+The *surface* is a cross-platform abstraction over the actual window object, that Vulkano
 can use for rendering.
 As for the window itself, it can be retrieved by calling `surface.window()`, which you can
-use to manipulate it and change its default properties.
+use to manipulate and change its default properties.
 
-After you made the change, running the program should now work and open a window, then immediately
-close it when the `main` function exits.
+After you made the change, you should be able to run the program, where a window will open and then immediately
+close when the `main` function exits.
 
 ## Events handling
 
-In order to make our application run for as long as the window is alive, we need to handle the
+In order to make our application run for as long as the window is not manually closed, we need to handle the
 window's events. This is typically done after initialization, and right before the end of the
 `main` function. Using the `event_loop` object:
 
@@ -84,7 +84,7 @@ event_loop.run(|event, _, control_flow| {
 
 What this code does is block the main thread forever, and calls the closure whenever the events
 loop (which we used to create our window) receives an event. These events include the events
-that are tied to our window, such a mouse movements.
+that are tied to our window, such as mouse movements.
 
 When the user wants to close the window, a `WindowEvent::CloseRequested` event is received, which makes our closure
 set the `control_flow` to `ControlFlow::Exit` which signals to winit that we want an exit.
