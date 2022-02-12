@@ -40,7 +40,7 @@ let device_extensions = DeviceExtensions {
 };
 ```
 
-Next, we are going to enumerate all devices and filter them by supported extensions:
+Next, we are going to enumerate all the devices and filter them by supported extensions:
 
 ```rust
 use vulkano::device::physical::{PhysicalDevice, PhysicalDeviceType};
@@ -52,7 +52,7 @@ PhysicalDevice::enumerate(&instance)
     // continues bellow
 ```
 
-Some devices that passed the test could not have the needed queue family(ies) to present images
+Some devices that passed the test may not have the needed queue family(ies) to present images
 to the surface or even support graphical operations. So, we are going to filter them and at the
 same time select the first queue family that is suitable:
 

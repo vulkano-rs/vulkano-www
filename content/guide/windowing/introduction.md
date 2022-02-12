@@ -1,7 +1,7 @@
 # Windowing introduction
 
-Up until now, we have only created applications that perform one quick action then exit. What
-we are going to do next is to create a window in order to draw graphics on it, and keep our
+Up until now, we have only created applications that perform one quick action and then exit. What
+we are going to do next is create a window in order to draw graphics on it, and keep our
 application running forever until the window is closed.
 
 Strictly speaking, creating a window and handling events is **not** covered by Vulkano. Vulkano,
@@ -27,7 +27,7 @@ We encourage you to browse [the documentation of `winit`](https://docs.rs/winit)
 Because the objects that come with creating a window are not part of Vulkan itself,
 the first thing that you will need to do is to enable all non-core extensions
 required to draw a window. `vulkano_win` automatically provides them for us, so the only
-thing left is to pass them to the instance creation:
+thing left is to pass them on to the instance creation:
 
 ```rust
 use vulkano::instance::{Instance, Version};
@@ -51,12 +51,12 @@ let surface = WindowBuilder::new()
 
 As you can see, we created a new object, called *surface*.
 
-The *surface* is an cross-platform abstraction over the actual window object, that Vulkano
+The *surface* is a cross-platform abstraction over the actual window object, that Vulkano
 can use for rendering.
 As for the window itself, it can be retrieved by calling `surface.window()`, which you can
-use to manipulate it and change its default properties.
+use to manipulate and change its default properties.
 
-After you made the change, running the program should now work and open a window, then immediately
+After you made the change, running the program should now open a window, then immediately
 close it when the `main` function exits.
 
 ## Events handling
@@ -84,12 +84,12 @@ event_loop.run(|event, _, control_flow| {
 
 What this code does is block the main thread forever, and calls the closure whenever the events
 loop (which we used to create our window) receives an event. These events include the events
-that are tied to our window, such a mouse movements.
+that are tied to our window, such as mouse movements.
 
 When the user wants to close the window, a `WindowEvent::CloseRequested` event is received, which makes our closure
 set the `control_flow` to `ControlFlow::Exit` which signals to winit that we want an exit.
 
-<!-- todo: I don't know if this is actually correct -->
+<!-- todo: is this correct? -->
 <!-- > **Note**: Since there is nothing to stop it, the window will try to update as quickly as it can,
 > likely using all the power it can get from one of your cores.
 > We will change that, however, in the incoming chapters. -->

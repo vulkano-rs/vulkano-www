@@ -33,7 +33,7 @@ fn get_render_pass(device: Arc<Device>, swapchain: Arc<Swapchain<Window>>) -> Ar
 let render_pass = get_render_pass(device.clone(), swapchain.clone());
 ```
 
-When we only had one image, we only needed to create one framebuffer for it. However, now we
+When we only had one image, we only needed to create one framebuffer for it. However, we now
 need to create a different framebuffer for each of the images:
 
 ```rust
@@ -184,7 +184,7 @@ fn main() {
 ```
 
 Currently the viewport state is set to `fixed_scissor_irrelevant`, meaning
-that it will only using one fixed viewport. Because of this, we will need to recreate
+that it will be only using one fixed viewport. Because of this, we will need to recreate
 the pipeline every time the window gets resized (the viewport changes). If you expect the
 window to be resized many times, you can set the pipeline viewport to a dynamic state, using
 `ViewportState::viewport_dynamic_scissor_irrelevant()`, at a cost of a bit of performance.
