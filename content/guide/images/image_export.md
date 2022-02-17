@@ -10,7 +10,7 @@ The answer to this question is that we have to create a buffer and ask the GPU t
 of the image to the buffer.
 
 > **Note**: You can find the [full source code of this section
-> here](https://github.com/vulkano-rs/vulkano-www/blob/master/examples/guide-image-clear.rs).
+> here](https://github.com/vulkano-rs/vulkano-www/blob/master/examples/images/image_clear.rs).
 >
 > **Note**: This time the device need a device extension for the use of storage buffers, see the line 36 of the full source code.
 
