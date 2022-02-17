@@ -12,9 +12,6 @@ and a *framebuffer* that contains the target image.
 
 It is now time to put everything together and perform the draw operation!
 
-> **Note**: You can find the [full source code of this section
-> here](https://github.com/vulkano-rs/vulkano-www/blob/master/examples/guide-triangle.rs).
-
 ## Creating a graphics pipeline
 
 Just like we had to create a compute pipeline in order to perform a compute operation, we have to

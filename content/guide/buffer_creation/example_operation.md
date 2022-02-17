@@ -6,9 +6,6 @@ to actually do something.
 What we are going to ask in this example is very simple: we will ask it to copy data from one
 buffer to another.
 
-> **Note**: You can find the [full source code of this section
-> here](https://github.com/vulkano-rs/vulkano-www/blob/master/examples/guide-example-operation.rs).
-
 ## Creating the buffers
 
 The first step is to create two `CpuAccessibleBuffer`s: the source and the destination. This
