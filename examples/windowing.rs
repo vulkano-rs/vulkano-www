@@ -224,7 +224,7 @@ fn main() {
         let format = caps.supported_formats[0].0;
 
         Swapchain::start(device.clone(), surface.clone())
-            .num_images(caps.min_image_count)
+            .num_images(caps.min_image_count + 1)
             .format(format)
             .dimensions(dimensions)
             .usage(ImageUsage::color_attachment())
@@ -284,7 +284,10 @@ fn main() {
     let mut window_resized = false;
     let mut recreate_swapchain = false;
 
-    let mut previous_frame_fence: Option<Arc<FenceSignalFuture<_>>> = None;
+    let frames_in_flight = images.len();
+    let mut fences: Vec<Option<Arc<FenceSignalFuture<_>>>> = vec![None; frames_in_flight];
+    fences.fill(None);
+    let mut fence_i = fences.len() - 1;
 
     event_loop.run(move |event, _, control_flow| match event {
         Event::WindowEvent {
@@ -352,7 +355,13 @@ fn main() {
                 recreate_swapchain = true;
             }
 
-            let previous_future = match previous_frame_fence.clone() {
+            // wait for the oldest fence to finish
+            if let Some(oldest_fence) = &fences[fence_i] {
+                oldest_fence.wait(None).unwrap();
+            }
+
+            let previous_fence_i = (fence_i + fences.len() - 1) % fences.len();
+            let previous_future = match fences[previous_fence_i].clone() {
                 // Create a NowFuture
                 None => {
                     let mut now = sync::now(device.clone());
@@ -361,11 +370,7 @@ fn main() {
                     now.boxed()
                 }
                 // Use the existing FenceSignalFuture
-                Some(fence) => {
-                    fence.wait(None).unwrap();
-
-                    fence.boxed()
-                }
+                Some(fence) => fence.boxed(),
             };
 
             let future = previous_future
@@ -375,7 +380,7 @@ fn main() {
                 .then_swapchain_present(queue.clone(), swapchain.clone(), image_i)
                 .then_signal_fence_and_flush();
 
-            previous_frame_fence = match future {
+            fences[image_i] = match future {
                 Ok(value) => Some(Arc::new(value)),
                 Err(FlushError::OutOfDate) => {
                     recreate_swapchain = true;
@@ -386,6 +391,8 @@ fn main() {
                     None
                 }
             };
+
+            fence_i = (fence_i + 1) % fences.len();
         }
         _ => (),
     });
