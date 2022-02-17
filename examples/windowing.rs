@@ -29,7 +29,7 @@ use vulkano::pipeline::GraphicsPipeline;
 use vulkano::render_pass::{Framebuffer, RenderPass, Subpass};
 use vulkano::shader::ShaderModule;
 use vulkano::swapchain::{self, AcquireError, Surface, Swapchain, SwapchainCreationError};
-use vulkano::sync::{self, FlushError, GpuFuture};
+use vulkano::sync::{self, FenceSignalFuture, FlushError, GpuFuture};
 use vulkano_win::VkSurfaceBuild;
 
 use winit::event::{Event, WindowEvent};
@@ -160,8 +160,7 @@ fn get_command_buffers(
             let mut builder = AutoCommandBufferBuilder::primary(
                 device.clone(),
                 queue.family(),
-                // todo: is there any way to use MultipleSubmit instead?
-                CommandBufferUsage::SimultaneousUse,
+                CommandBufferUsage::MultipleSubmit,
             )
             .unwrap();
 
@@ -223,6 +222,7 @@ fn main() {
         let dimensions: [u32; 2] = surface.window().inner_size().into();
         let composite_alpha = caps.supported_composite_alpha.iter().next().unwrap();
         let format = caps.supported_formats[0].0;
+
         Swapchain::start(device.clone(), surface.clone())
             .num_images(caps.min_image_count)
             .format(format)
@@ -284,7 +284,7 @@ fn main() {
     let mut window_resized = false;
     let mut recreate_swapchain = false;
 
-    let mut previous_frame_end = Some(sync::now(device.clone()).boxed());
+    let mut previous_frame_fence: Option<Arc<FenceSignalFuture<_>>> = None;
 
     event_loop.run(move |event, _, control_flow| match event {
         Event::WindowEvent {
@@ -300,8 +300,6 @@ fn main() {
             window_resized = true;
         }
         Event::MainEventsCleared => {
-            previous_frame_end.as_mut().unwrap().cleanup_finished();
-
             if window_resized || recreate_swapchain {
                 recreate_swapchain = false;
 
@@ -354,28 +352,40 @@ fn main() {
                 recreate_swapchain = true;
             }
 
-            let future = previous_frame_end
-                .take()
-                .unwrap()
+            let previous_future = match previous_frame_fence.clone() {
+                // Create a NowFuture
+                None => {
+                    let mut now = sync::now(device.clone());
+                    now.cleanup_finished();
+
+                    now.boxed()
+                }
+                // Use the existing FenceSignalFuture
+                Some(fence) => {
+                    fence.wait(None).unwrap();
+
+                    fence.boxed()
+                }
+            };
+
+            let future = previous_future
                 .join(acquire_future)
                 .then_execute(queue.clone(), command_buffers[image_i].clone())
                 .unwrap()
                 .then_swapchain_present(queue.clone(), swapchain.clone(), image_i)
                 .then_signal_fence_and_flush();
 
-            match future {
-                Ok(future) => {
-                    previous_frame_end = Some(future.boxed());
-                }
+            previous_frame_fence = match future {
+                Ok(value) => Some(Arc::new(value)),
                 Err(FlushError::OutOfDate) => {
                     recreate_swapchain = true;
-                    previous_frame_end = Some(sync::now(device.clone()).boxed());
+                    None
                 }
                 Err(e) => {
                     println!("Failed to flush future: {:?}", e);
-                    previous_frame_end = Some(sync::now(device.clone()).boxed());
+                    None
                 }
-            }
+            };
         }
         _ => (),
     });
