@@ -203,47 +203,50 @@ processed in advance. You can do it with only one fence
 if you want to do something like that). However, here we will use multiple fences (likewise multiple frames in flight), which
 will make easier for you implement any other synchronization technique you want.
 
-In this example we will, for simplicity, use the same number of fences as the number of images, making
-us able to use all of the existing command buffers at the same time. If you want more than that,
-you will need to create more command buffers or change their usage to `CommandBufferUsage::SimultaneousUse`,
-as each future (that has the fence) will have it own command buffer.
-
 Because each fence belongs to a specific future, we will actually store the futures as we create them,
 which will automatically hold each of their specific resources. We won't need to synchronize each frame,
 as we can just join with the previous frames (as all of the operations should happen continuously, anyway).
-Let's then create the vector that will store all of these:
 
 > **Note**: Here we will use *fence* and *future* somewhat interchangeably, as each fence corresponds to a
 > future and vice versa. Each time we mention a fence, think of it as a future that incorporates a fence.
+
+In this example we will, for simplicity, correspond each of our fences to one image, making
+us able to use all of the existing command buffers at the same time without worrying much about what resources are used in each future.
+If you want something different, the key is to make sure each future uses resources that are not already in use (this includes images
+and command buffers).
+
+Let's first create the vector that will store all of the fences:
 
 ```rust
 use vulkano::sync::FenceSignalFuture;
 
 let frames_in_flight = images.len();
 let mut fences: Vec<Option<Arc<FenceSignalFuture<_>>>> = vec![None; frames_in_flight];
-let mut fence_i = fences.len() - 1;
+let mut previous_fence_i = 0;
+
+event_loop.run(move |event, _, control_flow| match event {
+    // crop
 ```
 
-Because the fences don't exist at the start (or happen to stop existing because of an error), they are wrapped in an Option.
+Because the fences don't exist at the start (or happen to stop existing because of an error), they are wrapped inside an Option.
 Each future containing the fence has the information of the previous one, of which the type is contained inside
 `_`. We will also be storing them in a `Arc`, which will automatically free them when all the references are dropped.
 
-Our fences will get substituted in a loop, and `fence_i` will correspond to the oldest fence (which will get substituted).
-
-At the end of your file, remove all the previous future logic. To start, we need to wait if the oldest future to signal it's fence
-(which tells us that the GPU has finished drawing the oldest frame and presented it, and we are allowed to reuse it's command buffer):
+At the end of your main loop, remove all the previous future logic. Each frame, we will substitute the fence
+that corresponds to the image we have acquired. To make sure the new future and the old one will not be using
+the same image, we will wait for the old future to complete and free its resources:
 
 ```rust
-if let Some(oldest_fence) = &fences[fence_i] {
-    oldest_fence.wait(None).unwrap();
+// wait for the fence related to this image to finish
+// normally this would be the oldest fence, that most likely have already finished
+if let Some(image_fence) = &fences[image_i] {
+    image_fence.wait(None).unwrap();
 }
 ```
 
-Because we now take the future of the previous frame and reuse it.
-We only need to synchronize if the future doesn't already exist:
+We will join with the future from the previous frame, so that we only need to synchronize if the future doesn't already exist:
 
 ```rust
-let previous_fence_i = (fence_i + fences.len() - 1) % fences.len();
 let previous_future = match fences[previous_fence_i].clone() {
     // Create a NowFuture
     None => {
@@ -258,9 +261,9 @@ let previous_future = match fences[previous_fence_i].clone() {
 ```
 
 Here, we call `.boxed()` to our futures to store them in a heap, as they can have different sizes.
-The `now.cleanup_finished();` function will manually free all not used resources (which can happen after an error).
+The `now.cleanup_finished();` function will manually free all not used resources (which could still be there because of an error).
 
-Now that we have the `previous_future`, we can use it like before:
+Now that we have the `previous_future`, we can join and create a new one as usual:
 
 ```rust
 let future = previous_future
@@ -287,10 +290,10 @@ fences[image_i] = match future {
 };
 ```
 
-Don't forget to increment the fence index variable:
+Don't forget to set `previous_fence_i` for the next frame:
 
 ```rust
-fence_i = (fence_i + 1) % fences.len();
+previous_fence_i = image_i;
 ```
 
 In the end, we finally achieved a fully working triangle. The next step is to start moving it

@@ -286,7 +286,7 @@ fn main() {
 
     let frames_in_flight = images.len();
     let mut fences: Vec<Option<Arc<FenceSignalFuture<_>>>> = vec![None; frames_in_flight];
-    let mut fence_i = 0;
+    let mut previous_fence_i = 0;
 
     event_loop.run(move |event, _, control_flow| match event {
         Event::WindowEvent {
@@ -354,12 +354,11 @@ fn main() {
                 recreate_swapchain = true;
             }
 
-            // wait for the oldest fence to finish
-            if let Some(oldest_fence) = &fences[fence_i] {
-                oldest_fence.wait(None).unwrap();
+            // wait for the fence related to this image to finish (normally this would be the oldest fence)
+            if let Some(image_fence) = &fences[image_i] {
+                image_fence.wait(None).unwrap();
             }
 
-            let previous_fence_i = (fence_i + fences.len() - 1) % fences.len();
             let previous_future = match fences[previous_fence_i].clone() {
                 // Create a NowFuture
                 None => {
@@ -391,7 +390,7 @@ fn main() {
                 }
             };
 
-            fence_i = (fence_i + 1) % fences.len();
+            previous_fence_i = image_i;
         }
         _ => (),
     });
