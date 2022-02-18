@@ -21,7 +21,7 @@ by one, a GPU can perform it on multiple values at once.
 > are usually foremost *software* queues, and not actual hardware constructs.
 
 > **Note**: You can find the [full source code of this section
-> here](https://github.com/vulkano-rs/vulkano-www/blob/master/examples/guide-compute-operations.rs).
+> here](https://github.com/vulkano-rs/vulkano-www/blob/master/examples/compute_pipeline.rs).
 
 ## Usability
 
