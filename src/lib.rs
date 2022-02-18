@@ -117,18 +117,29 @@ fn routes(request: &Request) -> Response {
             })
         },
 
-        (GET) (/guide/window) => {
+        // todo: redirect to the other url
+        (GET) (/guide/windowing) => {
             guide_template_markdown({
-                include_str!("../content/guide/windowing/window.md")
+                include_str!("../content/guide/windowing/introduction.md")
             })
         },
-        (GET) (/guide/swapchain-creation) => {
+        (GET) (/guide/windowing/introduction) => {
+            guide_template_markdown({
+                include_str!("../content/guide/windowing/introduction.md")
+            })
+        },
+        (GET) (/guide/windowing/swapchain-creation) => {
             guide_template_markdown({
                 include_str!("../content/guide/windowing/swapchain_creation.md")
             })
         },
-        (GET) (/guide/acquire-present) => {
-            guide_template_markdown(include_str!("../content/guide/windowing/acquire_present.md"))
+        (GET) (/guide/windowing/other-initialization) => {
+            guide_template_markdown({
+                include_str!("../content/guide/windowing/other_initialization.md")
+            })
+        },
+        (GET) (/guide/windowing/event-handling) => {
+            guide_template_markdown(include_str!("../content/guide/windowing/event_handling.md"))
         },
 
         (GET) (/guide/memory) => {
