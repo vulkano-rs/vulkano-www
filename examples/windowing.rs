@@ -286,8 +286,7 @@ fn main() {
 
     let frames_in_flight = images.len();
     let mut fences: Vec<Option<Arc<FenceSignalFuture<_>>>> = vec![None; frames_in_flight];
-    fences.fill(None);
-    let mut fence_i = fences.len() - 1;
+    let mut fence_i = 0;
 
     event_loop.run(move |event, _, control_flow| match event {
         Event::WindowEvent {

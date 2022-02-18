@@ -214,9 +214,7 @@ fn get_command_buffers(
             let mut builder = AutoCommandBufferBuilder::primary(
                 device.clone(),
                 queue.family(),
-                // the usage is set to SimultaneousUse
-                // because any command buffer could be used multiple times simultaneously
-                CommandBufferUsage::SimultaneousUse,
+                CommandBufferUsage::MultipleSubmit,  // don't forget to write the correct buffer usage
             )
             .unwrap();
 

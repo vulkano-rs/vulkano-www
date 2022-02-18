@@ -187,7 +187,7 @@ use vulkano::image::ImageUsage;
 use vulkano::swapchain::Swapchain;
 
 let (swapchain, images) = Swapchain::start(device.clone(), surface.clone())
-    .num_images(caps.min_image_count)  // How many buffers to use in the swapchain
+    .num_images(caps.min_image_count + 1)  // How many buffers to use in the swapchain
     .format(format)
     .dimensions(dimensions)
     .usage(ImageUsage::color_attachment())  // What the images are going to be used for
@@ -196,6 +196,9 @@ let (swapchain, images) = Swapchain::start(device.clone(), surface.clone())
     .build()
     .expect("failed to create swapchain");
 ```
+
+It's good to have `num_images()` be at least one more than the minimal, to give a bit more freedom to
+the image queue.
 
 For additional information, check the
 [swapchain documentation](https://docs.rs/vulkano/0.28.0/vulkano/swapchain/index.html#swapchains).

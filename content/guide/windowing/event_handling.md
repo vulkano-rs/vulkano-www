@@ -114,13 +114,13 @@ if window_resized || recreate_swapchain {
 }
 ```
 
-Here we will update the viewport to the new dimensions. Because we set the pipeline to have a fixed
+We will update the viewport to the new dimensions, and because we set the pipeline to have a fixed
 viewport, we will have to recreate it. The command buffers will depend on the new pipeline and
 on the previously recreated framebuffers, so they will need to be recreated as well.
 
 ## Acquiring and presenting
 
-To actually start drawing, the first thing that we need to do is to *acquire* an image::
+To actually start drawing, the first thing that we need to do is to *acquire* an image to draw:
 
 ```rust
 let (image_i, suboptimal, acquire_future) =
@@ -138,7 +138,7 @@ The `acquire_next_image()` function returns the image index on which we are allo
 moment when the GPU will gain access to that image.
 
 If no image is available (which happens if you submit draw commands too quickly), then the function will
-block and wait until there is any. The second parameter is an optional timeout.
+block and wait until there is. The second parameter is an optional timeout.
 
 Sometimes the function may be suboptimal, were the swapchain image will still work, but may not get properly displayed.
 If this happens, we will signal to recreate the swapchain:
@@ -149,29 +149,10 @@ if suboptimal {
 }
 ```
 
-Previously, we just submitted one command to the gpu, and then waited for it to finish.
-Submitting a command produces an object that implements the `GpuFuture` trait,
-which holds the resources for as long as they are in use by the GPU.
-Destroying an object with this trait blocks the thread until the GPU finishes executing it.
-
-Because now things will happen in a loop, instead of destroying the future object right away, we will keep
-it alive between frames. In this way, instead of blocking the CPU side, the GPU can continue working between frames.
-
-To do that, we will start by creating a future representing *now*, and then storing it:
+The next step is to create the future that will be submitted to the GPU:
 
 ```rust
-let mut previous_frame_end = Some(sync::now(device.clone()).boxed());
-
-event_loop.run(move |event, _, control_flow| match event {
-// crop
-```
-
-Next, let's write some code for the actual future that will be created in each frame:
-
-```rust
-let future = previous_frame_end
-    .take()
-    .unwrap()
+let execution = sync::now(device.clone())
     .join(acquire_future)
     .then_execute(queue.clone(), command_buffers[image_i].clone())
     .unwrap()
@@ -179,49 +160,144 @@ let future = previous_frame_end
     .then_signal_fence_and_flush();
 ```
 
-First, we join in with the previous frame (so that we don't need to synchronize again).
-Then, execute the respective command buffer and then actually *present* the image to the swapchain.
-All of this will happen on the GPU without CPU interaction. This means that the image will only be
-presented after the GPU finishes executing the command buffer that will actually draw the triangle.
+Like we did in earlier chapters, we start by synchronizing. However, the command buffer can't be executed immediately,
+as it needs to wait for the image to actually become available. To do that,
+we `.join()` with the other future that we got from `acquire_next_image()`, the two representing the moment where we have
+synchronized *and* actually acquired the said image. We can then instruct the gpu to execute our main command buffer
+as usual (we select it by using the image index).
 
-In the end, we signal a *fence* (a signal to the CPU that the GPU has finished) and flush, to actually
-send the command.
+In the end, we need to *present* the image to the swapchain, telling it that we have finished drawing and the image is
+ready for display. Don't forget to add a fence and flush the future.
 
-If there are errors, we need to handle them right away. Let's do that:
+We are now doing more than just executing a command buffer, so let's do a bit of error handling:
 
 ```rust
-match future {
+match execution {
     Ok(future) => {
-        previous_frame_end = Some(future.boxed());
+        future.wait(None).unwrap();  // wait for the GPU to finish
     }
     Err(FlushError::OutOfDate) => {
         recreate_swapchain = true;
-        previous_frame_end = Some(sync::now(device.clone()).boxed());
     }
     Err(e) => {
         println!("Failed to flush future: {:?}", e);
-        previous_frame_end = Some(sync::now(device.clone()).boxed());
     }
 }
 ```
 
-Here, we save the future in a case of success, or synchronize and create a new one
-in case of failure.
+For now, we will just wait for the GPU to process all of its operations.
 
-Because we joining with the future from the previous frame, some of the resources that get created
-won't be automatically destroyed. We can manually free them by calling a special function:
+Finally, your triangle is complete! Well, almost, as you probably don't want for the CPU to just wait
+every frame for the GPU without actually doing anything. Anyways, if you execute your program now, you should
+see the window popup with a nice triangle, which you can resize without crashing.
+
+## Frames in flight: executing instructions parallel to the GPU
+
+Currently the CPU waits between frames for the GPU to finish, which is somewhat inefficient.
+What we are going to do now is to implement the functionality of *frames in flight*, allowing the CPU to start
+processing new frames while the GPU is working on older ones.
+
+To do that, we need to save the created fences and reuse them later. Each stored fence will correspond to a new frame that is being
+processed in advance. You can do it with only one fence
+(check Vulkano's [triangle example](https://github.com/vulkano-rs/vulkano/blob/v0.28.0/examples/src/bin/triangle.rs)
+if you want to do something like that). However, here we will use multiple fences (likewise multiple frames in flight), which
+will make easier for you implement any other synchronization technique you want.
+
+In this example we will, for simplicity, use the same number of fences as the number of images, making
+us able to use all of the existing command buffers at the same time. If you want more than that,
+you will need to create more command buffers or change their usage to `CommandBufferUsage::SimultaneousUse`,
+as each future (that has the fence) will have it own command buffer.
+
+Because each fence belongs to a specific future, we will actually store the futures as we create them,
+which will automatically hold each of their specific resources. We won't need to synchronize each frame,
+as we can just join with the previous frames (as all of the operations should happen continuously, anyway).
+Let's then create the vector that will store all of these:
+
+> **Note**: Here we will use *fence* and *future* somewhat interchangeably, as each fence corresponds to a
+> future and vice versa. Each time we mention a fence, think of it as a future that incorporates a fence.
 
 ```rust
-Event::RedrawEventsCleared => {
-    previous_frame_end.as_mut().unwrap().cleanup_finished();
-    // crop
+use vulkano::sync::FenceSignalFuture;
+
+let frames_in_flight = images.len();
+let mut fences: Vec<Option<Arc<FenceSignalFuture<_>>>> = vec![None; frames_in_flight];
+let mut fence_i = fences.len() - 1;
 ```
 
-You can call it from time to time, but here we are just going to call every frame.
+Because the fences don't exist at the start (or happen to stop existing because of an error), they are wrapped in an Option.
+Each future containing the fence has the information of the previous one, of which the type is contained inside
+`_`. We will also be storing them in a `Arc`, which will automatically free them when all the references are dropped.
 
-Your program is finally complete! If you run it, it should display a nice triangle on the screen.
+Our fences will get substituted in a loop, and `fence_i` will correspond to the oldest fence (which will get substituted).
+
+At the end of your file, remove all the previous future logic. To start, we need to wait if the oldest future to signal it's fence
+(which tells us that the GPU has finished drawing the oldest frame and presented it, and we are allowed to reuse it's command buffer):
+
+```rust
+if let Some(oldest_fence) = &fences[fence_i] {
+    oldest_fence.wait(None).unwrap();
+}
+```
+
+Because we now take the future of the previous frame and reuse it.
+We only need to synchronize if the future doesn't already exist:
+
+```rust
+let previous_fence_i = (fence_i + fences.len() - 1) % fences.len();
+let previous_future = match fences[previous_fence_i].clone() {
+    // Create a NowFuture
+    None => {
+        let mut now = sync::now(device.clone());
+        now.cleanup_finished();
+
+        now.boxed()
+    }
+    // Use the existing FenceSignalFuture
+    Some(fence) => fence.boxed(),
+};
+```
+
+Here, we call `.boxed()` to our futures to store them in a heap, as they can have different sizes.
+The `now.cleanup_finished();` function will manually free all not used resources (which can happen after an error).
+
+Now that we have the `previous_future`, we can use it like before:
+
+```rust
+let future = previous_future
+    .join(acquire_future)
+    .then_execute(queue.clone(), command_buffers[image_i].clone())
+    .unwrap()
+    .then_swapchain_present(queue.clone(), swapchain.clone(), image_i)
+    .then_signal_fence_and_flush();
+```
+
+And then substitute the old (obsolete) fence in the error handling:
+
+```rust
+fences[image_i] = match future {
+    Ok(value) => Some(Arc::new(value)),
+    Err(FlushError::OutOfDate) => {
+        recreate_swapchain = true;
+        None
+    }
+    Err(e) => {
+        println!("Failed to flush future: {:?}", e);
+        None
+    }
+};
+```
+
+Don't forget to increment the fence index variable:
+
+```rust
+fence_i = (fence_i + 1) % fences.len();
+```
+
+In the end, we finally achieved a fully working triangle. The next step is to start moving it
+and changing it properties, but that's something for the next chapter.
+
 If you have any problems, take a look at
 [all the code](https://github.com/vulkano-rs/vulkano-www/blob/master/examples/windowing.rs),
 and see if you have missed anything.
 
-Next: Going 3D (coming soon).
+Next: (coming soon).

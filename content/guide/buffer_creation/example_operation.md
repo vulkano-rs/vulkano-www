@@ -34,13 +34,13 @@ while the destination buffer contains sixty-four 0s.
 In order to ask the GPU to perform an operation, we need to create a type of object that we
 haven't covered yet, the *command buffer*.
 
-With Vulkan and vulkano you can't just execute commands one by one, as it would be too inefficient.
+With Vulkan and Vulkano you can't just execute commands one by one, as it would be too inefficient.
 Instead, we need to build a command buffer that contains a list of commands that we want to
 execute.
 
 You can create many command buffers and use them different times during the program. They can have
-different uses and can do many different things. In this case, we are just going to create one with
-the simple operation that we are trying to do.
+different uses and can do many different things. In this case, we are just going to create for the
+operation we are trying to achieve.
 
 Vulkan supports primary and secondary command buffers. Primary command buffers can be sent directly to the GPU
 while secondary command buffers allow you to store functionality that you can reuse multiple times in primary command buffers.
@@ -51,7 +51,7 @@ We won't cover secondary command buffers here, but you can read
 > why we submit as many things as we can at once.
 > OpenGL (Vulkan's predecessor) allows you to execute commands one by one, but in reality
 > implementations buffer commands internally into command buffers. In other words, OpenGL
-> automatically does what Vulkan requires us to do manually. In practice OpenGL's automatic
+> automatically does what Vulkan requires us to do manually. In practice, OpenGL's automatic
 > buffering often causes more harm than good in performance-critical applications.
 
 We are going to submit the commands to the GPU, so let's create a primary command buffer:
@@ -84,7 +84,7 @@ family), but when you design a real program you have to be aware of this require
 ## Submission and synchronization
 
 The last step is to actually send the command buffer and execute it in the GPU.
-We can do that by synchronizing with the gpu, then executing the command buffer:
+We can do that by synchronizing with the GPU, then executing the command buffer:
 
 ```rust
 use vulkano::sync;
@@ -97,13 +97,13 @@ sync::now(device.clone())
     .unwrap();
 ```
 
-No function in vulkano immediately sends an operation to the GPU
+No function in Vulkano immediately sends an operation to the GPU
 (with the exception of some unsafe low-level functions). Instead, `sync::now()` creates a new
 type of object called a *future*, that keeps alive all the resources that will be used by the GPU
 and represents the execution in time of the actual operations.
 
-The future returned by `sync::now()` is in a pending state, what makes possible to append the execution of other command
-buffers and operations. Only by calling `.flush()` these operations are all submitted at once, and
+The future returned by `sync::now()` is in a pending state, what makes it possible to append the execution of other command
+buffers and operations. Only by calling `.flush()` that these operations are all submitted at once, and
 they actually start executing on the GPU.
 
 Using objects like this let's us build dependencies between operations and makes
@@ -117,8 +117,8 @@ now may sometimes return an error, because the buffer could still be being used 
 
 In order to read the content of `destination` and make sure that our copy succeeded, we need to
 wait until the operation is complete. To do that, we need to program the GPU to send back a special
-signal that will make us know it has finished. This kind of signal is called a *fence*, and it let us
-control from the CPU the flow of execution in the GPU.
+signal that will make us know it has finished. This kind of signal is called a *fence*, and it lets us
+know whenever the GPU has reached a certain point of execution.
 
 To do that, let's actually save the future and wait for the operations to finish:
 
