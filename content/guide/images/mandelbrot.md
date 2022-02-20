@@ -10,7 +10,7 @@ as explained in that section. Each invocation of the `main` function of the shad
 one pixel.
 
 > **Note**: You can find the [full source code of this section
-> here](https://github.com/vulkano-rs/vulkano-www/blob/master/examples/images/mandelbrot.rs).
+> here](https://github.com/vulkano-rs/vulkano-www/blob/master/chapter_code/images/mandelbrot.rs).
 
 # The shader
 
