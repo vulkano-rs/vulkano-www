@@ -7,7 +7,8 @@
 // notice may not be copied, modified, or distributed except
 // according to those terms.
 
-//! This example contains the source code of the fourth part of the guide at http://vulkano.rs.
+//! This is the source code of the "Drawing a fractal with a compute shader" subchapter
+//! from the "Using images" chapter at http://vulkano.rs.
 //!
 //! It is not commented, as the explanations can be found in the guide itself.
 
