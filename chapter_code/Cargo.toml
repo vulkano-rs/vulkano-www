@@ -1,0 +1,13 @@
+[package]
+name = "chapter_code"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+vulkano = "0.28.0"
+vulkano-shaders = "0.28.0"
+image = "0.24.0"
+winit = "0.26.0"
+vulkano-win = "0.28.0"
