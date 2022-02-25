@@ -66,7 +66,7 @@ let mut builder = AutoCommandBufferBuilder::primary(
 )
 .unwrap();
 
-builder.copy_buffer(source.clone(), dest.clone()).unwrap();
+builder.copy_buffer(source.clone(), destination.clone()).unwrap();
 
 let command_buffer = builder.build().unwrap();
 ```
