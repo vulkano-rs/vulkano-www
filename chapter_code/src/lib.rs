@@ -1,5 +1,11 @@
 use std::io;
 
+pub mod vulkano_objects;
+pub mod shaders;
+mod vertex_data;
+
+pub use vertex_data::{Vertex2d, Vertex3d};
+
 #[cfg(test)]
 mod tests {
     #[test]
