@@ -1,12 +1,11 @@
 use std::sync::Arc;
 
-use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
 use vulkano::command_buffer::{CommandBufferExecFuture, PrimaryAutoCommandBuffer};
 use vulkano::device::{Device, DeviceExtensions, Features, Queue};
 use vulkano::image::SwapchainImage;
 use vulkano::instance::Instance;
 use vulkano::pipeline::graphics::viewport::Viewport;
-use vulkano::pipeline::GraphicsPipeline;
+use vulkano::pipeline::{GraphicsPipeline, Pipeline};
 use vulkano::render_pass::{Framebuffer, RenderPass};
 use vulkano::shader::ShaderModule;
 use vulkano::swapchain::{
@@ -15,13 +14,15 @@ use vulkano::swapchain::{
 };
 use vulkano::sync::{self, FenceSignalFuture, FlushError, GpuFuture, JoinFuture, NowFuture};
 use vulkano_win::VkSurfaceBuild;
-
 use winit::event_loop::EventLoop;
 use winit::window::{Window, WindowBuilder};
+use winit::dpi::LogicalSize;
 
-use chapter_code::shaders::static_triangle;
+use chapter_code::game_objects::Square;
+use chapter_code::models::SquareModel;
+use chapter_code::shaders::movable_square;
 use chapter_code::vulkano_objects;
-use chapter_code::Vertex2d;
+use chapter_code::vulkano_objects::buffers::SimpleBuffers;
 
 pub type Fence = FenceSignalFuture<
   PresentFuture<
@@ -42,7 +43,7 @@ pub struct Renderer {
   images: Vec<Arc<SwapchainImage<winit::window::Window>>>,
   render_pass: Arc<RenderPass>,
   framebuffers: Vec<Arc<Framebuffer>>,
-  vertex_buffer: Arc<CpuAccessibleBuffer<[Vertex2d]>>,
+  buffers: SimpleBuffers<movable_square::vs::ty::Data>,
   vertex_shader: Arc<ShaderModule>,
   fragment_shader: Arc<ShaderModule>,
   viewport: Viewport,
@@ -57,6 +58,13 @@ impl<'a> Renderer {
     let surface = WindowBuilder::new()
       .build_vk_surface(&event_loop, instance.clone())
       .unwrap();
+
+    {
+      // window configuration
+      let window = surface.window();
+      window.set_title("Moving Square");
+      window.set_inner_size(LogicalSize::new(600.0, 600.0));
+    }
 
     let device_extensions = DeviceExtensions {
       khr_swapchain: true,
@@ -98,9 +106,9 @@ impl<'a> Renderer {
     );
 
     let vertex_shader =
-      static_triangle::vs::load(device.clone()).expect("failed to create shader module");
+      movable_square::vs::load(device.clone()).expect("failed to create shader module");
     let fragment_shader =
-      static_triangle::fs::load(device.clone()).expect("failed to create shader module");
+      movable_square::fs::load(device.clone()).expect("failed to create shader module");
 
     let viewport = Viewport {
       origin: [0.0, 0.0],
@@ -116,14 +124,23 @@ impl<'a> Renderer {
       viewport.clone(),
     );
 
-    let vertex_buffer = create_vertex_buffer(device.clone());
+    let buffers = SimpleBuffers::initialize::<SquareModel>(
+      device.clone(),
+      pipeline
+        .layout()
+        .descriptor_set_layouts()
+        .get(0)
+        .unwrap()
+        .clone(),
+      images.len(),
+    );
 
-    let command_buffers = vulkano_objects::command_buffers::create_only_vertex_command_buffers(
+    let command_buffers = vulkano_objects::command_buffers::create_simple_command_buffers(
       device.clone(),
       queue.clone(),
       pipeline.clone(),
       &framebuffers,
-      vertex_buffer.clone(),
+      &buffers,
     );
 
     Self {
@@ -134,7 +151,7 @@ impl<'a> Renderer {
       images,
       render_pass,
       framebuffers,
-      vertex_buffer,
+      buffers,
       vertex_shader,
       fragment_shader,
       viewport,
@@ -175,12 +192,12 @@ impl<'a> Renderer {
       self.viewport.clone(),
     );
 
-    self.command_buffers = vulkano_objects::command_buffers::create_only_vertex_command_buffers(
+    self.command_buffers = vulkano_objects::command_buffers::create_simple_command_buffers(
       self.device.clone(),
       self.queue.clone(),
       self.pipeline.clone(),
       &self.framebuffers,
-      self.vertex_buffer.clone(),
+      &self.buffers,
     );
   }
 
@@ -214,23 +231,14 @@ impl<'a> Renderer {
       .then_swapchain_present(self.queue.clone(), self.swapchain.clone(), image_i)
       .then_signal_fence_and_flush()
   }
-}
 
-pub fn create_vertex_buffer(device: Arc<Device>) -> Arc<CpuAccessibleBuffer<[Vertex2d]>> {
-  let vertex1 = Vertex2d {
-    position: [-0.5, -0.5],
-  };
-  let vertex2 = Vertex2d {
-    position: [0.0, 0.5],
-  };
-  let vertex3 = Vertex2d {
-    position: [0.5, -0.25],
-  };
-  CpuAccessibleBuffer::from_iter(
-    device,
-    BufferUsage::vertex_buffer(),
-    false,
-    vec![vertex1, vertex2, vertex3].into_iter(),
-  )
-  .unwrap()
+  pub fn update_uniform(&self, index: usize, square: &Square) {
+    let mut uniform_content = self.buffers.uniforms[index]
+      .0
+      .write()
+      .unwrap_or_else(|e| panic!("Failed to write to uniform buffer\n{}", e));
+
+    uniform_content.color = square.color;
+    uniform_content.position = square.position;
+  }
 }
