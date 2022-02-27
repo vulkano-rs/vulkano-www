@@ -7,21 +7,22 @@
 // notice may not be copied, modified, or distributed except
 // according to those terms.
 
-//! This example contains the source code of the first part of the guide at http://vulkano.rs.
+//! This is the source code of the first three subchapters from the "Using images" chapter at http://vulkano.rs.
 //!
 //! It is not commented, as the explanations can be found in the guide itself.
 
+use image::{ImageBuffer, Rgba};
 use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
 use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage};
-use vulkano::device::physical::PhysicalDevice;
-use vulkano::device::{Device, DeviceExtensions, Features};
+use vulkano::device::{physical::PhysicalDevice, Device, DeviceExtensions, Features};
+use vulkano::format::{ClearValue, Format};
+use vulkano::image::{ImageDimensions, StorageImage};
 use vulkano::instance::{Instance, InstanceExtensions};
 use vulkano::sync;
 use vulkano::sync::GpuFuture;
 use vulkano::Version;
 
 fn main() {
-    // Initialization
     let instance = Instance::new(None, Version::V1_1, &InstanceExtensions::none(), None)
         .expect("failed to create instance");
 
@@ -29,7 +30,6 @@ fn main() {
         .next()
         .expect("no device available");
 
-    // Device creation
     let queue_family = physical
         .queue_families()
         .find(|&q| q.supports_graphics())
@@ -47,18 +47,24 @@ fn main() {
 
     let queue = queues.next().unwrap();
 
-    // Example operation
-    let source_content = 0..64;
-    let source =
-        CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false, source_content)
-            .expect("failed to create buffer");
+    // Image creation
+    let image = StorageImage::new(
+        device.clone(),
+        ImageDimensions::Dim2d {
+            width: 1024,
+            height: 1024,
+            array_layers: 1, // images can be arrays of layers
+        },
+        Format::R8G8B8A8_UNORM,
+        Some(queue.family()),
+    )
+    .unwrap();
 
-    let destination_content = (0..64).map(|_| 0);
-    let destination = CpuAccessibleBuffer::from_iter(
+    let buf = CpuAccessibleBuffer::from_iter(
         device.clone(),
         BufferUsage::all(),
         false,
-        destination_content,
+        (0..1024 * 1024 * 4).map(|_| 0u8),
     )
     .expect("failed to create buffer");
 
@@ -69,22 +75,22 @@ fn main() {
     )
     .unwrap();
     builder
-        .copy_buffer(source.clone(), destination.clone())
+        .clear_color_image(image.clone(), ClearValue::Float([0.0, 0.0, 1.0, 1.0]))
+        .unwrap()
+        .copy_image_to_buffer(image.clone(), buf.clone())
         .unwrap();
     let command_buffer = builder.build().unwrap();
 
-    // Start the execution
     let future = sync::now(device.clone())
         .then_execute(queue.clone(), command_buffer)
         .unwrap()
         .then_signal_fence_and_flush()
         .unwrap();
-    // Wait for the GPU to finish
+
     future.wait(None).unwrap();
 
-    let src_content = source.read().unwrap();
-    let destination_content = destination.read().unwrap();
-    assert_eq!(&*src_content, &*destination_content);
-
-    println!("Everything succeeded!");
+    // Exporting the result
+    let buffer_content = buf.read().unwrap();
+    let image = ImageBuffer::<Rgba<u8>, _>::from_raw(1024, 1024, &buffer_content[..]).unwrap();
+    image.save("image.png").unwrap();
 }

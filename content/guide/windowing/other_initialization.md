@@ -277,7 +277,7 @@ fn main() {
 ```
 
 If you feel lost in all the code, feel free to take a look at
-[the final code](https://github.com/vulkano-rs/vulkano-www/blob/master/examples/windowing.rs).
+[full source code here](https://github.com/vulkano-rs/vulkano-www/blob/master/chapter_code/windowing.rs).
 
 The initialization is finally complete! Next, we will start working on the event loop and programming
 the functionality of each frame.
