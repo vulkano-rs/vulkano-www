@@ -38,7 +38,7 @@ impl<'a> RenderLoop {
     }
     if self.recreate_swapchain {
       self.recreate_swapchain = false;
-      self.renderer.handle_swapchain_recreation();
+      self.renderer.recreate_swapchain();
     }
 
     let (image_i, suboptimal, acquire_future) = match self.renderer.acquire_swapchain_image() {

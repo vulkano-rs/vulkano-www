@@ -14,15 +14,16 @@ use vulkano::swapchain::{
 };
 use vulkano::sync::{self, FenceSignalFuture, FlushError, GpuFuture, JoinFuture, NowFuture};
 use vulkano_win::VkSurfaceBuild;
+use winit::dpi::LogicalSize;
 use winit::event_loop::EventLoop;
 use winit::window::{Window, WindowBuilder};
-use winit::dpi::LogicalSize;
 
 use chapter_code::game_objects::Square;
 use chapter_code::models::SquareModel;
 use chapter_code::shaders::movable_square;
 use chapter_code::vulkano_objects;
-use chapter_code::vulkano_objects::buffers::SimpleBuffers;
+use chapter_code::vulkano_objects::buffers::ImmutableBuffers;
+use chapter_code::Vertex2d;
 
 pub type Fence = FenceSignalFuture<
   PresentFuture<
@@ -43,7 +44,7 @@ pub struct Renderer {
   images: Vec<Arc<SwapchainImage<winit::window::Window>>>,
   render_pass: Arc<RenderPass>,
   framebuffers: Vec<Arc<Framebuffer>>,
-  buffers: SimpleBuffers<movable_square::vs::ty::Data>,
+  buffers: ImmutableBuffers<Vertex2d, movable_square::vs::ty::Data>,
   vertex_shader: Arc<ShaderModule>,
   fragment_shader: Arc<ShaderModule>,
   viewport: Viewport,
@@ -62,7 +63,7 @@ impl<'a> Renderer {
     {
       // window configuration
       let window = surface.window();
-      window.set_title("Moving Square");
+      window.set_title("Movable Square");
       window.set_inner_size(LogicalSize::new(600.0, 600.0));
     }
 
@@ -124,7 +125,7 @@ impl<'a> Renderer {
       viewport.clone(),
     );
 
-    let buffers = SimpleBuffers::initialize::<SquareModel>(
+    let buffers = ImmutableBuffers::initialize::<SquareModel>(
       device.clone(),
       pipeline
         .layout()
@@ -133,6 +134,7 @@ impl<'a> Renderer {
         .unwrap()
         .clone(),
       images.len(),
+      queue.clone(),
     );
 
     let command_buffers = vulkano_objects::command_buffers::create_simple_command_buffers(
@@ -161,7 +163,7 @@ impl<'a> Renderer {
     }
   }
 
-  pub fn handle_swapchain_recreation(&mut self) {
+  pub fn recreate_swapchain(&mut self) {
     let (new_swapchain, new_images) = match self
       .swapchain
       .recreate()
@@ -181,7 +183,7 @@ impl<'a> Renderer {
   }
 
   pub fn handle_window_resize(&mut self) {
-    self.handle_swapchain_recreation();
+    self.recreate_swapchain();
     self.viewport.dimensions = self.surface.window().inner_size().into();
 
     self.pipeline = vulkano_objects::pipeline::create_pipeline(

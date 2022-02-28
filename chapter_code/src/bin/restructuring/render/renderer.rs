@@ -144,7 +144,7 @@ impl<'a> Renderer {
     }
   }
 
-  pub fn handle_swapchain_recreation(&mut self) {
+  pub fn recreate_swapchain(&mut self) {
     let (new_swapchain, new_images) = match self
       .swapchain
       .recreate()
@@ -164,7 +164,7 @@ impl<'a> Renderer {
   }
 
   pub fn handle_window_resize(&mut self) {
-    self.handle_swapchain_recreation();
+    self.recreate_swapchain();
     self.viewport.dimensions = self.surface.window().inner_size().into();
 
     self.pipeline = vulkano_objects::pipeline::create_pipeline(
