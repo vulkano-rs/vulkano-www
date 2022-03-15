@@ -6,8 +6,8 @@ to actually do something.
 What we are going to ask in this example is very simple: we will ask it to copy data from one
 buffer to another.
 
-> **Note**: You can find the [full source code of this section
-> here](https://github.com/vulkano-rs/vulkano-www/blob/master/chapter_code/buffer_creation.rs).
+> **Note**: You can find the [full source code of this chapter
+> here](https://github.com/vulkano-rs/vulkano-www/blob/master/chapter_code/src/bin/buffer_creation.rs).
 
 ## Creating the buffers
 
