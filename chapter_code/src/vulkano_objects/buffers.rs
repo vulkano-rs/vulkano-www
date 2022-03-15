@@ -25,6 +25,7 @@ where
 
   // Vb and D have their own collection, so they are implicitly wrapped in an Arc, but Ib should be wrapped explicitly
   fn get_index(&self) -> Arc<Ib>;
+  
   fn get_uniform_descriptor_set(&self, i: usize) -> D;
 }
 

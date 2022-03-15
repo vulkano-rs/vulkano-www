@@ -18,7 +18,7 @@ mod tests {
 }
 
 pub fn select_example_to_run(examples: &Vec<&str>, execute: Box<dyn Fn(&str) -> ()>) {
-    println!("Select which example to run: (default 0)");
+    println!("Select example to run: (default 0)");
 
     for (i, example) in examples.iter().enumerate() {
         println!("{} {}", i, example);
