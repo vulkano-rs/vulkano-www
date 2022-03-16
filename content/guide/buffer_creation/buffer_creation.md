@@ -21,7 +21,7 @@ like this:
 ```rust
 use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
 
-let data = 12;
+let data: i32 = 12;
 let buffer = CpuAccessibleBuffer::from_data(device.clone(), BufferUsage::all(), false, data)
     .expect("failed to create buffer");
 ```
