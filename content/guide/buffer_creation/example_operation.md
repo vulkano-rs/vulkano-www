@@ -15,11 +15,11 @@ The first step is to create two `CpuAccessibleBuffer`s: the source and the desti
 was covered in [the previous section](/guide/buffer-creation).
 
 ```rust
-let source_content = 0..64;
+let source_content: Vec<i32> = (0..64).collect();
 let source = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false, source_content)
     .expect("failed to create buffer");
 
-let destination_content = (0..64).map(|_| 0);
+let destination_content: Vec<i32> = (0..64).map(|_| 0).collect();
 let destination = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false, destination_content)
     .expect("failed to create buffer");
 ```
