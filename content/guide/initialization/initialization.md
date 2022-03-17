@@ -14,8 +14,14 @@ for more information.
 use vulkano::instance::{Instance, InstanceExtensions};
 use vulkano::Version;
 
-let instance = Instance::new(None, Version::V1_1, &InstanceExtensions::none(), None)
-    .expect("failed to create instance");
+let instance_info = InstanceCreateInfo {
+    max_api_version: Some(Version::V1_2),
+    enabled_extensions: InstanceExtensions::none(),
+    enabled_layers: vec![],
+    ..InstanceCreateInfo::application_from_cargo_toml()
+};
+
+let instance = Instance::new(instance_info).expect("failed to create instance");
 ```
 
 Like many other functions in vulkano, creating an instance returns a `Result`. If Vulkan is not

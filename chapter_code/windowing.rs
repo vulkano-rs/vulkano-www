@@ -78,7 +78,7 @@ fn select_physical_device<'a>(
         .filter(|&p| p.supported_extensions().is_superset_of(&device_extensions))
         .filter_map(|p| {
             p.queue_families()
-                .find(|&q| q.supports_graphics() && surface.is_supported(q).unwrap_or(false))
+                .find(|&q| q.supports_graphics() && q.supports_surface(surface).unwrap_or(false))
                 .map(|q| (p, q))
         })
         .min_by_key(|(p, _)| match p.properties().device_type {

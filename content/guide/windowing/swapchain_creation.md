@@ -62,7 +62,7 @@ same time select the first queue family that is suitable:
             // Find the first first queue family that is suitable.
             // If none is found, `None` is returned to `filter_map`, 
             // which disqualifies this physical device.
-            .find(|&q| q.supports_graphics() && surface.is_supported(q).unwrap_or(false))
+            .find(|&q| q.supports_graphics() && q.supports_surface(surface).unwrap_or(false))
             .map(|q| (p, q))
     })
     // continues bellow

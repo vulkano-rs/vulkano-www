@@ -21,7 +21,7 @@ like this:
 ```rust
 use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
 
-let data = 12;
+let data: i32 = 12;
 let buffer = CpuAccessibleBuffer::from_data(device.clone(), BufferUsage::all(), false, data)
     .expect("failed to create buffer");
 ```
@@ -55,13 +55,13 @@ But you can put any type you want in a buffer, there is no restriction. You can,
 this:
 
 ```rust
-#[derive(Copy, Clone)] // it still needs to implement the Copy trait
+#[derive(Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
+#[repr(C)]
 struct MyStruct {
     a: u32,
-    b: bool,
+    b: u32,
 }
-
-let data = MyStruct { a: 5, b: true };
+let data = MyStruct { a: 5, b: 69 };
 
 let buffer = CpuAccessibleBuffer::from_data(device.clone(), BufferUsage::all(), false,
                                             data).unwrap();
