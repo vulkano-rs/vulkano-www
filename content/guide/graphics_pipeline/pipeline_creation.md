@@ -108,6 +108,17 @@ dynamic viewport, where you would pass your viewport in the command buffer inste
 
 # Drawing
 
+We will need to have a `CpuAccessibleBuffer` created so we can copy our image to it from the framebuffer:
+
+```rust
+let buf = CpuAccessibleBuffer::from_iter(
+    device.clone(),
+    BufferUsage::all(),
+    false,
+    (0..1024 * 1024 * 4).map(|_| 0u8),  // 1024 (pixels) x 1024 (pixels) x 4 (rgba channels)
+);
+```
+
 Now that we have all the ingredients, it is time to bind everything and insert a draw call inside of
 our render pass.
 
