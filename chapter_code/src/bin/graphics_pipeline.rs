@@ -14,7 +14,7 @@
 use image::{ImageBuffer, Rgba};
 use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
 use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage, SubpassContents};
-use vulkano::device::{physical::PhysicalDevice, Device, DeviceExtensions, Features};
+use vulkano::device::{physical::PhysicalDevice, Device, Features};
 use vulkano::format::Format;
 use vulkano::image::{view::ImageView, ImageDimensions, StorageImage};
 use vulkano::instance::{Instance, InstanceExtensions};
@@ -44,7 +44,7 @@ fn main() {
         Device::new(
             physical,
             &Features::none(),
-            &DeviceExtensions::none(),
+            &physical.required_extensions(),
             [(queue_family, 0.5)].iter().cloned(),
         )
         .expect("failed to create device")

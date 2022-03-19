@@ -43,7 +43,8 @@ fn main() {
             &DeviceExtensions {
                 khr_storage_buffer_storage_class: true,
                 ..DeviceExtensions::none()
-            },
+            }
+            .union(physical.required_extensions()),
             [(queue_family, 0.5)].iter().cloned(),
         )
         .expect("failed to create device")
@@ -92,7 +93,6 @@ void main() {
         .descriptor_set_layouts()
         .get(0)
         .unwrap();
-    
     let set = PersistentDescriptorSet::new(
         layout.clone(),
         [WriteDescriptorSet::buffer(0, data_buffer.clone())], // 0 is the binding

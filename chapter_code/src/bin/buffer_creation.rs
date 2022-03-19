@@ -14,7 +14,7 @@
 use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
 use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage};
 use vulkano::device::physical::PhysicalDevice;
-use vulkano::device::{Device, DeviceExtensions, Features};
+use vulkano::device::{Device, Features};
 use vulkano::instance::{Instance, InstanceExtensions};
 use vulkano::sync;
 use vulkano::sync::GpuFuture;
@@ -39,7 +39,7 @@ fn main() {
         Device::new(
             physical,
             &Features::none(),
-            &DeviceExtensions::none(),
+            &physical.required_extensions(),
             [(queue_family, 0.5)].iter().cloned(),
         )
         .expect("failed to create device")
