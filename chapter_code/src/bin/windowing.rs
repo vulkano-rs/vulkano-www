@@ -224,7 +224,7 @@ fn main() {
         let format = caps.supported_formats[0].0;
 
         Swapchain::start(device.clone(), surface.clone())
-            .num_images(caps.min_image_count + 1)
+            .num_images(caps.min_image_count)
             .format(format)
             .dimensions(dimensions)
             .usage(ImageUsage::color_attachment())

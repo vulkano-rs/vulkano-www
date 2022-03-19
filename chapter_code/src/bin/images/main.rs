@@ -19,5 +19,5 @@ fn execute_example(selection: &str) {
 }
 
 fn main() {
-    select_example_to_run(&EXAMPLES.to_vec(), Box::new(execute_example));
+    select_example_to_run(&EXAMPLES.to_vec(), execute_example);
 }

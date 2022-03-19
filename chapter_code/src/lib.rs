@@ -17,7 +17,7 @@ mod tests {
     }
 }
 
-pub fn select_example_to_run(examples: &Vec<&str>, execute: Box<dyn Fn(&str) -> ()>) {
+pub fn select_example_to_run(examples: &Vec<&str>, execute: fn(&str)) {
     println!("Select example to run: (default 0)");
 
     for (i, example) in examples.iter().enumerate() {
@@ -33,13 +33,9 @@ pub fn select_example_to_run(examples: &Vec<&str>, execute: Box<dyn Fn(&str) -> 
 
     if selection.len() == 0 {
         execute(examples[0]);
-        return;
     }
-
-    let is_numeric = selection.chars().all(|c| c.is_numeric());
-
-    if is_numeric {
-        let i = selection.parse::<usize>().unwrap();
+    // else if selection is numeric
+    else if let Some(i) = selection.parse::<usize>().ok() {
         if i >= examples.len() {
             println!(
                 "The given index \"{}\" doesn't correspond to any known example",
@@ -48,15 +44,14 @@ pub fn select_example_to_run(examples: &Vec<&str>, execute: Box<dyn Fn(&str) -> 
         } else {
             execute(examples[i]);
         }
-        return;
-    }
-
-    match examples.iter().position(|&s| s == selection) {
-        Some(i) => {
-            execute(examples[i]);
-        }
-        None => {
-            println!("\"{}\" doesn't correspond to any known example", selection);
+    } else {
+        match examples.iter().position(|&s| s == selection) {
+            Some(i) => {
+                execute(examples[i]);
+            }
+            None => {
+                println!("\"{}\" doesn't correspond to any known example", selection);
+            }
         }
     }
 }

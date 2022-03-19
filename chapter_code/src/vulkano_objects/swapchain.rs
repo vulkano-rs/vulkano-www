@@ -23,7 +23,7 @@ pub fn create_swapchain(
   let format = caps.supported_formats[0].0;
 
   Swapchain::start(device, surface)
-    .num_images(caps.min_image_count + 1)
+    .num_images(caps.min_image_count)
     .format(format)
     .dimensions(dimensions)
     .usage(ImageUsage::color_attachment())
