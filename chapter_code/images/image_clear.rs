@@ -14,17 +14,15 @@
 use image::{ImageBuffer, Rgba};
 use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
 use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage};
-use vulkano::device::{physical::PhysicalDevice, Device, DeviceExtensions, Features};
+use vulkano::device::{physical::PhysicalDevice, Device, DeviceCreateInfo, QueueCreateInfo};
 use vulkano::format::{ClearValue, Format};
 use vulkano::image::{ImageDimensions, StorageImage};
-use vulkano::instance::{Instance, InstanceExtensions};
+use vulkano::instance::{Instance, InstanceCreateInfo};
 use vulkano::sync;
 use vulkano::sync::GpuFuture;
-use vulkano::Version;
 
 fn main() {
-    let instance = Instance::new(None, Version::V1_1, &InstanceExtensions::none(), None)
-        .expect("failed to create instance");
+    let instance = Instance::new(InstanceCreateInfo::default()).expect("failed to create instance");
 
     let physical = PhysicalDevice::enumerate(&instance)
         .next()
@@ -38,9 +36,10 @@ fn main() {
     let (device, mut queues) = {
         Device::new(
             physical,
-            &Features::none(),
-            &DeviceExtensions::none(),
-            [(queue_family, 0.5)].iter().cloned(),
+            DeviceCreateInfo {
+                queue_create_infos: vec![QueueCreateInfo::family(queue_family)],
+                ..Default::default()
+            },
         )
         .expect("failed to create device")
     };
@@ -93,4 +92,6 @@ fn main() {
     let buffer_content = buf.read().unwrap();
     let image = ImageBuffer::<Rgba<u8>, _>::from_raw(1024, 1024, &buffer_content[..]).unwrap();
     image.save("image.png").unwrap();
+
+    println!("Everything succeeded!");
 }

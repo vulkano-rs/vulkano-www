@@ -11,21 +11,20 @@
 //!
 //! It is not commented, as the explanations can be found in the guide itself.
 
+use vulkano::device::QueueCreateInfo;
 use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
 use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage};
 use vulkano::descriptor_set::{PersistentDescriptorSet, WriteDescriptorSet};
 use vulkano::device::physical::PhysicalDevice;
-use vulkano::device::{Device, DeviceExtensions, Features};
-use vulkano::instance::{Instance, InstanceExtensions};
+use vulkano::device::{Device, DeviceExtensions, DeviceCreateInfo};
+use vulkano::instance::{Instance, InstanceCreateInfo};
 use vulkano::pipeline::Pipeline;
 use vulkano::pipeline::{ComputePipeline, PipelineBindPoint};
 use vulkano::sync;
 use vulkano::sync::GpuFuture;
-use vulkano::Version;
 
 fn main() {
-    let instance = Instance::new(None, Version::V1_1, &InstanceExtensions::none(), None)
-        .expect("failed to create instance");
+    let instance = Instance::new(InstanceCreateInfo::default()).expect("failed to create instance");
 
     let physical = PhysicalDevice::enumerate(&instance)
         .next()
@@ -39,12 +38,14 @@ fn main() {
     let (device, mut queues) = {
         Device::new(
             physical,
-            &Features::none(),
-            &DeviceExtensions {
-                khr_storage_buffer_storage_class: true,
-                ..DeviceExtensions::none()
-            },
-            [(queue_family, 0.5)].iter().cloned(),
+            DeviceCreateInfo {
+                queue_create_infos: vec![QueueCreateInfo::family(queue_family)],
+                enabled_extensions: DeviceExtensions {
+                    khr_storage_buffer_storage_class: true,
+                    ..DeviceExtensions::none()
+                },
+                ..Default::default()
+            }
         )
         .expect("failed to create device")
     };
@@ -89,7 +90,7 @@ void main() {
 
     let layout = compute_pipeline
         .layout()
-        .descriptor_set_layouts()
+        .set_layouts()
         .get(0)
         .unwrap();
     
