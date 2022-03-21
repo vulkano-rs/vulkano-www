@@ -11,12 +11,12 @@
 //!
 //! It is not commented, as the explanations can be found in the guide itself.
 
-use vulkano::device::QueueCreateInfo;
 use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
 use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage};
 use vulkano::descriptor_set::{PersistentDescriptorSet, WriteDescriptorSet};
 use vulkano::device::physical::PhysicalDevice;
-use vulkano::device::{Device, DeviceExtensions, DeviceCreateInfo};
+use vulkano::device::QueueCreateInfo;
+use vulkano::device::{Device, DeviceCreateInfo, DeviceExtensions};
 use vulkano::instance::{Instance, InstanceCreateInfo};
 use vulkano::pipeline::Pipeline;
 use vulkano::pipeline::{ComputePipeline, PipelineBindPoint};
@@ -35,20 +35,18 @@ fn main() {
         .find(|&q| q.supports_compute())
         .expect("couldn't find a compute queue family");
 
-    let (device, mut queues) = {
-        Device::new(
-            physical,
-            DeviceCreateInfo {
-                queue_create_infos: vec![QueueCreateInfo::family(queue_family)],
-                enabled_extensions: DeviceExtensions {
-                    khr_storage_buffer_storage_class: true,
-                    ..DeviceExtensions::none()
-                },
-                ..Default::default()
-            }
-        )
-        .expect("failed to create device")
-    };
+    let (device, mut queues) = Device::new(
+        physical,
+        DeviceCreateInfo {
+            queue_create_infos: vec![QueueCreateInfo::family(queue_family)],
+            enabled_extensions: DeviceExtensions {
+                khr_storage_buffer_storage_class: true,
+                ..DeviceExtensions::none()
+            },
+            ..Default::default()
+        },
+    )
+    .expect("failed to create device");
 
     let queue = queues.next().unwrap();
 
@@ -88,12 +86,7 @@ void main() {
     )
     .expect("failed to create compute pipeline");
 
-    let layout = compute_pipeline
-        .layout()
-        .set_layouts()
-        .get(0)
-        .unwrap();
-    
+    let layout = compute_pipeline.layout().set_layouts().get(0).unwrap();
     let set = PersistentDescriptorSet::new(
         layout.clone(),
         [WriteDescriptorSet::buffer(0, data_buffer.clone())], // 0 is the binding

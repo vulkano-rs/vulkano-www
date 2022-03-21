@@ -38,16 +38,14 @@ fn main() {
         .find(|&q| q.supports_graphics())
         .expect("couldn't find a graphical queue family");
 
-    let (device, mut queues) = {
-        Device::new(
-            physical,
-            DeviceCreateInfo {
-                queue_create_infos: vec![QueueCreateInfo::family(queue_family)],
-                ..Default::default()
-            },
-        )
-        .expect("failed to create device")
-    };
+    let (device, mut queues) = Device::new(
+        physical,
+        DeviceCreateInfo {
+            queue_create_infos: vec![QueueCreateInfo::family(queue_family)],
+            ..Default::default()
+        },
+    )
+    .expect("failed to create device");
 
     let queue = queues.next().unwrap();
 

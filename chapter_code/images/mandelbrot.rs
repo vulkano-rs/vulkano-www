@@ -21,8 +21,8 @@ use vulkano::device::{physical::PhysicalDevice, Device, DeviceCreateInfo, QueueC
 use vulkano::format::Format;
 use vulkano::image::{view::ImageView, ImageDimensions, StorageImage};
 use vulkano::instance::{Instance, InstanceCreateInfo};
-use vulkano::pipeline::{ComputePipeline, PipelineBindPoint, Pipeline};
-use vulkano::sync::{GpuFuture, self};
+use vulkano::pipeline::{ComputePipeline, Pipeline, PipelineBindPoint};
+use vulkano::sync::{self, GpuFuture};
 
 fn main() {
     let instance = Instance::new(InstanceCreateInfo::default()).expect("failed to create instance");
@@ -36,16 +36,14 @@ fn main() {
         .find(|&q| q.supports_graphics())
         .expect("couldn't find a graphical queue family");
 
-    let (device, mut queues) = {
-        Device::new(
-            physical,
-            DeviceCreateInfo {
-                queue_create_infos: vec![QueueCreateInfo::family(queue_family)],
-                ..Default::default()
-            },
-        )
-        .expect("failed to create device")
-    };
+    let (device, mut queues) = Device::new(
+        physical,
+        DeviceCreateInfo {
+            queue_create_infos: vec![QueueCreateInfo::family(queue_family)],
+            ..Default::default()
+        },
+    )
+    .expect("failed to create device");
 
     let queue = queues.next().unwrap();
 

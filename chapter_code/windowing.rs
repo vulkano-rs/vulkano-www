@@ -29,7 +29,7 @@ use vulkano::pipeline::graphics::input_assembly::InputAssemblyState;
 use vulkano::pipeline::graphics::vertex_input::BuffersDefinition;
 use vulkano::pipeline::graphics::viewport::{Viewport, ViewportState};
 use vulkano::pipeline::GraphicsPipeline;
-use vulkano::render_pass::{Framebuffer, RenderPass, Subpass, FramebufferCreateInfo};
+use vulkano::render_pass::{Framebuffer, FramebufferCreateInfo, RenderPass, Subpass};
 use vulkano::shader::ShaderModule;
 use vulkano::swapchain::{self, AcquireError, Surface, Swapchain, SwapchainCreationError};
 use vulkano::sync::{self, FenceSignalFuture, FlushError, GpuFuture};
@@ -209,19 +209,17 @@ fn main() {
     let (physical_device, queue_family) =
         select_physical_device(&instance, surface.clone(), &device_extensions);
 
-    let (device, mut queues) = {
-        Device::new(
-            physical_device,
-            DeviceCreateInfo {
-                queue_create_infos: vec![QueueCreateInfo::family(queue_family)],
-                enabled_extensions: physical_device
-                    .required_extensions()
-                    .union(&device_extensions), // new
-                ..Default::default()
-            },
-        )
-        .expect("failed to create device")
-    };
+    let (device, mut queues) = Device::new(
+        physical_device,
+        DeviceCreateInfo {
+            queue_create_infos: vec![QueueCreateInfo::family(queue_family)],
+            enabled_extensions: physical_device
+                .required_extensions()
+                .union(&device_extensions), // new
+            ..Default::default()
+        },
+    )
+    .expect("failed to create device");
 
     let queue = queues.next().unwrap();
 
