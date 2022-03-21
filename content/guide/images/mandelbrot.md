@@ -12,7 +12,7 @@ one pixel.
 > **Note**: You can find the [full source code of this section
 > here](https://github.com/vulkano-rs/vulkano-www/blob/master/chapter_code/images/mandelbrot.rs).
 
-# The shader
+## The shader
 
 Let's spend some time on the GLSL code of the shader, which I wrote for you:
 
@@ -123,7 +123,7 @@ Writing the pixel of an image must be done with the `imageStore` function. As ex
 previous section](/guide/image_clear) the content of the image is opaque and is always treated as
 floating-points, even though we know that its memory contains integers.
 
-# Calling this shader
+## Calling this shader
 
 Now that the shader is written, the rest should be straight-forward. We start by creating an image,
 as seen before:
@@ -156,11 +156,7 @@ let view = ImageView::new_default(image.clone()).unwrap();
 Now, let's create the descriptor set by adding the image view, like we did earlier:
 
 ```rust
-let layout = compute_pipeline
-    .layout()
-    .descriptor_set_layouts()
-    .get(0)
-    .unwrap();
+let layout = compute_pipeline.layout().set_layouts().get(0).unwrap();
 let set = PersistentDescriptorSet::new(
     layout.clone(),
     [WriteDescriptorSet::image_view(0, view.clone())], // 0 is the binding
@@ -220,6 +216,8 @@ future.wait(None).unwrap();
 let buffer_content = buf.read().unwrap();
 let image = ImageBuffer::<Rgba<u8>, _>::from_raw(1024, 1024, &buffer_content[..]).unwrap();
 image.save("image.png").unwrap();
+
+println!("Everything succeeded!");
 ```
 
 And here is what you should get:

@@ -14,16 +14,14 @@
 use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
 use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage};
 use vulkano::device::physical::PhysicalDevice;
-use vulkano::device::{Device, DeviceExtensions, Features};
-use vulkano::instance::{Instance, InstanceExtensions};
-use vulkano::sync;
-use vulkano::sync::GpuFuture;
-use vulkano::Version;
+use vulkano::device::QueueCreateInfo;
+use vulkano::device::{Device, DeviceCreateInfo};
+use vulkano::instance::{Instance, InstanceCreateInfo};
+use vulkano::sync::{self, GpuFuture};
 
 fn main() {
     // Initialization
-    let instance = Instance::new(None, Version::V1_1, &InstanceExtensions::none(), None)
-        .expect("failed to create instance");
+    let instance = Instance::new(InstanceCreateInfo::default()).expect("failed to create instance");
 
     let physical = PhysicalDevice::enumerate(&instance)
         .next()
@@ -35,15 +33,14 @@ fn main() {
         .find(|&q| q.supports_graphics())
         .expect("couldn't find a graphical queue family");
 
-    let (device, mut queues) = {
-        Device::new(
-            physical,
-            &Features::none(),
-            &DeviceExtensions::none(),
-            [(queue_family, 0.5)].iter().cloned(),
-        )
-        .expect("failed to create device")
-    };
+    let (device, mut queues) = Device::new(
+        physical,
+        DeviceCreateInfo {
+            queue_create_infos: vec![QueueCreateInfo::family(queue_family)],
+            ..Default::default()
+        },
+    )
+    .expect("failed to create device");
 
     let queue = queues.next().unwrap();
 

@@ -38,12 +38,7 @@ how will the buffer be written:
 use vulkano::pipeline::Pipeline;
 use vulkano::descriptor_set::{PersistentDescriptorSet, WriteDescriptorSet};
 
-let layout = compute_pipeline
-    .layout()
-    .set_layouts()
-    .get(0)
-    .unwrap();
-
+let layout = compute_pipeline.layout().set_layouts().get(0).unwrap();
 let set = PersistentDescriptorSet::new(
     layout.clone(),
     [WriteDescriptorSet::buffer(0, data_buffer.clone())], // 0 is the binding

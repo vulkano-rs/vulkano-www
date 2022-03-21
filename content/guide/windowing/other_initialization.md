@@ -39,7 +39,7 @@ need to create a different framebuffer for each of the images:
 ```rust
 use vulkano::image::view::ImageView;
 use vulkano::image::SwapchainImage;
-use vulkano::render_pass::Framebuffer;
+use vulkano::render_pass::{Framebuffer, FramebufferCreateInfo};
 
 fn get_framebuffers(
     images: &[Arc<SwapchainImage<Window>>],
@@ -48,12 +48,15 @@ fn get_framebuffers(
     images
         .iter()
         .map(|image| {
-            let view = ImageView::new(image.clone()).unwrap();
-            Framebuffer::start(render_pass.clone())
-                .add(view)
-                .unwrap()
-                .build()
-                .unwrap()
+            let view = ImageView::new_default(image.clone()).unwrap();
+            Framebuffer::new(
+                render_pass.clone(),
+                FramebufferCreateInfo {
+                    attachments: vec![view],
+                    ..Default::default()
+                },
+            )
+            .unwrap()
         })
         .collect::<Vec<_>>()
 }
@@ -67,10 +70,11 @@ We don't need to modify anything in the shaders and the vertex buffer
 only changing the structure a bit:
 
 ```rust
-use vulkano::buffer::BufferUsage;
-use vulkano::buffer::CpuAccessibleBuffer;
+use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
+use bytemuck::{Pod, Zeroable};
 
-#[derive(Default, Copy, Clone)]
+#[repr(C)]
+#[derive(Default, Copy, Clone, Zeroable, Pod)]
 struct Vertex {
     position: [f32; 2],
 }
@@ -121,7 +125,7 @@ fn main() {
     };
     let vertex_buffer = CpuAccessibleBuffer::from_iter(
         device.clone(),
-        BufferUsage::all(),
+        BufferUsage::vertex_buffer(),
         false,
         vec![vertex1, vertex2, vertex3].into_iter(),
     )

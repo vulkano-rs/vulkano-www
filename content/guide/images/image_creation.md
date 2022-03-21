@@ -43,7 +43,7 @@ of one to four values. The four components are named, in order, R, G, B and A.
 > that we can store arbitrary data in this format instead of colors.
 
 You can check [the list of available formats
-here](https://docs.rs/vulkano/0.28.0/vulkano/format/enum.Format.html).
+here](https://docs.rs/vulkano/0.29.0/vulkano/format/enum.Format.html).
 
 For example if you create an image with the format `R8_SINT`, then it will only have one component.
 But with the format `A2R10G10B10_SSCALED_PACK32`, you have all four components. The first part of the

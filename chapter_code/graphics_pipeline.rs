@@ -11,25 +11,23 @@
 //!
 //! It is not commented, as the explanations can be found in the guide itself.
 
+use bytemuck::{Pod, Zeroable};
 use image::{ImageBuffer, Rgba};
 use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
 use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage, SubpassContents};
-use vulkano::device::{physical::PhysicalDevice, Device, DeviceExtensions, Features};
+use vulkano::device::{physical::PhysicalDevice, Device, DeviceCreateInfo, QueueCreateInfo};
 use vulkano::format::Format;
 use vulkano::image::{view::ImageView, ImageDimensions, StorageImage};
-use vulkano::instance::{Instance, InstanceExtensions};
+use vulkano::instance::{Instance, InstanceCreateInfo};
 use vulkano::pipeline::graphics::input_assembly::InputAssemblyState;
 use vulkano::pipeline::graphics::vertex_input::BuffersDefinition;
 use vulkano::pipeline::graphics::viewport::{Viewport, ViewportState};
 use vulkano::pipeline::GraphicsPipeline;
-use vulkano::render_pass::{Framebuffer, Subpass};
-use vulkano::sync;
-use vulkano::sync::GpuFuture;
-use vulkano::Version;
+use vulkano::render_pass::{Framebuffer, FramebufferCreateInfo, Subpass};
+use vulkano::sync::{self, GpuFuture};
 
 fn main() {
-    let instance = Instance::new(None, Version::V1_1, &InstanceExtensions::none(), None)
-        .expect("failed to create instance");
+    let instance = Instance::new(InstanceCreateInfo::default()).expect("failed to create instance");
 
     let physical = PhysicalDevice::enumerate(&instance)
         .next()
@@ -40,15 +38,14 @@ fn main() {
         .find(|&q| q.supports_graphics())
         .expect("couldn't find a graphical queue family");
 
-    let (device, mut queues) = {
-        Device::new(
-            physical,
-            &Features::none(),
-            &DeviceExtensions::none(),
-            [(queue_family, 0.5)].iter().cloned(),
-        )
-        .expect("failed to create device")
-    };
+    let (device, mut queues) = Device::new(
+        physical,
+        DeviceCreateInfo {
+            queue_create_infos: vec![QueueCreateInfo::family(queue_family)],
+            ..Default::default()
+        },
+    )
+    .expect("failed to create device");
 
     let queue = queues.next().unwrap();
 
@@ -72,7 +69,8 @@ fn main() {
     )
     .expect("failed to create buffer");
 
-    #[derive(Default, Copy, Clone)]
+    #[repr(C)]
+    #[derive(Default, Copy, Clone, Zeroable, Pod)]
     struct Vertex {
         position: [f32; 2],
     }
@@ -89,7 +87,7 @@ fn main() {
     };
     let vertex_buffer = CpuAccessibleBuffer::from_iter(
         device.clone(),
-        BufferUsage::all(),
+        BufferUsage::vertex_buffer(),
         false,
         vec![vertex1, vertex2, vertex3].into_iter(),
     )
@@ -111,12 +109,15 @@ fn main() {
     )
     .unwrap();
 
-    let view = ImageView::new(image.clone()).unwrap();
-    let framebuffer = Framebuffer::start(render_pass.clone())
-        .add(view)
-        .unwrap()
-        .build()
-        .unwrap();
+    let view = ImageView::new_default(image.clone()).unwrap();
+    let framebuffer = Framebuffer::new(
+        render_pass.clone(),
+        FramebufferCreateInfo {
+            attachments: vec![view],
+            ..Default::default()
+        },
+    )
+    .unwrap();
 
     mod vs {
         vulkano_shaders::shader! {
@@ -202,4 +203,6 @@ void main() {
     let buffer_content = buf.read().unwrap();
     let image = ImageBuffer::<Rgba<u8>, _>::from_raw(1024, 1024, &buffer_content[..]).unwrap();
     image.save("image.png").unwrap();
+
+    println!("Everything succeeded!");
 }

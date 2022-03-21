@@ -6,22 +6,14 @@ Before you can start using any function from Vulkan and vulkano, the first thing
 an *instance*. Creating an instance tries to load Vulkan from the system and reads the list of
 available implementations.
 
-Creating an instance takes four optional parameters which we aren't going to cover for now. You can
-check [the documentation](https://docs.rs/vulkano/0.28.0/vulkano/instance/struct.Instance.html)
-for more information.
+For starters, our program will be very simple, so, for now, creating an instance won't need any
+[additional parameters](https://docs.rs/vulkano/0.29.0/vulkano/instance/struct.InstanceCreateInfo.html),
+so we can create it with default configurations:
 
 ```rust
-use vulkano::instance::{Instance, InstanceExtensions};
-use vulkano::Version;
+use vulkano::instance::{Instance, InstanceCreateInfo};
 
-let instance_info = InstanceCreateInfo {
-    max_api_version: Some(Version::V1_2),
-    enabled_extensions: InstanceExtensions::none(),
-    enabled_layers: vec![],
-    ..InstanceCreateInfo::application_from_cargo_toml()
-};
-
-let instance = Instance::new(instance_info).expect("failed to create instance");
+let instance = Instance::new(InstanceCreateInfo::default()).expect("failed to create instance");
 ```
 
 Like many other functions in vulkano, creating an instance returns a `Result`. If Vulkan is not
@@ -60,7 +52,8 @@ let physical = PhysicalDevice::enumerate(&instance).next().expect("no device ava
 
 The `enumerate` function returns an iterator to the list of available physical devices.
 We call `next` on it to return the first device, if any. Note that the first device is not
-necessarily the best device. In a real program you probably want to leave the choice to the user.
+necessarily the best device. In a real program you probably want to leave the choice to the user
+(later we will see a better implementation of this).
 
 Keep in mind that the list of physical devices can be empty. This happens if Vulkan is installed
 on the system, but none of the physical devices of the machine are capable of supporting Vulkan. In

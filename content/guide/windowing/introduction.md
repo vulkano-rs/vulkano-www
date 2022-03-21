@@ -18,7 +18,7 @@ going to add a dependency to the `vulkano-win` crate which is a link between vul
 Add, in your `Cargo.toml`:
 
 ```toml
-vulkano-win = "0.28.0"
+vulkano-win = "0.29.0"
 winit = "0.26"
 ```
 
@@ -30,10 +30,14 @@ required to draw a window. `vulkano_win` automatically provides them for us, so 
 thing left is to pass them on to the instance creation:
 
 ```rust
-use vulkano::instance::{Instance, Version};
+use vulkano::instance::{Instance, InstanceCreateInfo};
 
 let required_extensions = vulkano_win::required_extensions();
-let instance = Instance::new(None, Version::V1_1, &required_extensions, None).unwrap();
+let instance = Instance::new(InstanceCreateInfo {
+    enabled_extensions: required_extensions,
+    ..Default::default()
+})
+.expect("failed to create instance");
 ```
 
 Now, let's create the actual window:

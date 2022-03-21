@@ -35,8 +35,8 @@ and some others support both.
 ## Creating a device
 
 The reason why queues are relevant right now is in order to create a *device*, we have to tell the
-Vulkan implementation which queues we want to use. Let's choose a single queue that we will use for
-all of our operations.
+Vulkan implementation which type of queues we want to use. Queues are grouped into *queue families*,
+which describe their capabilities. Let's create a queue family that symbolizes graphical operations:
 
 ```rust
 let queue_family = physical.queue_families()
@@ -44,20 +44,24 @@ let queue_family = physical.queue_families()
     .expect("couldn't find a graphical queue family");
 ```
 
-Creating a device returns two things: the device itself, but also a list of *queue objects* that
-will later allow us to submit operations.
+We can use it to create the device:
 
 ```rust
 use vulkano::device::{Device, DeviceExtensions, Features};
 
-let (device, mut queues) = {
-    Device::new(physical, &Features::none(), &DeviceExtensions::none(),
-                [(queue_family, 0.5)].iter().cloned()).expect("failed to create device")
-};
+let (device, mut queues) = Device::new(
+    physical,
+    DeviceCreateInfo {
+        // here we pass the desired queue families that we want to use
+        queue_create_infos: vec![QueueCreateInfo::family(queue_family)],
+        ..Default::default()
+    },
+)
+.expect("failed to create device");
 ```
 
-Just like creating an instance, creating a device takes additional parameters which we aren't going
-to cover yet.
+Creating a device returns two things: the device itself, but also a list of *queue objects* that
+will later allow us to submit operations.
 
 Once this function call succeeds we have an open channel of communication with a Vulkan device!
 

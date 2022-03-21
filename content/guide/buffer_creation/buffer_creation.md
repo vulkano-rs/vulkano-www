@@ -32,7 +32,7 @@ which shouldn't be expensive. You should get used to passing the device as param
 need to do so for most of the Vulkan objects that you create.
 
 The second parameter indicates [which purpose we are creating the
-buffer](https://docs.rs/vulkano/0.28.0/vulkano/buffer/struct.BufferUsage.html) for, which can help the
+buffer](https://docs.rs/vulkano/0.29.0/vulkano/buffer/struct.BufferUsage.html) for, which can help the
 implementation perform some optimizations. Trying to use a buffer in a way that wasn't indicated in
 its constructor will result in an error. For the sake of the example, we just create a
 `BufferUsage` that allows all possible usages.
@@ -55,19 +55,23 @@ But you can put any type you want in a buffer, there is no restriction. You can,
 this:
 
 ```rust
-#[derive(Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
+use bytemuck::{Pod, Zeroable};
+
+// here we derive all these traits to ensure the data behaves as simple as possible
 #[repr(C)]
+#[derive(Default, Copy, Clone, Zeroable, Pod)]
 struct MyStruct {
     a: u32,
     b: u32,
 }
+
 let data = MyStruct { a: 5, b: 69 };
 
-let buffer = CpuAccessibleBuffer::from_data(device.clone(), BufferUsage::all(), false,
-                                            data).unwrap();
+let buffer =
+    CpuAccessibleBuffer::from_data(device.clone(), BufferUsage::all(), false, data).unwrap();
 ```
 
-> **Note**: While you can put any type that implements the `Copy` trait you want in a buffer, using a type that doesn't implement
+> **Note**: While you can put any type that implements these traits in a buffer, using a type that doesn't implement
 > the `Send` and `Sync` traits or that isn't `'static` will restrict what you can do with
 > that buffer.
 
@@ -84,9 +88,9 @@ type of the content of the buffer is `[u8]`, which, in Rust, represents an array
 is only known at runtime.
 
 ```rust
-let iter = (0 .. 128).map(|_| 5u8);
-let buffer = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false,
-                                            iter).unwrap();
+let iter = (0..128).map(|_| 5u8);
+let buffer =
+    CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false, iter).unwrap();
 ```
 
 You now know how to create a `CpuAccessibleBuffer`.
