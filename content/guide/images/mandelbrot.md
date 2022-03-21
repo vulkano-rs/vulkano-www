@@ -150,7 +150,7 @@ so the creation isn't very difficult:
 ```rust
 use vulkano::image::view::ImageView;
 
-let view = ImageView::new(image.clone()).unwrap();
+let view = ImageView::new_default(image.clone()).unwrap();
 ```
 
 Now, let's create the descriptor set by adding the image view, like we did earlier:
