@@ -87,7 +87,7 @@ fn main() {
     };
     let vertex_buffer = CpuAccessibleBuffer::from_iter(
         device.clone(),
-        BufferUsage::all(),
+        BufferUsage::vertex_buffer(),
         false,
         vec![vertex1, vertex2, vertex3].into_iter(),
     )

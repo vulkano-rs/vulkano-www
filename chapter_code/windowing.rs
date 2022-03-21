@@ -228,6 +228,7 @@ fn main() {
             .surface_capabilities(&surface, Default::default())
             .expect("failed to get surface capabilities");
 
+        let dimensions = surface.window().inner_size();
         let composite_alpha = caps.supported_composite_alpha.iter().next().unwrap();
         let image_format = Some(
             physical_device
@@ -242,7 +243,7 @@ fn main() {
             SwapchainCreateInfo {
                 min_image_count: caps.min_image_count,
                 image_format,
-                image_extent: surface.window().inner_size().into(),
+                image_extent: dimensions.into(),
                 image_usage: ImageUsage::color_attachment(),
                 composite_alpha,
                 ..Default::default()
@@ -267,7 +268,7 @@ fn main() {
     };
     let vertex_buffer = CpuAccessibleBuffer::from_iter(
         device.clone(),
-        BufferUsage::all(),
+        BufferUsage::vertex_buffer(),
         false,
         vec![vertex1, vertex2, vertex3].into_iter(),
     )

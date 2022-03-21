@@ -19,7 +19,8 @@ done, the shape of our triangle is going to be a buffer whose content is an arra
 `Vertex` objects.
 
 ```rust
-#[derive(Default, Copy, Clone)]
+#[repr(C)]
+#[derive(Default, Copy, Clone, Zeroable, Pod)]
 struct Vertex {
     position: [f32; 2],
 }
@@ -58,14 +59,15 @@ that we are going to pass as parameter when we start the drawing operation.
 ```rust
 let vertex_buffer = CpuAccessibleBuffer::from_iter(
     device.clone(),
-    BufferUsage::all(),
+    BufferUsage::vertex_buffer(),
     false,
     vec![vertex1, vertex2, vertex3].into_iter(),
 )
 .unwrap();
 ```
 
-A buffer that contains a collection of vertices is commonly named a *vertex buffer*.
+A buffer that contains a collection of vertices is commonly named a *vertex buffer*. Because we
+already know the specific use of this buffer, we can also specify the usage as `BufferUsage::vertex_buffer()`.
 
 > **Note**: Vertex buffers are not special in any way. The term *vertex buffer* indicates the
 > way the programmer intends to use the buffer, and it is not a property of the buffer.

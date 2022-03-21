@@ -106,7 +106,7 @@ dynamic viewport, where you would pass your viewport in the command buffer inste
 > **Note**: If you configure multiple viewports, you can use geometry shaders to choose which
 > viewport the shape is going to be drawn to. This topic isn't covered here.
 
-# Drawing
+## Drawing
 
 Now that we have all the ingredients, it is time to bind everything and insert a draw call inside of
 our render pass.
@@ -168,6 +168,8 @@ future.wait(None).unwrap();
 let buffer_content = buf.read().unwrap();
 let image = ImageBuffer::<Rgba<u8>, _>::from_raw(1024, 1024, &buffer_content[..]).unwrap();
 image.save("image.png").unwrap();
+
+println!("Everything succeeded!");
 ```
 
 And here is what you should get:

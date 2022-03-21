@@ -159,7 +159,7 @@ This feeds the shader to the Vulkan implementation. The last step to perform at 
 create a ***compute pipeline*** object from that shader. This is the object that actually describes
 the compute operation that we are going to perform. We won't cover the last three parameters, but
 you can search about them
-[here](https://docs.rs/vulkano/0.28.0/vulkano/pipeline/compute/struct.ComputePipeline.html).
+[here](https://docs.rs/vulkano/0.29.0/vulkano/pipeline/compute/struct.ComputePipeline.html).
 
 ```rust
 use vulkano::pipeline::ComputePipeline;

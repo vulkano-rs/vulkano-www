@@ -44,7 +44,7 @@ Before starting to use our swapchain, let's write the logic to recreate it
 in case of it becoming invalid:
 
 ```rust
-use vulkano::swapchain::SwapchainCreationError;
+use vulkano::swapchain::{SwapchainCreateInfo, SwapchainCreationError};
 
 Event::RedrawEventsCleared => {
     if recreate_swapchain {
@@ -52,15 +52,14 @@ Event::RedrawEventsCleared => {
 
         let new_dimensions = surface.window().inner_size();
 
-        let (new_swapchain, new_images) = match swapchain
-            .recreate()
-            .dimensions(new_dimensions.into())
-            .build()
-        {
+        let (new_swapchain, new_images) = match swapchain.recreate(SwapchainCreateInfo {
+            image_extent: new_dimensions.into(),  // here, "image_extend" will correspond to the window dimensions
+            ..swapchain.create_info()
+        }) {
             Ok(r) => r,
             // This error tends to happen when the user is manually resizing the window.
             // Simply restarting the loop is the easiest way to fix this issue.
-            Err(SwapchainCreationError::UnsupportedDimensions) => return,
+            Err(SwapchainCreationError::ImageExtentNotSupported { .. }) => return,
             Err(e) => panic!("Failed to recreate swapchain: {:?}", e),
         };
         swapchain = new_swapchain;
@@ -80,13 +79,12 @@ if window_resized || recreate_swapchain {
 
     let new_dimensions = surface.window().inner_size();
 
-    let (new_swapchain, new_images) = match swapchain
-        .recreate()
-        .dimensions(new_dimensions.into())
-        .build()
-    {
+    let (new_swapchain, new_images) = match swapchain.recreate(SwapchainCreateInfo {
+        image_extent: new_dimensions.into(),
+        ..swapchain.create_info()
+    }) {
         Ok(r) => r,
-        Err(SwapchainCreationError::UnsupportedDimensions) => return,
+        Err(SwapchainCreationError::ImageExtentNotSupported { .. }) => return,
         Err(e) => panic!("Failed to recreate swapchain: {:?}", e),
     };
     swapchain = new_swapchain;
@@ -199,7 +197,7 @@ processing new frames while the GPU is working on older ones.
 
 To do that, we need to save the created fences and reuse them later. Each stored fence will correspond to a new frame that is being
 processed in advance. You can do it with only one fence
-(check Vulkano's [triangle example](https://github.com/vulkano-rs/vulkano/blob/v0.28.0/examples/src/bin/triangle.rs)
+(check Vulkano's [triangle example](https://github.com/vulkano-rs/vulkano/blob/v0.29.0/examples/src/bin/triangle.rs)
 if you want to do something like that). However, here we will use multiple fences (likewise multiple frames in flight), which
 will make easier for you implement any other synchronization technique you want.
 
