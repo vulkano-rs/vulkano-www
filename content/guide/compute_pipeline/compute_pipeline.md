@@ -120,7 +120,7 @@ To use `vulkano-shaders`, we first have to add a dependency:
 
 ```toml
 # Notice that it uses the same version as vulkano
-vulkano-shaders = "0.28.0"
+vulkano-shaders = "0.29.0"
 ```
 
 Here is the syntax:

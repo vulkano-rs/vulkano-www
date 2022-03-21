@@ -58,9 +58,10 @@ As a preliminary action we are going to create the buffer that will contain the 
 similar to what we already did twice:
 
 ```rust
-let data_iter = 0 .. 65536;
-let data_buffer = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false,
-                                                 data_iter).expect("failed to create buffer");
+let data_iter = 0..65536;
+let data_buffer =
+    CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false, data_iter)
+        .expect("failed to create buffer");
 ```
 
 The `data_buffer` buffer now contains the data before the transformation, and we are going to
