@@ -15,17 +15,14 @@ use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
 use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage};
 use vulkano::descriptor_set::{PersistentDescriptorSet, WriteDescriptorSet};
 use vulkano::device::physical::PhysicalDevice;
-use vulkano::device::{Device, DeviceExtensions, Features};
-use vulkano::instance::{Instance, InstanceExtensions};
-use vulkano::pipeline::Pipeline;
-use vulkano::pipeline::{ComputePipeline, PipelineBindPoint};
+use vulkano::device::{Device, DeviceCreateInfo, DeviceExtensions, QueueCreateInfo};
+use vulkano::instance::{Instance, InstanceCreateInfo};
+use vulkano::pipeline::{ComputePipeline, Pipeline, PipelineBindPoint};
 use vulkano::sync;
 use vulkano::sync::GpuFuture;
-use vulkano::Version;
 
 fn main() {
-    let instance = Instance::new(None, Version::V1_1, &InstanceExtensions::none(), None)
-        .expect("failed to create instance");
+    let instance = Instance::new(InstanceCreateInfo::default()).expect("failed to create instance");
 
     let physical = PhysicalDevice::enumerate(&instance)
         .next()
@@ -36,19 +33,18 @@ fn main() {
         .find(|&q| q.supports_compute())
         .expect("couldn't find a compute queue family");
 
-    let (device, mut queues) = {
-        Device::new(
-            physical,
-            &Features::none(),
-            &DeviceExtensions {
+    let (device, mut queues) = Device::new(
+        physical,
+        DeviceCreateInfo {
+            queue_create_infos: vec![QueueCreateInfo::family(queue_family)],
+            enabled_extensions: DeviceExtensions {
                 khr_storage_buffer_storage_class: true,
                 ..DeviceExtensions::none()
-            }
-            .union(physical.required_extensions()),
-            [(queue_family, 0.5)].iter().cloned(),
-        )
-        .expect("failed to create device")
-    };
+            },
+            ..Default::default()
+        },
+    )
+    .expect("failed to create device");
 
     let queue = queues.next().unwrap();
 
@@ -88,11 +84,7 @@ void main() {
     )
     .expect("failed to create compute pipeline");
 
-    let layout = compute_pipeline
-        .layout()
-        .descriptor_set_layouts()
-        .get(0)
-        .unwrap();
+    let layout = compute_pipeline.layout().set_layouts().get(0).unwrap();
     let set = PersistentDescriptorSet::new(
         layout.clone(),
         [WriteDescriptorSet::buffer(0, data_buffer.clone())], // 0 is the binding

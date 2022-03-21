@@ -81,6 +81,8 @@ The `ImageBuffer` can then be saved into a PNG file:
 
 ```rust
 image.save("image.png").unwrap();
+
+println!("Everything succeeded!");
 ```
 
 And that's it! When running your program, a blue image named `image.png` should appear.

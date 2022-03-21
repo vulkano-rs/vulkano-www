@@ -17,19 +17,15 @@ use image::Rgba;
 use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
 use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage};
 use vulkano::descriptor_set::{PersistentDescriptorSet, WriteDescriptorSet};
-use vulkano::device::{physical::PhysicalDevice, Device, Features};
+use vulkano::device::{physical::PhysicalDevice, Device, DeviceCreateInfo, QueueCreateInfo};
 use vulkano::format::Format;
 use vulkano::image::{view::ImageView, ImageDimensions, StorageImage};
-use vulkano::instance::{Instance, InstanceExtensions};
-use vulkano::pipeline::Pipeline;
-use vulkano::pipeline::{ComputePipeline, PipelineBindPoint};
-use vulkano::sync;
-use vulkano::sync::GpuFuture;
-use vulkano::Version;
+use vulkano::instance::{Instance, InstanceCreateInfo};
+use vulkano::pipeline::{ComputePipeline, Pipeline, PipelineBindPoint};
+use vulkano::sync::{self, GpuFuture};
 
 pub fn main() {
-    let instance = Instance::new(None, Version::V1_1, &InstanceExtensions::none(), None)
-        .expect("failed to create instance");
+    let instance = Instance::new(InstanceCreateInfo::default()).expect("failed to create instance");
 
     let physical = PhysicalDevice::enumerate(&instance)
         .next()
@@ -40,15 +36,14 @@ pub fn main() {
         .find(|&q| q.supports_graphics())
         .expect("couldn't find a graphical queue family");
 
-    let (device, mut queues) = {
-        Device::new(
-            physical,
-            &Features::none(),
-            &physical.required_extensions(),
-            [(queue_family, 0.5)].iter().cloned(),
-        )
-        .expect("failed to create device")
-    };
+    let (device, mut queues) = Device::new(
+        physical,
+        DeviceCreateInfo {
+            queue_create_infos: vec![QueueCreateInfo::family(queue_family)],
+            ..Default::default()
+        },
+    )
+    .expect("failed to create device");
 
     let queue = queues.next().unwrap();
 
@@ -109,12 +104,8 @@ void main() {
     )
     .unwrap();
 
-    let view = ImageView::new(image.clone()).unwrap();
-    let layout = compute_pipeline
-        .layout()
-        .descriptor_set_layouts()
-        .get(0)
-        .unwrap();
+    let view = ImageView::new_default(image.clone()).unwrap();
+    let layout = compute_pipeline.layout().set_layouts().get(0).unwrap();
     let set = PersistentDescriptorSet::new(
         layout.clone(),
         [WriteDescriptorSet::image_view(0, view.clone())], // 0 is the binding
@@ -161,4 +152,6 @@ void main() {
     let buffer_content = buf.read().unwrap();
     let image = ImageBuffer::<Rgba<u8>, _>::from_raw(1024, 1024, &buffer_content[..]).unwrap();
     image.save("image.png").unwrap();
+
+    println!("Everything succeeded!");
 }

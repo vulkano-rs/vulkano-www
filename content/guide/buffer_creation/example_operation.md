@@ -15,11 +15,11 @@ The first step is to create two `CpuAccessibleBuffer`s: the source and the desti
 was covered in [the previous section](/guide/buffer-creation).
 
 ```rust
-let source_content = 0..64;
+let source_content: Vec<i32> = (0..64).collect();
 let source = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false, source_content)
     .expect("failed to create buffer");
 
-let destination_content = (0..64).map(|_| 0);
+let destination_content: Vec<i32> = (0..64).map(|_| 0).collect();
 let destination = CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false, destination_content)
     .expect("failed to create buffer");
 ```
@@ -45,7 +45,7 @@ operation we are trying to achieve.
 Vulkan supports primary and secondary command buffers. Primary command buffers can be sent directly to the GPU
 while secondary command buffers allow you to store functionality that you can reuse multiple times in primary command buffers.
 We won't cover secondary command buffers here, but you can read
-[more about them](https://docs.rs/vulkano/0.28.0/vulkano/command_buffer/index.html).
+[more about them](https://docs.rs/vulkano/0.29.0/vulkano/command_buffer/index.html).
 
 > **Note**: Submitting a command to the GPU can take up to several hundred microseconds, which is
 > why we submit as many things as we can at once.
@@ -87,8 +87,7 @@ The last step is to actually send the command buffer and execute it in the GPU.
 We can do that by synchronizing with the GPU, then executing the command buffer:
 
 ```rust
-use vulkano::sync;
-use vulkano::sync::GpuFuture;
+use vulkano::sync:: {self, GpuFuture};
 
 sync::now(device.clone())
     .then_execute(queue.clone(), command_buffer)
@@ -131,7 +130,7 @@ let future = sync::now(device.clone())
 ```
 
 Signaling a fence returns a future object called
-[FenceSignalFuture](https://docs.rs/vulkano/0.28.0/vulkano/sync/struct.FenceSignalFuture.html),
+[FenceSignalFuture](https://docs.rs/vulkano/0.29.0/vulkano/sync/struct.FenceSignalFuture.html),
 that has a special method `.wait()`:
 
 ```rust

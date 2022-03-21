@@ -62,7 +62,7 @@ same time select the first queue family that is suitable:
             // Find the first first queue family that is suitable.
             // If none is found, `None` is returned to `filter_map`, 
             // which disqualifies this physical device.
-            .find(|&q| q.supports_graphics() && surface.is_supported(q).unwrap_or(false))
+            .find(|&q| q.supports_graphics() && q.supports_surface(surface).unwrap_or(false))
             .map(|q| (p, q))
     })
     // continues bellow
@@ -141,20 +141,19 @@ that can support the swapchain.
 To do that, we need to pass all the previously required extensions:
 
 ```rust
-use vulkano::device::Device;
-use vulkano::device::Features;
+use vulkano::device::{Device, DeviceCreateInfo, QueueCreateInfo};
 
-let (device, mut queues) = {
-    Device::new(
-        physical_device,
-        &Features::none(),
-        &physical_device
+let (device, mut queues) = Device::new(
+    physical_device,
+    DeviceCreateInfo {
+        queue_create_infos: vec![QueueCreateInfo::family(queue_family)],
+        enabled_extensions: physical_device
             .required_extensions()
-            .union(&device_extensions),  // new
-        [(queue_family, 0.5)].iter().cloned(),
-    )
-    .expect("failed to create device")
-};
+            .union(&device_extensions), // new
+        ..Default::default()
+    },
+)
+.expect("failed to create device");
 
 let queue = queues.next().unwrap();
 ```
@@ -167,7 +166,9 @@ parameters when we create the swapchain. Therefore, we have to query the
 capabilities of the surface.
 
 ```rust
-let caps = surface.capabilities(physical_device).expect("failed to get surface capabilities");
+let caps = physical_device
+    .surface_capabilities(&surface, Default::default())
+    .expect("failed to get surface capabilities");
 ```
 
 Of all of these properties, we only care about some of them, mainly
@@ -175,32 +176,41 @@ the dimensions of the image (which have to be constrained between a minimum and 
 behavior when it comes to transparency (composite alpha), and the format of the images.
 
 ```rust
-let dimensions: [u32; 2] = surface.window().inner_size().into();
+let dimensions = surface.window().inner_size();
 let composite_alpha = caps.supported_composite_alpha.iter().next().unwrap();
-let format = caps.supported_formats[0].0;
+let image_format = Some(
+    physical_device
+        .surface_formats(&surface, Default::default())
+        .unwrap()[0]
+        .0,
+);
 ```
 
 Combining everything, we can create the swapchain:
 
 ```rust
 use vulkano::image::ImageUsage;
-use vulkano::swapchain::Swapchain;
+use vulkano::swapchain::{Swapchain, SwapchainCreateInfo};
 
-let (swapchain, images) = Swapchain::start(device.clone(), surface.clone())
-    .num_images(caps.min_image_count + 1)  // How many buffers to use in the swapchain
-    .format(format)
-    .dimensions(dimensions)
-    .usage(ImageUsage::color_attachment())  // What the images are going to be used for
-    .sharing_mode(&queue)  // The queue(s) that the resource will be used
-    .composite_alpha(composite_alpha)
-    .build()
-    .expect("failed to create swapchain");
+let (swapchain, images) = Swapchain::new(
+    device.clone(),
+    surface.clone(),
+    SwapchainCreateInfo {
+        min_image_count: caps.min_image_count + 1, // How many buffers to use in the swapchain
+        image_format,
+        image_extent: dimensions.into(),
+        image_usage: ImageUsage::color_attachment(), // What the images are going to be used for
+        composite_alpha,
+        ..Default::default()
+    },
+)
+.unwrap();
 ```
 
-It's good to have `num_images()` be at least one more than the minimal, to give a bit more freedom to
+It's good to have `min_image_count` be at least one more than the minimal, to give a bit more freedom to
 the image queue.
 
 For additional information, check the
-[swapchain documentation](https://docs.rs/vulkano/0.28.0/vulkano/swapchain/index.html#swapchains).
+[swapchain documentation](https://docs.rs/vulkano/0.29.0/vulkano/swapchain/index.html#swapchains).
 
 Next: [Other initialization](/guide/windowing/other-initialization)

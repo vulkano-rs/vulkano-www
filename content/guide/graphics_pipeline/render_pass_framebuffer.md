@@ -67,14 +67,17 @@ bad idea to keep the framebuffer objects alive between frames, but it won't kill
 performances to create and destroy a few framebuffer objects during some frames.
 
 ```rust
-use vulkano::render_pass::Framebuffer;
+use vulkano::render_pass::{Framebuffer, FramebufferCreateInfo};
 
-let view = ImageView::new(image.clone()).unwrap();
-let framebuffer = Framebuffer::start(render_pass.clone())
-    .add(view)
-    .unwrap()
-    .build()
-    .unwrap();
+let view = ImageView::new_default(image.clone()).unwrap();
+let framebuffer = Framebuffer::new(
+    render_pass.clone(),
+    FramebufferCreateInfo {
+        attachments: vec![view],
+        ..Default::default()
+    },
+)
+.unwrap();
 ```
 
 We are now ready the enter drawing mode!

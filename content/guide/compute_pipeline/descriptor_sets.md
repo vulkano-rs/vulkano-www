@@ -38,12 +38,7 @@ how will the buffer be written:
 use vulkano::pipeline::Pipeline;
 use vulkano::descriptor_set::{PersistentDescriptorSet, WriteDescriptorSet};
 
-let layout = compute_pipeline
-    .layout()
-    .descriptor_set_layouts()
-    .get(0)
-    .unwrap();
-
+let layout = compute_pipeline.layout().set_layouts().get(0).unwrap();
 let set = PersistentDescriptorSet::new(
     layout.clone(),
     [WriteDescriptorSet::buffer(0, data_buffer.clone())], // 0 is the binding
@@ -53,7 +48,7 @@ let set = PersistentDescriptorSet::new(
 
 In order to create a descriptor set, you'll need to know the layout that it is targeting. We do this by using the "Pipeline" trait
 and calling `.layout()` on our pipeline to obtain the pipeline's layout. Next we'll fetch the layout
-specific to the pass that we want to target by using `.descriptor_set_layouts().get(0)` where zero indicates the
+specific to the pass that we want to target by using `.set_layouts().get(0)` where zero indicates the
 first index of the pass that we are targeting.
 
 Once you have created a descriptor set, you may also use it with other pipelines, as long as the
