@@ -71,6 +71,7 @@ only changing the structure a bit:
 
 ```rust
 use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
+use bytemuck::{Pod, Zeroable};
 
 #[repr(C)]
 #[derive(Default, Copy, Clone, Zeroable, Pod)]

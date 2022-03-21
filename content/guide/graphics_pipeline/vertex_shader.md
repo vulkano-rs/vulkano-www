@@ -19,6 +19,8 @@ done, the shape of our triangle is going to be a buffer whose content is an arra
 `Vertex` objects.
 
 ```rust
+use bytemuck::{Pod, Zeroable};
+
 #[repr(C)]
 #[derive(Default, Copy, Clone, Zeroable, Pod)]
 struct Vertex {
