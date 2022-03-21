@@ -152,7 +152,7 @@ constants are in the case of drawing on multiple viewports or drawing multiple o
 Once we have finished drawing, let's do the same thing as [in the mandelbrot
 example](/guide/mandelbrot) and write the image to a PNG file.
 
-To do that, as before, let's create the buffer:
+To do that, as before, let's first create the buffer:
 
 ```rust
 // crop

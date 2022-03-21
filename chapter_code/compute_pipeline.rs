@@ -15,11 +15,9 @@ use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
 use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage};
 use vulkano::descriptor_set::{PersistentDescriptorSet, WriteDescriptorSet};
 use vulkano::device::physical::PhysicalDevice;
-use vulkano::device::QueueCreateInfo;
-use vulkano::device::{Device, DeviceCreateInfo, DeviceExtensions};
+use vulkano::device::{Device, DeviceCreateInfo, DeviceExtensions, QueueCreateInfo};
 use vulkano::instance::{Instance, InstanceCreateInfo};
-use vulkano::pipeline::Pipeline;
-use vulkano::pipeline::{ComputePipeline, PipelineBindPoint};
+use vulkano::pipeline::{ComputePipeline, Pipeline, PipelineBindPoint};
 use vulkano::sync;
 use vulkano::sync::GpuFuture;
 
