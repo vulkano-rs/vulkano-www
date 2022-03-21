@@ -1,36 +1,44 @@
 use std::sync::Arc;
+use vulkano::render_pass::FramebufferCreateInfo;
 
 use vulkano::device::physical::PhysicalDevice;
-use vulkano::device::{Device, Queue};
+use vulkano::device::Device;
 use vulkano::image::view::ImageView;
 use vulkano::image::{ImageUsage, SwapchainImage};
 use vulkano::render_pass::{Framebuffer, RenderPass};
-use vulkano::swapchain::{Surface, Swapchain};
+use vulkano::swapchain::{Surface, Swapchain, SwapchainCreateInfo};
 use winit::window::Window;
 
 pub fn create_swapchain(
   physical_device: &PhysicalDevice,
   device: Arc<Device>,
   surface: Arc<Surface<Window>>,
-  queue: Arc<Queue>,
 ) -> (Arc<Swapchain<Window>>, Vec<Arc<SwapchainImage<Window>>>) {
-  let caps = surface
-    .capabilities(*physical_device)
+  let caps = physical_device
+    .surface_capabilities(&surface, Default::default())
     .expect("failed to get surface capabilities");
 
-  let dimensions: [u32; 2] = surface.window().inner_size().into();
   let composite_alpha = caps.supported_composite_alpha.iter().next().unwrap();
-  let format = caps.supported_formats[0].0;
+  let image_format = Some(
+    physical_device
+      .surface_formats(&surface, Default::default())
+      .unwrap()[0]
+      .0,
+  );
 
-  Swapchain::start(device, surface)
-    .num_images(caps.min_image_count)
-    .format(format)
-    .dimensions(dimensions)
-    .usage(ImageUsage::color_attachment())
-    .sharing_mode(&queue)
-    .composite_alpha(composite_alpha)
-    .build()
-    .expect("failed to create swapchain")
+  Swapchain::new(
+    device,
+    surface.clone(),
+    SwapchainCreateInfo {
+      min_image_count: caps.min_image_count,
+      image_format,
+      image_extent: surface.window().inner_size().into(),
+      image_usage: ImageUsage::color_attachment(),
+      composite_alpha,
+      ..Default::default()
+    },
+  )
+  .unwrap()
 }
 
 pub fn create_framebuffers_from_swapchain_images(
@@ -40,12 +48,15 @@ pub fn create_framebuffers_from_swapchain_images(
   images
     .iter()
     .map(|image| {
-      let view = ImageView::new(image.clone()).unwrap();
-      Framebuffer::start(render_pass.clone())
-        .add(view)
-        .unwrap()
-        .build()
-        .unwrap()
+      let view = ImageView::new_default(image.clone()).unwrap();
+      Framebuffer::new(
+        render_pass.clone(),
+        FramebufferCreateInfo {
+          attachments: vec![view],
+          ..Default::default()
+        },
+      )
+      .unwrap()
     })
     .collect::<Vec<_>>()
 }

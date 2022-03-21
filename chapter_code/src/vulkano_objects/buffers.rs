@@ -1,12 +1,14 @@
+use bytemuck::Pod;
 use std::sync::Arc;
-use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer, ImmutableBuffer, TypedBufferAccess};
+use vulkano::buffer::{
+  BufferContents, BufferUsage, CpuAccessibleBuffer, ImmutableBuffer, TypedBufferAccess,
+};
 use vulkano::command_buffer::{CommandBufferExecFuture, PrimaryAutoCommandBuffer};
 use vulkano::descriptor_set::layout::DescriptorSetLayout;
 use vulkano::descriptor_set::{
   DescriptorSetsCollection, PersistentDescriptorSet, WriteDescriptorSet,
 };
 use vulkano::device::{Device, Queue};
-use vulkano::memory::Content;
 use vulkano::pipeline::graphics::vertex_input::VertexBuffersCollection;
 use vulkano::sync::{GpuFuture, NowFuture};
 
@@ -25,18 +27,17 @@ where
 
   // Vb and D have their own collection, so they are implicitly wrapped in an Arc, but Ib should be wrapped explicitly
   fn get_index(&self) -> Arc<Ib>;
-  
   fn get_uniform_descriptor_set(&self, i: usize) -> D;
 }
 
 // Struct with a cpu accessible vertex, index and uniform buffer, with generic (V)ertices and (U)niforms
-pub struct SimpleBuffers<V: Send + Sync + 'static, U: Content + Copy + Send + Sync + 'static> {
+pub struct SimpleBuffers<V: BufferContents + Pod, U: BufferContents> {
   pub vertex: Arc<CpuAccessibleBuffer<[V]>>,
   pub index: Arc<CpuAccessibleBuffer<[u16]>>,
   pub uniforms: Vec<Uniform<U>>,
 }
 
-impl<V: Send + Sync + 'static, U: Content + Copy + Send + Sync + 'static> SimpleBuffers<V, U> {
+impl<V: BufferContents + Pod, U: BufferContents + Copy> SimpleBuffers<V, U> {
   pub fn initialize<M: Model<V, U>>(
     device: Arc<Device>,
     descriptor_set_layout: Arc<DescriptorSetLayout>,
@@ -58,8 +59,8 @@ impl<'a, V, U>
   Buffers<Arc<CpuAccessibleBuffer<[V]>>, CpuAccessibleBuffer<[u16]>, Arc<PersistentDescriptorSet>>
   for SimpleBuffers<V, U>
 where
-  V: Send + Sync + 'static,
-  U: Content + Copy + Send + Sync + 'static,
+  V: BufferContents + Pod,
+  U: BufferContents,
 {
   fn get_vertex(&self) -> Arc<CpuAccessibleBuffer<[V]>> {
     self.vertex.clone()
@@ -75,13 +76,13 @@ where
 }
 
 // Struct with immutable vertex and index buffer and a cpu accessible uniform buffer, with generic (V)ertices and (U)niforms
-pub struct ImmutableBuffers<V: 'static, U: Content + Copy + Send + Sync + 'static> {
+pub struct ImmutableBuffers<V: BufferContents + Pod, U: BufferContents> {
   pub vertex: Arc<ImmutableBuffer<[V]>>,
   pub index: Arc<ImmutableBuffer<[u16]>>,
   pub uniforms: Vec<Uniform<U>>,
 }
 
-impl<V: 'static + Send + Sync, U: Content + Copy + Send + Sync + 'static> ImmutableBuffers<V, U> {
+impl<V: BufferContents + Pod, U: BufferContents + Copy> ImmutableBuffers<V, U> {
   pub fn initialize<M: Model<V, U>>(
     device: Arc<Device>,
     descriptor_set_layout: Arc<DescriptorSetLayout>,
@@ -114,8 +115,8 @@ impl<'a, V, U>
   Buffers<Arc<ImmutableBuffer<[V]>>, ImmutableBuffer<[u16]>, Arc<PersistentDescriptorSet>>
   for ImmutableBuffers<V, U>
 where
-  V: Send + Sync + 'static,
-  U: Content + Copy + Send + Sync + 'static,
+  V: BufferContents + Pod,
+  U: BufferContents,
 {
   fn get_vertex(&self) -> Arc<ImmutableBuffer<[V]>> {
     self.vertex.clone()
@@ -132,8 +133,8 @@ where
 
 fn create_cpu_accessible_vertex<V, U, M>(device: Arc<Device>) -> Arc<CpuAccessibleBuffer<[V]>>
 where
-  V: 'static,
-  U: Copy + 'static,
+  V: BufferContents + Pod,
+  U: BufferContents,
   M: Model<V, U>,
 {
   CpuAccessibleBuffer::from_iter(
@@ -152,8 +153,8 @@ fn create_immutable_vertex<V, U, M>(
   CommandBufferExecFuture<NowFuture, PrimaryAutoCommandBuffer>,
 )
 where
-  V: Send + Sync + 'static,
-  U: Copy + 'static,
+  V: BufferContents + Pod,
+  U: BufferContents,
   M: Model<V, U>,
 {
   ImmutableBuffer::from_iter(
@@ -166,8 +167,8 @@ where
 
 fn create_cpu_accessible_index<V, U, M>(device: Arc<Device>) -> Arc<CpuAccessibleBuffer<[u16]>>
 where
-  V: 'static,
-  U: Copy + 'static,
+  V: BufferContents,
+  U: BufferContents,
   M: Model<V, U>,
 {
   CpuAccessibleBuffer::from_iter(
@@ -186,8 +187,8 @@ fn create_immutable_index<V, U, M>(
   CommandBufferExecFuture<NowFuture, PrimaryAutoCommandBuffer>,
 )
 where
-  V: 'static,
-  U: Copy + 'static,
+  V: BufferContents,
+  U: BufferContents,
   M: Model<V, U>,
 {
   ImmutableBuffer::from_iter(
@@ -204,8 +205,8 @@ fn create_cpu_accessible_uniforms<V, U, M>(
   buffer_count: usize,
 ) -> Vec<Uniform<U>>
 where
-  V: Send + Sync + 'static,
-  U: Copy + Send + Sync + 'static,
+  V: BufferContents,
+  U: BufferContents + Copy,
   M: Model<V, U>,
 {
   (0..buffer_count)

@@ -1,7 +1,6 @@
 use std::sync::Arc;
 
-use vulkano::device::physical::PhysicalDeviceType;
-use vulkano::device::physical::{PhysicalDevice, QueueFamily};
+use vulkano::device::physical::{PhysicalDevice, PhysicalDeviceType, QueueFamily};
 use vulkano::device::DeviceExtensions;
 use vulkano::instance::Instance;
 use vulkano::swapchain::Surface;
@@ -16,7 +15,7 @@ pub fn select_physical_device<'a>(
     .filter(|&p| p.supported_extensions().is_superset_of(&device_extensions))
     .filter_map(|p| {
       p.queue_families()
-        .find(|&q| q.supports_graphics() && surface.is_supported(q).unwrap_or(false))
+        .find(|&q| q.supports_graphics() && q.supports_surface(&surface).unwrap_or(false))
         .map(|q| (p, q))
     })
     .min_by_key(|(p, _)| match p.properties().device_type {

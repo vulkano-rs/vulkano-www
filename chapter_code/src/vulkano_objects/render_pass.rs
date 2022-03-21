@@ -15,7 +15,7 @@ pub fn create_render_pass(
           color: {
               load: Clear,
               store: Store,
-              format: swapchain.format(),
+              format: swapchain.image_format(),
               samples: 1,
           }
       },

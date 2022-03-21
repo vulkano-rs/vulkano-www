@@ -1,11 +1,13 @@
+use bytemuck::{Pod, Zeroable};
+
 #[repr(C)]
-#[derive(Default, Debug, Copy, Clone)]
+#[derive(Default, Debug, Copy, Clone, Zeroable, Pod)]
 pub struct Vertex2d {
   pub position: [f32; 2],
 }
 
 #[repr(C)]
-#[derive(Default, Debug, Copy, Clone)]
+#[derive(Default, Debug, Copy, Clone, Zeroable, Pod)]
 pub struct Vertex3d {
   pub position: [f32; 3],
 }

@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
 use vulkano::command_buffer::{CommandBufferExecFuture, PrimaryAutoCommandBuffer};
-use vulkano::device::{Device, DeviceExtensions, Features, Queue};
+use vulkano::device::{Device, DeviceCreateInfo, DeviceExtensions, Queue, QueueCreateInfo};
 use vulkano::image::SwapchainImage;
 use vulkano::instance::Instance;
 use vulkano::pipeline::graphics::viewport::Viewport;
@@ -11,11 +11,10 @@ use vulkano::render_pass::{Framebuffer, RenderPass};
 use vulkano::shader::ShaderModule;
 use vulkano::swapchain::{
   self, AcquireError, PresentFuture, Surface, Swapchain, SwapchainAcquireFuture,
-  SwapchainCreationError,
+  SwapchainCreateInfo, SwapchainCreationError,
 };
 use vulkano::sync::{self, FenceSignalFuture, FlushError, GpuFuture, JoinFuture, NowFuture};
 use vulkano_win::VkSurfaceBuild;
-
 use winit::event_loop::EventLoop;
 use winit::window::{Window, WindowBuilder};
 
@@ -72,11 +71,13 @@ impl<'a> Renderer {
     let (device, mut queues) = {
       Device::new(
         physical_device,
-        &Features::none(),
-        &physical_device
-          .required_extensions()
-          .union(&device_extensions),
-        [(queue_family, 0.5)].iter().cloned(),
+        DeviceCreateInfo {
+          queue_create_infos: vec![QueueCreateInfo::family(queue_family)],
+          enabled_extensions: physical_device
+            .required_extensions()
+            .union(&device_extensions), // new
+          ..Default::default()
+        },
       )
       .expect("failed to create device")
     };
@@ -87,7 +88,6 @@ impl<'a> Renderer {
       &physical_device,
       device.clone(),
       surface.clone(),
-      queue.clone(),
     );
 
     let render_pass =
@@ -145,14 +145,12 @@ impl<'a> Renderer {
   }
 
   pub fn recreate_swapchain(&mut self) {
-    let (new_swapchain, new_images) = match self
-      .swapchain
-      .recreate()
-      .dimensions(self.surface.window().inner_size().into())
-      .build()
-    {
+    let (new_swapchain, new_images) = match self.swapchain.recreate(SwapchainCreateInfo {
+      image_extent: self.surface.window().inner_size().into(),
+      ..self.swapchain.create_info()
+    }) {
       Ok(r) => r,
-      Err(SwapchainCreationError::UnsupportedDimensions) => return,
+      Err(SwapchainCreationError::ImageExtentNotSupported { .. }) => return,
       Err(e) => panic!("Failed to recreate swapchain: {:?}", e),
     };
 
