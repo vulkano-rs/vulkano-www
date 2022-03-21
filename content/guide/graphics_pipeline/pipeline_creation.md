@@ -152,6 +152,24 @@ constants are in the case of drawing on multiple viewports or drawing multiple o
 Once we have finished drawing, let's do the same thing as [in the mandelbrot
 example](/guide/mandelbrot) and write the image to a PNG file.
 
+To do that, as before, let's create the buffer:
+
+```rust
+// crop
+
+let buf = CpuAccessibleBuffer::from_iter(
+    device.clone(),
+    BufferUsage::all(),
+    false,
+    (0..1024 * 1024 * 4).map(|_| 0u8),
+)
+.expect("failed to create buffer");
+
+// crop
+```
+
+And then write the rest of the operations:
+
 ```rust
     .copy_image_to_buffer(image, buf.clone())
     .unwrap();
