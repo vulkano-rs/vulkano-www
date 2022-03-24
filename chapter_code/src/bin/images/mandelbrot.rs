@@ -24,7 +24,7 @@ use vulkano::instance::{Instance, InstanceCreateInfo};
 use vulkano::pipeline::{ComputePipeline, Pipeline, PipelineBindPoint};
 use vulkano::sync::{self, GpuFuture};
 
-fn main() {
+pub fn main() {
     let instance = Instance::new(InstanceCreateInfo::default()).expect("failed to create instance");
 
     let physical = PhysicalDevice::enumerate(&instance)
