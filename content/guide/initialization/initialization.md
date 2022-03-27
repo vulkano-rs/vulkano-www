@@ -45,7 +45,7 @@ Consequently the best thing to do in practice is to choose one physical device w
 everything:
 
 ```rust
-use vulkano::device::physical::PhysicalDevice
+use vulkano::device::physical::PhysicalDevice;
 
 let physical = PhysicalDevice::enumerate(&instance).next().expect("no device available");
 ```
