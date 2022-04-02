@@ -109,7 +109,7 @@ For example if `buffer` contains a `MyStruct` (see above):
 let mut content = buffer.write().unwrap();
 // `content` implements `DerefMut` whose target is of type `MyStruct` (the content of the buffer)
 content.a *= 2;
-content.b = false;
+content.b = 9;
 ```
 
 Alternatively, suppose that the content of `buffer` is of type `[u8]` (like with the example that
