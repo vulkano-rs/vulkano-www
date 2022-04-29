@@ -48,7 +48,7 @@ A render pass is made of **attachments** and **passes**. Here we declare one att
 is `color` (the name is arbitrary), and one pass that will use `color` as its single output.
 
 The `load: Clear` line indicates that we want the GPU to *clear* the image when entering the render
-pass (ie. fill it with a single color), while `store: Store` indicates that we want the GPU to
+pass (i.e. fill it with a single color), while `store: Store` indicates that we want the GPU to
 actually store the output of our draw commands to the image.
 
 > **Note**: It is possible to create temporary images whose content is only relevant inside of a
@@ -64,7 +64,7 @@ by creating a *framebuffer*.
 
 Creating a framebuffer is typically done as part of the rendering process. It is not a
 bad idea to keep the framebuffer objects alive between frames, but it won't kill your
-performances to create and destroy a few framebuffer objects during some frames.
+performance to create and destroy a few framebuffer objects during some frames.
 
 ```rust
 use vulkano::render_pass::{Framebuffer, FramebufferCreateInfo};
