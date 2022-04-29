@@ -37,10 +37,7 @@ fn main() {
         physical,
         DeviceCreateInfo {
             queue_create_infos: vec![QueueCreateInfo::family(queue_family)],
-            enabled_extensions: DeviceExtensions {
-                khr_storage_buffer_storage_class: true,
-                ..DeviceExtensions::none()
-            },
+            enabled_extensions: DeviceExtensions::none(),
             ..Default::default()
         },
     )
