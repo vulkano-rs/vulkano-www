@@ -122,6 +122,9 @@ To use `vulkano-shaders`, we first have to add a dependency:
 # Notice that it uses the same version as vulkano
 vulkano-shaders = "0.29.0"
 ```
+NOTE: `vulkano-shaders` uses the crate `shaderc-sys` for the actual GLSL compilation step. 
+
+When you build your project, an attempt will be made at automatigical SPIR-V install if don't already have it. SPIR-V also comes in [the Vulkan SDK](https://www.vulkan.org/tools#download-these-essential-development-tools)). See https://lib.rs/crates/shaderc-sys for installation instructions should the automatic system fail. 
 
 Here is the syntax:
 
