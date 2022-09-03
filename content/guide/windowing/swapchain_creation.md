@@ -147,9 +147,7 @@ let (device, mut queues) = Device::new(
     physical_device,
     DeviceCreateInfo {
         queue_create_infos: vec![QueueCreateInfo::family(queue_family)],
-        enabled_extensions: physical_device
-            .required_extensions()
-            .union(&device_extensions), // new
+        enabled_extensions: device_extensions,
         ..Default::default()
     },
 )
@@ -211,6 +209,6 @@ It's good to have `min_image_count` be at least one more than the minimal, to gi
 the image queue.
 
 For additional information, check the
-[swapchain documentation](https://docs.rs/vulkano/0.29.0/vulkano/swapchain/index.html#swapchains).
+[swapchain documentation](https://docs.rs/vulkano/0.30.0/vulkano/swapchain/index.html#swapchains).
 
 Next: [Other initialization](/guide/windowing/other-initialization)

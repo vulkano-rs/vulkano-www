@@ -123,9 +123,11 @@ let mut builder = AutoCommandBufferBuilder::primary(
 
 builder
     .begin_render_pass(
-        framebuffer.clone(),
+        RenderPassBeginInfo {
+            clear_values: vec![Some([0.0, 0.0, 1.0, 1.0].into())],
+            ..RenderPassBeginInfo::framebuffer(framebuffer.clone())
+        },
         SubpassContents::Inline,
-        vec![[0.0, 0.0, 1.0, 1.0].into()],
     )
     .unwrap()
 
@@ -171,7 +173,7 @@ let buf = CpuAccessibleBuffer::from_iter(
 And then write the rest of the operations:
 
 ```rust
-    .copy_image_to_buffer(image, buf.clone())
+    .copy_image_to_buffer(CopyImageToBufferInfo::image_buffer(image, buf.clone()))
     .unwrap();
 
 let command_buffer = builder.build().unwrap();

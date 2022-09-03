@@ -43,7 +43,7 @@ You will first need to set up some external dependencies as documented in the [V
 As with all Rust libraries, add these entries in your Cargo.toml:
 
 ```toml
-vulkano = "0.29.0"
+vulkano = "0.30.0"
 bytemuck = "1.8.0"
 ```
 

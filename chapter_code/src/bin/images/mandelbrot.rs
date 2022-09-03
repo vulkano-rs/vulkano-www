@@ -15,7 +15,9 @@
 use image::ImageBuffer;
 use image::Rgba;
 use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
-use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage};
+use vulkano::command_buffer::{
+    AutoCommandBufferBuilder, CommandBufferUsage, CopyImageToBufferInfo,
+};
 use vulkano::descriptor_set::{PersistentDescriptorSet, WriteDescriptorSet};
 use vulkano::device::{physical::PhysicalDevice, Device, DeviceCreateInfo, QueueCreateInfo};
 use vulkano::format::Format;
@@ -136,7 +138,10 @@ void main() {
         )
         .dispatch([1024 / 8, 1024 / 8, 1])
         .unwrap()
-        .copy_image_to_buffer(image.clone(), buf.clone())
+        .copy_image_to_buffer(CopyImageToBufferInfo::image_buffer(
+            image.clone(),
+            buf.clone(),
+        ))
         .unwrap();
 
     let command_buffer = builder.build().unwrap();

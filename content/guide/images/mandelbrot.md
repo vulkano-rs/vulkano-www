@@ -195,7 +195,10 @@ builder
     )
     .dispatch([1024 / 8, 1024 / 8, 1])
     .unwrap()
-    .copy_image_to_buffer(image.clone(), buf.clone())
+    .copy_image_to_buffer(CopyImageToBufferInfo::image_buffer(
+        image.clone(),
+        buf.clone(),
+    ))    
     .unwrap();
 
 let command_buffer = builder.build().unwrap();

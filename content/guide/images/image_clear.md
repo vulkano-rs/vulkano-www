@@ -14,7 +14,7 @@ what we are going to do by asking the GPU to fill our image with a specific colo
 *clearing* an image.
 
 ```rust
-use vulkano::format::ClearValue;
+use vulkano::format::ClearColorValue;
 
 let mut builder = AutoCommandBufferBuilder::primary(
     device.clone(),
@@ -24,7 +24,10 @@ let mut builder = AutoCommandBufferBuilder::primary(
 .unwrap();
 
 builder
-    .clear_color_image(image.clone(), ClearValue::Float([0.0, 0.0, 1.0, 1.0]))
+    .clear_color_image(ClearColorImageInfo {
+        clear_value: ClearColorValue::Float([0.0, 0.0, 1.0, 1.0]),
+        ..ClearColorImageInfo::image(image.clone())
+    })
     .unwrap();
 
 let command_buffer = builder.build().unwrap();
@@ -35,7 +38,7 @@ let command_buffer = builder.build().unwrap();
 
 ## Normalized components
 
-[The `ClearValue` enum](https://docs.rs/vulkano/0.29.0/vulkano/format/enum.ClearValue.html) indicates
+[The `ClearColorValue` enum](https://docs.rs/vulkano/0.30.0/vulkano/format/enum.ClearColorValue.html) indicates
 which color to fill the image with. Depending on the format of the image, we have to use the right
 enum variant of `ClearValue`.
 

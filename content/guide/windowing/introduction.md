@@ -18,7 +18,7 @@ going to add a dependency to the `vulkano-win` crate which is a link between vul
 Add, in your `Cargo.toml`:
 
 ```toml
-vulkano-win = "0.29.0"
+vulkano-win = "0.30.0"
 winit = "0.26"
 ```
 
