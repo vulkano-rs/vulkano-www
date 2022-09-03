@@ -47,7 +47,7 @@ let queue_family = physical.queue_families()
 We can use it to create the device:
 
 ```rust
-use vulkano::device::{Device, Features};
+use vulkano::device::{Device, DeviceCreateInfo, Features, QueueCreateInfo};
 
 let (device, mut queues) = Device::new(
     physical,
