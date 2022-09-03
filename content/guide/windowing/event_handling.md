@@ -197,7 +197,7 @@ processing new frames while the GPU is working on older ones.
 
 To do that, we need to save the created fences and reuse them later. Each stored fence will correspond to a new frame that is being
 processed in advance. You can do it with only one fence
-(check Vulkano's [triangle example](https://github.com/vulkano-rs/vulkano/blob/v0.29.0/examples/src/bin/triangle.rs)
+(check Vulkano's [triangle example](https://github.com/vulkano-rs/vulkano/blob/v0.30.0/examples/src/bin/triangle.rs)
 if you want to do something like that). However, here we will use multiple fences (likewise multiple frames in flight), which
 will make easier for you implement any other synchronization technique you want.
 

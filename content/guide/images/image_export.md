@@ -35,9 +35,15 @@ And let's modify the command buffer we created in the previous section to add th
 
 ```rust
 builder
-    .clear_color_image(image.clone(), ClearValue::Float([0.0, 0.0, 1.0, 1.0]))
+    .clear_color_image(ClearColorImageInfo {
+        clear_value: ClearColorValue::Float([0.0, 0.0, 1.0, 1.0]),
+        ..ClearColorImageInfo::image(image.clone())
+    })
     .unwrap()
-    .copy_image_to_buffer(image.clone(), buf.clone()) // new
+    .copy_image_to_buffer(CopyImageToBufferInfo::image_buffer(
+        image.clone(),
+        buf.clone(),
+    ))
     .unwrap();
 ```
 

@@ -45,7 +45,7 @@ operation we are trying to achieve.
 Vulkan supports primary and secondary command buffers. Primary command buffers can be sent directly to the GPU
 while secondary command buffers allow you to store functionality that you can reuse multiple times in primary command buffers.
 We won't cover secondary command buffers here, but you can read
-[more about them](https://docs.rs/vulkano/0.29.0/vulkano/command_buffer/index.html).
+[more about them](https://docs.rs/vulkano/0.30.0/vulkano/command_buffer/index.html).
 
 > **Note**: Submitting a command to the GPU can take up to several hundred microseconds, which is
 > why we submit as many things as we can at once.
@@ -57,7 +57,7 @@ We won't cover secondary command buffers here, but you can read
 We are going to submit the commands to the GPU, so let's create a primary command buffer:
 
 ```rust
-use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage};
+use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage, CopyBufferInfo};
 
 let mut builder = AutoCommandBufferBuilder::primary(
     device.clone(),
@@ -66,7 +66,7 @@ let mut builder = AutoCommandBufferBuilder::primary(
 )
 .unwrap();
 
-builder.copy_buffer(source.clone(), destination.clone()).unwrap();
+builder.copy_buffer(CopyBufferInfo::buffers(source.clone(), destination.clone())).unwrap();
 
 let command_buffer = builder.build().unwrap();
 ```
@@ -130,7 +130,7 @@ let future = sync::now(device.clone())
 ```
 
 Signaling a fence returns a future object called
-[FenceSignalFuture](https://docs.rs/vulkano/0.29.0/vulkano/sync/struct.FenceSignalFuture.html),
+[FenceSignalFuture](https://docs.rs/vulkano/0.30.0/vulkano/sync/struct.FenceSignalFuture.html),
 that has a special method `.wait()`:
 
 ```rust

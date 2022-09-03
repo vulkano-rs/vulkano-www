@@ -202,7 +202,9 @@ one for each framebuffer. Let's put everything nicely into a function:
 use vulkano::buffer::TypedBufferAccess;
 use vulkano::command_buffer::{
     AutoCommandBufferBuilder, CommandBufferUsage, PrimaryAutoCommandBuffer, SubpassContents,
+    RenderPassBeginInfo,
 };
+
 use vulkano::device::Queue;
 
 fn get_command_buffers(
@@ -224,9 +226,11 @@ fn get_command_buffers(
 
             builder
                 .begin_render_pass(
-                    framebuffer.clone(),
+                    RenderPassBeginInfo {
+                        clear_values: vec![Some([0.1, 0.1, 0.1, 1.0].into())],
+                        ..RenderPassBeginInfo::framebuffer(framebuffer.clone())
+                    },
                     SubpassContents::Inline,
-                    vec![[0.0, 0.0, 1.0, 1.0].into()],
                 )
                 .unwrap()
                 .bind_pipeline_graphics(pipeline.clone())
