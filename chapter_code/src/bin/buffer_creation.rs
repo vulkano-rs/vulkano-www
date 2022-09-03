@@ -12,7 +12,7 @@
 //! It is not commented, as the explanations can be found in the guide itself.
 
 use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
-use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage};
+use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage, CopyBufferInfo};
 use vulkano::device::physical::PhysicalDevice;
 use vulkano::device::QueueCreateInfo;
 use vulkano::device::{Device, DeviceCreateInfo};
@@ -66,7 +66,7 @@ fn main() {
     )
     .unwrap();
     builder
-        .copy_buffer(source.clone(), destination.clone())
+        .copy_buffer(CopyBufferInfo::buffers(source.clone(), destination.clone()))
         .unwrap();
     let command_buffer = builder.build().unwrap();
 

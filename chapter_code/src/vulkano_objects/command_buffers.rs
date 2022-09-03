@@ -1,9 +1,7 @@
 use std::sync::Arc;
 
 use vulkano::buffer::{CpuAccessibleBuffer, TypedBufferAccess};
-use vulkano::command_buffer::{
-  AutoCommandBufferBuilder, CommandBufferUsage, PrimaryAutoCommandBuffer, SubpassContents,
-};
+use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage, PrimaryAutoCommandBuffer, RenderPassBeginInfo, SubpassContents};
 use vulkano::descriptor_set::DescriptorSetsCollection;
 use vulkano::device::{Device, Queue};
 use vulkano::pipeline::graphics::vertex_input::VertexBuffersCollection;
@@ -32,9 +30,11 @@ pub fn create_only_vertex_command_buffers(
 
       builder
         .begin_render_pass(
-          framebuffer.clone(),
-          SubpassContents::Inline,
-          vec![[0.1, 0.1, 0.1, 1.0].into()],
+            RenderPassBeginInfo {
+                clear_values: vec![Some([0.1, 0.1, 0.1, 1.0].into())],
+                ..RenderPassBeginInfo::framebuffer(framebuffer.clone())
+            },
+            SubpassContents::Inline,
         )
         .unwrap()
         .bind_pipeline_graphics(pipeline.clone())
@@ -76,9 +76,11 @@ pub fn create_simple_command_buffers<
 
       builder
         .begin_render_pass(
-          framebuffer.clone(),
-          SubpassContents::Inline,
-          vec![[0.1, 0.1, 0.1, 1.0].into()],
+            RenderPassBeginInfo {
+                clear_values: vec![Some([0.1, 0.1, 0.1, 1.0].into())],
+                ..RenderPassBeginInfo::framebuffer(framebuffer.clone())
+            },
+            SubpassContents::Inline,
         )
         .unwrap()
         .bind_pipeline_graphics(pipeline.clone())
