@@ -14,7 +14,7 @@
 use bytemuck::{Pod, Zeroable};
 use image::{ImageBuffer, Rgba};
 use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
-use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage, SubpassContents};
+use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage, CopyImageToBufferInfo, RenderPassBeginInfo, SubpassContents};
 use vulkano::device::{physical::PhysicalDevice, Device, DeviceCreateInfo, QueueCreateInfo};
 use vulkano::format::Format;
 use vulkano::image::{view::ImageView, ImageDimensions, StorageImage};
@@ -175,9 +175,11 @@ void main() {
 
     builder
         .begin_render_pass(
-            framebuffer.clone(),
+            RenderPassBeginInfo {
+                clear_values: vec![Some([0.0, 0.0, 1.0, 1.0].into())],
+                ..RenderPassBeginInfo::framebuffer(framebuffer.clone())
+            },
             SubpassContents::Inline,
-            vec![[0.0, 0.0, 1.0, 1.0].into()],
         )
         .unwrap()
         .bind_pipeline_graphics(pipeline.clone())
@@ -188,7 +190,7 @@ void main() {
         .unwrap()
         .end_render_pass()
         .unwrap()
-        .copy_image_to_buffer(image, buf.clone())
+        .copy_image_to_buffer(CopyImageToBufferInfo::image_buffer(image, buf.clone()))
         .unwrap();
 
     let command_buffer = builder.build().unwrap();
