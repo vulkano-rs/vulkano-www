@@ -6,6 +6,12 @@ To run the website, just do:
 ADDR=0.0.0.0:8000 cargo run
 ```
 
+To run chapter code:
+```
+cd chapter_code
+cargo run --bin <inser_chapter_name>
+```
+
 ## License
 
 Licensed under either of
