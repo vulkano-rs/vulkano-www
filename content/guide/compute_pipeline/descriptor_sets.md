@@ -13,11 +13,13 @@ In Vulkan, the buffers that a compute pipeline needs to access must be bound to 
 *descriptor*s. The code above declares such a descriptor.
 
 > **Note**: A descriptor can contain a buffer, but also other types that we haven't covered yet:
-> a buffer view, an image, a sampled image, etc. Each descriptor can also be an array.
+> a buffer view, an image, a sampled image, etc. One or more descriptors of the same type can form
+> an array.
 
-Descriptors are grouped by *descriptor set*s. The `layout(set = 0, binding = 0)` attribute in the
-GLSL code indicates that this descriptor is the descriptor 0 in the set 0. Descriptor indices and
-set indices are 0-based.
+A descriptor or array of descriptors is assigned to a *binding*, and bindings are grouped into
+*descriptor set*s. The `layout(set = 0, binding = 0)` attribute in the
+GLSL code indicates that this descriptor is assigned to binding 0 in the set 0. Binding indices
+and set indices are 0-based.
 
 What we declared in the GLSL code is actually not a descriptor set, but only a slot for a
 descriptor set. Before we can invoke the compute pipeline, we first need to bind an actual
