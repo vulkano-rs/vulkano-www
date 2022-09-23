@@ -9,7 +9,7 @@ use vulkano::pipeline::{GraphicsPipeline, Pipeline};
 use vulkano::render_pass::{Framebuffer, RenderPass};
 use vulkano::shader::ShaderModule;
 use vulkano::swapchain::{
-    self, AcquireError, PresentFuture, Surface, Swapchain, SwapchainAcquireFuture,
+    self, AcquireError, PresentFuture, PresentInfo, Surface, Swapchain, SwapchainAcquireFuture,
     SwapchainCreateInfo, SwapchainCreationError,
 };
 use vulkano::sync::{self, FenceSignalFuture, FlushError, GpuFuture, JoinFuture, NowFuture};
@@ -22,7 +22,7 @@ use chapter_code::game_objects::Square;
 use chapter_code::models::SquareModel;
 use chapter_code::shaders::movable_square;
 use chapter_code::vulkano_objects;
-use chapter_code::vulkano_objects::buffers::ImmutableBuffers;
+use chapter_code::vulkano_objects::buffers::DeviceLocalBuffers;
 use chapter_code::Vertex2d;
 
 pub type Fence = FenceSignalFuture<
@@ -44,7 +44,7 @@ pub struct Renderer {
     images: Vec<Arc<SwapchainImage<winit::window::Window>>>,
     render_pass: Arc<RenderPass>,
     framebuffers: Vec<Arc<Framebuffer>>,
-    buffers: ImmutableBuffers<Vertex2d, movable_square::vs::ty::Data>,
+    buffers: DeviceLocalBuffers<Vertex2d, movable_square::vs::ty::Data>,
     vertex_shader: Arc<ShaderModule>,
     fragment_shader: Arc<ShaderModule>,
     viewport: Viewport,
@@ -69,10 +69,10 @@ impl<'a> Renderer {
 
         let device_extensions = DeviceExtensions {
             khr_swapchain: true,
-            ..DeviceExtensions::none()
+            ..DeviceExtensions::empty()
         };
 
-        let (physical_device, queue_family) =
+        let (physical_device, queue_family_index) =
             vulkano_objects::physical_device::select_physical_device(
                 &instance,
                 surface.clone(),
@@ -80,9 +80,12 @@ impl<'a> Renderer {
             );
 
         let (device, mut queues) = Device::new(
-            physical_device,
+            physical_device.clone(),
             DeviceCreateInfo {
-                queue_create_infos: vec![QueueCreateInfo::family(queue_family)],
+                queue_create_infos: vec![QueueCreateInfo {
+                    queue_family_index,
+                    ..Default::default()
+                }],
                 enabled_extensions: device_extensions, // new
                 ..Default::default()
             },
@@ -123,7 +126,7 @@ impl<'a> Renderer {
             viewport.clone(),
         );
 
-        let buffers = ImmutableBuffers::initialize::<SquareModel>(
+        let buffers = DeviceLocalBuffers::initialize::<SquareModel>(
             device.clone(),
             pipeline.layout().set_layouts().get(0).unwrap().clone(),
             images.len(),
@@ -221,7 +224,13 @@ impl<'a> Renderer {
             .join(swapchain_acquire_future)
             .then_execute(self.queue.clone(), self.command_buffers[image_i].clone())
             .unwrap()
-            .then_swapchain_present(self.queue.clone(), self.swapchain.clone(), image_i)
+            .then_swapchain_present(
+                self.queue.clone(),
+                PresentInfo {
+                    index: image_i,
+                    ..PresentInfo::swapchain(self.swapchain.clone())
+                },
+            )
             .then_signal_fence_and_flush()
     }
 

@@ -8,95 +8,95 @@ use crate::render::renderer::{Fence, Renderer};
 use chapter_code::game_objects::Square;
 
 pub struct RenderLoop {
-  renderer: Renderer,
-  recreate_swapchain: bool,
-  window_resized: bool,
-  fences: Vec<Option<Arc<Fence>>>,
-  previous_fence_i: usize,
+    renderer: Renderer,
+    recreate_swapchain: bool,
+    window_resized: bool,
+    fences: Vec<Option<Arc<Fence>>>,
+    previous_fence_i: usize,
 }
 
 impl<'a> RenderLoop {
-  pub fn new(event_loop: &EventLoop<()>) -> Self {
-    let renderer = Renderer::initialize(event_loop);
-    let frames_in_flight = renderer.get_image_count();
-    let fences: Vec<Option<Arc<Fence>>> = vec![None; frames_in_flight];
+    pub fn new(event_loop: &EventLoop<()>) -> Self {
+        let renderer = Renderer::initialize(event_loop);
+        let frames_in_flight = renderer.get_image_count();
+        let fences: Vec<Option<Arc<Fence>>> = vec![None; frames_in_flight];
 
-    Self {
-      renderer,
-      recreate_swapchain: false,
-      window_resized: false,
-      fences,
-      previous_fence_i: 0,
-    }
-  }
-
-  pub fn update(&mut self, triangle: &Square) {
-    if self.window_resized {
-      self.window_resized = false;
-      self.recreate_swapchain = false;
-      self.renderer.handle_window_resize();
-    }
-    if self.recreate_swapchain {
-      self.recreate_swapchain = false;
-      self.renderer.recreate_swapchain();
-    }
-
-    let (image_i, suboptimal, acquire_future) = match self.renderer.acquire_swapchain_image() {
-      Ok(r) => r,
-      Err(AcquireError::OutOfDate) => {
-        self.recreate_swapchain = true;
-        return;
-      }
-      Err(e) => panic!("Failed to acquire next image: {:?}", e),
-    };
-
-    if suboptimal {
-      self.recreate_swapchain = true;
-    }
-
-    if let Some(image_fence) = &self.fences[image_i] {
-      image_fence.wait(None).unwrap();
-    }
-
-    // logic that uses the GPU resources that are currently not used (have been waited upon)
-    self.renderer.update_uniform(image_i, triangle);
-
-    let something_needs_all_gpu_resources = false;
-    let previous_future = match self.fences[self.previous_fence_i].clone() {
-      None => self.renderer.synchronize().boxed(),
-      Some(fence) => {
-        if something_needs_all_gpu_resources {
-          fence.wait(None).unwrap();
+        Self {
+            renderer,
+            recreate_swapchain: false,
+            window_resized: false,
+            fences,
+            previous_fence_i: 0,
         }
-        fence.boxed()
-      }
-    };
-
-    if something_needs_all_gpu_resources {
-      // logic that can use every GPU resource (the GPU is sleeping)
     }
 
-    let result = self
-      .renderer
-      .flush_next_future(previous_future, acquire_future, image_i);
+    pub fn update(&mut self, triangle: &Square) {
+        if self.window_resized {
+            self.window_resized = false;
+            self.recreate_swapchain = false;
+            self.renderer.handle_window_resize();
+        }
+        if self.recreate_swapchain {
+            self.recreate_swapchain = false;
+            self.renderer.recreate_swapchain();
+        }
 
-    self.fences[image_i] = match result {
-      Ok(fence) => Some(Arc::new(fence)),
-      Err(FlushError::OutOfDate) => {
-        self.recreate_swapchain = true;
-        None
-      }
-      Err(e) => {
-        println!("Failed to flush future: {:?}", e);
-        None
-      }
-    };
+        let (image_i, suboptimal, acquire_future) = match self.renderer.acquire_swapchain_image() {
+            Ok(r) => r,
+            Err(AcquireError::OutOfDate) => {
+                self.recreate_swapchain = true;
+                return;
+            }
+            Err(e) => panic!("Failed to acquire next image: {:?}", e),
+        };
 
-    self.previous_fence_i = image_i;
-  }
+        if suboptimal {
+            self.recreate_swapchain = true;
+        }
 
-  pub fn handle_window_resize(&mut self) {
-    // impacts the next update
-    self.window_resized = true;
-  }
+        if let Some(image_fence) = &self.fences[image_i] {
+            image_fence.wait(None).unwrap();
+        }
+
+        // logic that uses the GPU resources that are currently not used (have been waited upon)
+        self.renderer.update_uniform(image_i, triangle);
+
+        let something_needs_all_gpu_resources = false;
+        let previous_future = match self.fences[self.previous_fence_i].clone() {
+            None => self.renderer.synchronize().boxed(),
+            Some(fence) => {
+                if something_needs_all_gpu_resources {
+                    fence.wait(None).unwrap();
+                }
+                fence.boxed()
+            }
+        };
+
+        if something_needs_all_gpu_resources {
+            // logic that can use every GPU resource (the GPU is sleeping)
+        }
+
+        let result = self
+            .renderer
+            .flush_next_future(previous_future, acquire_future, image_i);
+
+        self.fences[image_i] = match result {
+            Ok(fence) => Some(Arc::new(fence)),
+            Err(FlushError::OutOfDate) => {
+                self.recreate_swapchain = true;
+                None
+            }
+            Err(e) => {
+                println!("Failed to flush future: {:?}", e);
+                None
+            }
+        };
+
+        self.previous_fence_i = image_i;
+    }
+
+    pub fn handle_window_resize(&mut self) {
+        // impacts the next update
+        self.window_resized = true;
+    }
 }

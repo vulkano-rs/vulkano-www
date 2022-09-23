@@ -6,10 +6,10 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-vulkano = "0.30.0"
-vulkano-shaders = "0.30.0"
+vulkano = "0.31.0"
+vulkano-shaders = "0.31.0"
 image = "0.24.0"
-winit = "0.26.0"
-vulkano-win = "0.30.0"
+winit = "0.27.3"
+vulkano-win = "0.31.0"
 rand = "0.8.5"
-bytemuck = "1.8.0"
+bytemuck = "1.9.1"

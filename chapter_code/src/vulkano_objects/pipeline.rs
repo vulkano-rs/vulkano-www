@@ -11,19 +11,19 @@ use vulkano::shader::ShaderModule;
 use crate::Vertex2d;
 
 pub fn create_pipeline(
-  device: Arc<Device>,
-  vs: Arc<ShaderModule>,
-  fs: Arc<ShaderModule>,
-  render_pass: Arc<RenderPass>,
-  viewport: Viewport,
+    device: Arc<Device>,
+    vs: Arc<ShaderModule>,
+    fs: Arc<ShaderModule>,
+    render_pass: Arc<RenderPass>,
+    viewport: Viewport,
 ) -> Arc<GraphicsPipeline> {
-  GraphicsPipeline::start()
-    .vertex_input_state(BuffersDefinition::new().vertex::<Vertex2d>())
-    .vertex_shader(vs.entry_point("main").unwrap(), ())
-    .input_assembly_state(InputAssemblyState::new())
-    .viewport_state(ViewportState::viewport_fixed_scissor_irrelevant([viewport]))
-    .fragment_shader(fs.entry_point("main").unwrap(), ())
-    .render_pass(Subpass::from(render_pass.clone(), 0).unwrap())
-    .build(device.clone())
-    .unwrap()
+    GraphicsPipeline::start()
+        .vertex_input_state(BuffersDefinition::new().vertex::<Vertex2d>())
+        .vertex_shader(vs.entry_point("main").unwrap(), ())
+        .input_assembly_state(InputAssemblyState::new())
+        .viewport_state(ViewportState::viewport_fixed_scissor_irrelevant([viewport]))
+        .fragment_shader(fs.entry_point("main").unwrap(), ())
+        .render_pass(Subpass::from(render_pass.clone(), 0).unwrap())
+        .build(device.clone())
+        .unwrap()
 }

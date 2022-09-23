@@ -16,8 +16,8 @@ equivalent of a CPU thread is a ***queue***. Queues are grouped by **queue famil
 The queue families of a physical device can be enumerated like this:
 
 ```rust
-for family in physical.queue_families() {
-    println!("Found a queue family with {:?} queue(s)", family.queues_count());
+for family in physical.queue_family_properties() {
+    println!("Found a queue family with {:?} queue(s)", family.queue_count);
 }
 ```
 
@@ -36,15 +36,18 @@ and some others support both.
 
 The reason why queues are relevant right now is in order to create a *device*, we have to tell the
 Vulkan implementation which type of queues we want to use. Queues are grouped into *queue families*,
-which describe their capabilities. Let's create a queue family that symbolizes graphical operations:
+which describe their capabilities. Let's locate a queue family that supports graphical operations:
 
 ```rust
-let queue_family = physical.queue_families()
-    .find(|&q| q.supports_graphics())
-    .expect("couldn't find a graphical queue family");
+let queue_family_index = physical
+    .queue_family_properties()
+    .iter()
+    .enumerate()
+    .position(|(_, q)| q.queue_flags.graphics)
+    .expect("couldn't find a graphical queue family") as u32;
 ```
 
-We can use it to create the device:
+Once we have the index of a viable queue family, we can use it to create the device:
 
 ```rust
 use vulkano::device::{Device, DeviceCreateInfo, Features, QueueCreateInfo};
@@ -52,8 +55,11 @@ use vulkano::device::{Device, DeviceCreateInfo, Features, QueueCreateInfo};
 let (device, mut queues) = Device::new(
     physical,
     DeviceCreateInfo {
-        // here we pass the desired queue families that we want to use
-        queue_create_infos: vec![QueueCreateInfo::family(queue_family)],
+        // here we pass the desired queue family to use by index
+        queue_create_infos: vec![QueueCreateInfo {
+            queue_family_index,
+            ..Default::default()
+        }],
         ..Default::default()
     },
 )
