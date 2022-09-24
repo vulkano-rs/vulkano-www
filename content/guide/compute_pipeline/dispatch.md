@@ -12,7 +12,7 @@ use vulkano::pipeline::PipelineBindPoint;
 
 let mut builder = AutoCommandBufferBuilder::primary(
     device.clone(),
-    queue.family(),
+    queue.queue_family_index(),
     CommandBufferUsage::OneTimeSubmit,
 )
 .unwrap();

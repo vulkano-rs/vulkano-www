@@ -126,7 +126,7 @@ void main() {
     let buf = CpuAccessibleBuffer::from_iter(
         device.clone(),
         BufferUsage {
-            uniform_buffer: true,
+            transfer_dst: true,
             ..Default::default()
         },
         false,

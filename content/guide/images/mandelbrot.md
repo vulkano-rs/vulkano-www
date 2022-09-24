@@ -137,14 +137,14 @@ let image = StorageImage::new(
         array_layers: 1,
     },
     Format::R8G8B8A8_UNORM,
-    Some(queue.family()),
+    Some(queue.queue_family_index()),
 )
 .unwrap();
 ```
 
 This time we can't just clear the image like we did earlier. To actually pass the image
-to the gpu shader, we first need to create a `ImageView` of it. An `ImageView` describes where
-and how the gpu should access or use the image. Here, we want a view of the entire image,
+to the GPU shader, we first need to create a `ImageView` of it. An `ImageView` describes where
+and how the GPU should access or use the image. Here, we want a view of the entire image,
 so the creation isn't very difficult:
 
 ```rust
@@ -153,7 +153,7 @@ use vulkano::image::view::ImageView;
 let view = ImageView::new_default(image.clone()).unwrap();
 ```
 
-Now, let's create the descriptor set by adding the image view, like we did earlier:
+Now, let's create the descriptor set by adding the image view, like we did [earlier](/guide/descriptor-sets):
 
 ```rust
 let layout = compute_pipeline.layout().set_layouts().get(0).unwrap();
@@ -164,12 +164,15 @@ let set = PersistentDescriptorSet::new(
 .unwrap();
 ```
 
-Next, we can create a buffer where to write the output:
+Next, we can create a buffer for storing the image output:
 
 ```rust
 let buf = CpuAccessibleBuffer::from_iter(
     device.clone(),
-    BufferUsage::all(),
+    BufferUsage {
+        transfer_dst: true,
+        ..Default::default()
+    },
     false,
     (0..1024 * 1024 * 4).map(|_| 0u8),
 )
@@ -181,7 +184,7 @@ The command buffer contains a dispatch command followed with a copy-image-to-buf
 ```rust
 let mut builder = AutoCommandBufferBuilder::primary(
     device.clone(),
-    queue.family(),
+    queue.queue_family_index(),
     CommandBufferUsage::OneTimeSubmit,
 )
 .unwrap();

@@ -148,7 +148,7 @@ let future = sync::now(device.clone())
 ```
 
 Signaling a fence returns a future object called
-[FenceSignalFuture](https://docs.rs/vulkano/0.30.0/vulkano/sync/struct.FenceSignalFuture.html),
+[FenceSignalFuture](https://docs.rs/vulkano/0.31.0/vulkano/sync/struct.FenceSignalFuture.html),
 that has a special method `.wait()`:
 
 ```rust
