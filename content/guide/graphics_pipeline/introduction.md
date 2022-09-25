@@ -9,7 +9,7 @@ While these two kind of operations are sufficient in order to use the power of t
 parallel calculations (as seen in [the Mandelbrot example](/guide/mandelbrot)), there is a third
 kind of operations: graphical operations.
 
-Before they were used for general-purpose calculations, GPU were used for graphics (hence their
+Before they were used for general-purpose calculations, GPUs were used for graphics (hence their
 name). To benefit from this, GPUs provide to developers a specialized well-optimized series of steps
 called ***the graphics pipeline***. Using the graphics pipeline is more restrictive than using
 compute operations, but it is also much faster.
