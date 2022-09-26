@@ -13,3 +13,6 @@ winit = "0.27.3"
 vulkano-win = "0.31.0"
 rand = "0.8.5"
 bytemuck = "1.9.1"
+
+[profile.dev]
+opt-level = 1 

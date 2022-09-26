@@ -15,11 +15,11 @@ however, is capable of rendering to window(s).
 In order to create a window, we will use the `winit` crate. And while we're at it, we are also
 going to add a dependency to the `vulkano-win` crate which is a link between vulkano and winit.
 
-Add, in your `Cargo.toml`:
+Add to your `Cargo.toml` dependencies:
 
 ```toml
-vulkano-win = "0.30.0"
-winit = "0.26"
+vulkano-win = "0.31.0"
+winit = "0.27.3"
 ```
 
 We encourage you to browse [the documentation of `winit`](https://docs.rs/winit).
@@ -32,11 +32,15 @@ thing left is to pass them on to the instance creation:
 ```rust
 use vulkano::instance::{Instance, InstanceCreateInfo};
 
-let required_extensions = vulkano_win::required_extensions();
-let instance = Instance::new(InstanceCreateInfo {
-    enabled_extensions: required_extensions,
-    ..Default::default()
-})
+let library = VulkanLibrary::new().expect("no local Vulkan library/DLL");
+let required_extensions = vulkano_win::required_extensions(&library);
+let instance = Instance::new(
+    library,
+    InstanceCreateInfo {
+        enabled_extensions: required_extensions,
+        ..Default::default()
+    }
+)
 .expect("failed to create instance");
 ```
 
