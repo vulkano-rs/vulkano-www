@@ -7,9 +7,10 @@ Both the CPU and the GPU execute instructions one by one. The instructions avail
 programs that run on the CPU include, for example, modifying a value in memory, or performing some
 mathematical operation.
 
-The instructions that a GPU can execute are the same, except that they can operate on a lot of
+The instructions that a GPU can execute are often limited, but they can operate on a lot of
 data at once. You can, for example, instruct the GPU to multiply thirty-two values by a constant,
-in approximately the same time that a CPU would take to multiply a single value by that constant.
+in approximately the same time that a CPU would take to multiply a single value by that constant
+(ignoring the overhead of transfering data between the two devices).
 
 This is what makes GPUs very good at parallel computations which require executing the same
 sequence of operation on multiple values. While a CPU would perform this sequence on each value one
@@ -60,8 +61,11 @@ similar to what we already did twice:
 ```rust
 let data_iter = 0..65536;
 let data_buffer =
-    CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false, data_iter)
-        .expect("failed to create buffer");
+    CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage {
+        storage_buffer: true,
+        ..Default::default()
+    }, false, data_iter)
+    .expect("failed to create buffer");
 ```
 
 The `data_buffer` buffer now contains the data before the transformation, and we are going to

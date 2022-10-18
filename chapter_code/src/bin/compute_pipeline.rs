@@ -14,32 +14,39 @@
 use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
 use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage};
 use vulkano::descriptor_set::{PersistentDescriptorSet, WriteDescriptorSet};
-use vulkano::device::physical::PhysicalDevice;
 use vulkano::device::{Device, DeviceCreateInfo, DeviceExtensions, QueueCreateInfo};
 use vulkano::instance::{Instance, InstanceCreateInfo};
 use vulkano::pipeline::{ComputePipeline, Pipeline, PipelineBindPoint};
-use vulkano::sync;
-use vulkano::sync::GpuFuture;
+use vulkano::sync::{self, GpuFuture};
 
 fn main() {
-    let instance = Instance::new(InstanceCreateInfo::default()).expect("failed to create instance");
+    let library = vulkano::VulkanLibrary::new().expect("no local Vulkan library/DLL");
+    let instance =
+        Instance::new(library, InstanceCreateInfo::default()).expect("failed to create instance");
 
-    let physical = PhysicalDevice::enumerate(&instance)
+    let physical = instance
+        .enumerate_physical_devices()
+        .expect("could not enumerate devices")
         .next()
-        .expect("no device available");
+        .expect("no devices available");
 
-    let queue_family = physical
-        .queue_families()
-        .find(|&q| q.supports_compute())
-        .expect("couldn't find a compute queue family");
+    let queue_family_index = physical
+        .queue_family_properties()
+        .iter()
+        .enumerate()
+        .position(|(_, q)| q.queue_flags.graphics)
+        .expect("couldn't find a graphical queue family") as u32;
 
     let (device, mut queues) = Device::new(
         physical,
         DeviceCreateInfo {
-            queue_create_infos: vec![QueueCreateInfo::family(queue_family)],
+            queue_create_infos: vec![QueueCreateInfo {
+                queue_family_index,
+                ..Default::default()
+            }],
             enabled_extensions: DeviceExtensions {
                 khr_storage_buffer_storage_class: true,
-                ..DeviceExtensions::none()
+                ..DeviceExtensions::empty()
             },
             ..Default::default()
         },
@@ -50,9 +57,16 @@ fn main() {
 
     // Introduction to compute operations
     let data_iter = 0..65536;
-    let data_buffer =
-        CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false, data_iter)
-            .expect("failed to create buffer");
+    let data_buffer = CpuAccessibleBuffer::from_iter(
+        device.clone(),
+        BufferUsage {
+            storage_buffer: true,
+            ..Default::default()
+        },
+        false,
+        data_iter,
+    )
+    .expect("failed to create buffer");
 
     // Compute pipelines
     mod cs {
@@ -93,7 +107,7 @@ void main() {
 
     let mut builder = AutoCommandBufferBuilder::primary(
         device.clone(),
-        queue.family(),
+        queue.queue_family_index(),
         CommandBufferUsage::OneTimeSubmit,
     )
     .unwrap();

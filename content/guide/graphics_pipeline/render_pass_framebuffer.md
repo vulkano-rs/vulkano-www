@@ -1,6 +1,6 @@
 # Render passes
 
-In order to fully optimize and parallelize commands execution, we can't just ask the GPU
+In order to fully optimize and parallelize command execution, we can't just ask the GPU
 to draw a shape whenever we want. Instead we first have to enter a special "rendering mode" by
 *entering* what is called a ***render pass***. It is only once we have entered a render pass that
 you can draw.
@@ -97,20 +97,22 @@ topic. Be we are using only direct commands, we will leave it as `::Inline`
 As a demonstration, let's just enter a render pass and leave it immediately after:
 
 ```rust
-use vulkano::command_buffer::SubpassContents;
+use vulkano::command_buffer::{RenderPassBeginInfo, SubpassContents};
 
 let mut builder = AutoCommandBufferBuilder::primary(
     device.clone(),
-    queue.family(),
+    queue.queue_family_index(),
     CommandBufferUsage::OneTimeSubmit,
 )
 .unwrap();
 
 builder
     .begin_render_pass(
-        framebuffer.clone(),
+        RenderPassBeginInfo {
+            clear_values: vec![Some([0.0, 0.0, 1.0, 1.0].into())],
+            ..RenderPassBeginInfo::framebuffer(framebuffer.clone())
+        },
         SubpassContents::Inline,
-        vec![[0.0, 0.0, 1.0, 1.0].into()],
     )
     .unwrap()
     .end_render_pass()

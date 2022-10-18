@@ -62,7 +62,6 @@ use vulkano::pipeline::graphics::input_assembly::InputAssemblyState;
 use vulkano::pipeline::graphics::vertex_input::BuffersDefinition;
 use vulkano::pipeline::graphics::viewport::{Viewport, ViewportState};
 use vulkano::pipeline::GraphicsPipeline;
-use vulkano::pipeline::viewport::Viewport;
 use vulkano::render_pass::Subpass;
 
 // More on this latter
@@ -92,7 +91,7 @@ let pipeline = GraphicsPipeline::start()
 ```
 
 When we draw, we have the possibility to draw only to a specific rectangle of the screen called a
-***viewport***. The borders of the viewport will map to the `-1` and `1` logical coordinates that
+***viewport***. The borders of the viewport will map to the `-1.0` and `1.0` logical coordinates that
 we covered in [the vertex input section of the guide](/guide/vertex-input). Any part of the shape
 that ends up outside of this rectangle will be discarded.
 
@@ -116,7 +115,7 @@ To draw the triangle, we need to pass the pipeline, the vertex_buffer and the ac
 ```rust
 let mut builder = AutoCommandBufferBuilder::primary(
     device.clone(),
-    queue.family(),
+    queue.queue_family_index(),
     CommandBufferUsage::OneTimeSubmit,
 )
 .unwrap();
@@ -161,7 +160,10 @@ To do that, as before, let's first create the buffer:
 
 let buf = CpuAccessibleBuffer::from_iter(
     device.clone(),
-    BufferUsage::all(),
+    BufferUsage {
+        transfer_dst: true,
+        ..Default::default()
+    },
     false,
     (0..1024 * 1024 * 4).map(|_| 0u8),
 )

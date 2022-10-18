@@ -2,18 +2,20 @@
 
 ## Creating an instance
 
-Before you can start using any function from Vulkan and vulkano, the first thing to do is to create
-an *instance*. Creating an instance tries to load Vulkan from the system and reads the list of
-available implementations.
+Before you can start utilizing the Vulkan API, the first thing to do is to create
+an *instance*. An instance specifies the mapping between vulkano and the local Vulkan library.
+As of vulkano version `0.31.0`, the library needs to be explicitly specified by passing a `VulkanLibrary`
+to the  `Instance` constructor.
 
 For starters, our program will be very simple, so, for now, creating an instance won't need any
-[additional parameters](https://docs.rs/vulkano/0.30.0/vulkano/instance/struct.InstanceCreateInfo.html),
+[additional parameters](https://docs.rs/vulkano/0.31.0/vulkano/instance/struct.InstanceCreateInfo.html),
 so we can create it with default configurations:
 
 ```rust
+use vulkano::VulkanLibrary;
 use vulkano::instance::{Instance, InstanceCreateInfo};
-
-let instance = Instance::new(InstanceCreateInfo::default()).expect("failed to create instance");
+let library = VulkanLibrary::new().expect("no local Vulkan library/DLL");
+let instance = Instance::new(library, InstanceCreateInfo::default()).expect("failed to create instance");
 ```
 
 Like many other functions in vulkano, creating an instance returns a `Result`. If Vulkan is not
@@ -45,12 +47,14 @@ Consequently the best thing to do in practice is to choose one physical device w
 everything:
 
 ```rust
-use vulkano::device::physical::PhysicalDevice;
-
-let physical = PhysicalDevice::enumerate(&instance).next().expect("no device available");
+let physical = instance
+    .enumerate_physical_devices()
+    .expect("could not enumerate devices")
+    .next()
+    .expect("no devices available");
 ```
 
-The `enumerate` function returns an iterator to the list of available physical devices.
+The `enumerate_physical_devices` function returns a `Result` of an iterator to the list of available physical devices.
 We call `next` on it to return the first device, if any. Note that the first device is not
 necessarily the best device. In a real program you probably want to leave the choice to the user
 (later we will see a better implementation of this).

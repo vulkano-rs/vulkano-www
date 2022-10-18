@@ -38,13 +38,21 @@ monitor for you to physically see.
 
 ## Setup
 
-You will first need to set up some external dependencies as documented in the [Vulkano readme](https://github.com/vulkano-rs/vulkano/blob/master/README.md#setup).
+You may first need to set up some external dependencies as documented in the [Vulkano readme](https://github.com/vulkano-rs/vulkano/blob/master/README.md#setup-and-troubleshooting) to avoid build failures in the future.
 
-As with all Rust libraries, add these entries in your Cargo.toml:
+To get started with vulkano, add it as a project dependency to your Cargo.toml:
 
 ```toml
-vulkano = "0.30.0"
-bytemuck = "1.8.0"
+[dependencies]
+vulkano = "0.31.0"
+```
+
+You may want to consider adding the following minimum optimization level to your `Cargo.toml` as well.
+The purpose of this is to reduce performance artifacts resulting from the default debug optimization.
+
+```toml
+[profile.dev]
+opt-level = 1 
 ```
 
 Note: If you run into any issues with this guide, please [open an issue](https://github.com/vulkano-rs/vulkano-www/issues).

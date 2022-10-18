@@ -10,7 +10,7 @@ use vulkano::pipeline::GraphicsPipeline;
 use vulkano::render_pass::{Framebuffer, RenderPass};
 use vulkano::shader::ShaderModule;
 use vulkano::swapchain::{
-    self, AcquireError, PresentFuture, Surface, Swapchain, SwapchainAcquireFuture,
+    self, AcquireError, PresentFuture, PresentInfo, Surface, Swapchain, SwapchainAcquireFuture,
     SwapchainCreateInfo, SwapchainCreationError,
 };
 use vulkano::sync::{self, FenceSignalFuture, FlushError, GpuFuture, JoinFuture, NowFuture};
@@ -59,10 +59,10 @@ impl<'a> Renderer {
 
         let device_extensions = DeviceExtensions {
             khr_swapchain: true,
-            ..DeviceExtensions::none()
+            ..DeviceExtensions::empty()
         };
 
-        let (physical_device, queue_family) =
+        let (physical_device, queue_family_index) =
             vulkano_objects::physical_device::select_physical_device(
                 &instance,
                 surface.clone(),
@@ -71,9 +71,12 @@ impl<'a> Renderer {
 
         let (device, mut queues) = {
             Device::new(
-                physical_device,
+                physical_device.clone(),
                 DeviceCreateInfo {
-                    queue_create_infos: vec![QueueCreateInfo::family(queue_family)],
+                    queue_create_infos: vec![QueueCreateInfo {
+                        queue_family_index,
+                        ..Default::default()
+                    }],
                     enabled_extensions: device_extensions,
                     ..Default::default()
                 },
@@ -208,7 +211,13 @@ impl<'a> Renderer {
             .join(swapchain_acquire_future)
             .then_execute(self.queue.clone(), self.command_buffers[image_i].clone())
             .unwrap()
-            .then_swapchain_present(self.queue.clone(), self.swapchain.clone(), image_i)
+            .then_swapchain_present(
+                self.queue.clone(),
+                PresentInfo {
+                    index: image_i,
+                    ..PresentInfo::swapchain(self.swapchain.clone())
+                },
+            )
             .then_signal_fence_and_flush()
     }
 }
@@ -225,7 +234,10 @@ pub fn create_vertex_buffer(device: Arc<Device>) -> Arc<CpuAccessibleBuffer<[Ver
     };
     CpuAccessibleBuffer::from_iter(
         device,
-        BufferUsage::vertex_buffer(),
+        BufferUsage {
+            vertex_buffer: true,
+            ..Default::default()
+        },
         false,
         vec![vertex1, vertex2, vertex3].into_iter(),
     )

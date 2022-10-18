@@ -24,7 +24,10 @@ the number of elements in the buffer is `1024 * 1024 * 4`.
 ```rust
 let buf = CpuAccessibleBuffer::from_iter(
     device.clone(),
-    BufferUsage::all(),
+    BufferUsage {
+        transfer_dst: true,
+        ..Default::default()
+    },
     false,
     (0..1024 * 1024 * 4).map(|_| 0u8),
 )
@@ -34,6 +37,7 @@ let buf = CpuAccessibleBuffer::from_iter(
 And let's modify the command buffer we created in the previous section to add the copy operation:
 
 ```rust
+use vulkano::command_buffer::CopyImageToBufferInfo;
 builder
     .clear_color_image(ClearColorImageInfo {
         clear_value: ClearColorValue::Float([0.0, 0.0, 1.0, 1.0]),
@@ -54,6 +58,7 @@ to the buffer.
 Let's not forget to execute the command buffer and block until the operation is finished:
 
 ```rust
+use vulkano::sync::{self, GpuFuture};
 let future = sync::now(device.clone())
     .then_execute(queue.clone(), command_buffer)
     .unwrap()

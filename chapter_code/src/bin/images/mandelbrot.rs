@@ -19,7 +19,7 @@ use vulkano::command_buffer::{
     AutoCommandBufferBuilder, CommandBufferUsage, CopyImageToBufferInfo,
 };
 use vulkano::descriptor_set::{PersistentDescriptorSet, WriteDescriptorSet};
-use vulkano::device::{physical::PhysicalDevice, Device, DeviceCreateInfo, QueueCreateInfo};
+use vulkano::device::{Device, DeviceCreateInfo, QueueCreateInfo};
 use vulkano::format::Format;
 use vulkano::image::{view::ImageView, ImageDimensions, StorageImage};
 use vulkano::instance::{Instance, InstanceCreateInfo};
@@ -27,21 +27,30 @@ use vulkano::pipeline::{ComputePipeline, Pipeline, PipelineBindPoint};
 use vulkano::sync::{self, GpuFuture};
 
 pub fn main() {
-    let instance = Instance::new(InstanceCreateInfo::default()).expect("failed to create instance");
+    let library = vulkano::VulkanLibrary::new().expect("no local Vulkan library/DLL");
+    let instance =
+        Instance::new(library, InstanceCreateInfo::default()).expect("failed to create instance");
 
-    let physical = PhysicalDevice::enumerate(&instance)
+    let physical = instance
+        .enumerate_physical_devices()
+        .expect("could not enumerate devices")
         .next()
-        .expect("no device available");
+        .expect("no devices available");
 
-    let queue_family = physical
-        .queue_families()
-        .find(|&q| q.supports_graphics())
-        .expect("couldn't find a graphical queue family");
+    let queue_family_index = physical
+        .queue_family_properties()
+        .iter()
+        .enumerate()
+        .position(|(_, q)| q.queue_flags.graphics)
+        .expect("couldn't find a graphical queue family") as u32;
 
     let (device, mut queues) = Device::new(
         physical,
         DeviceCreateInfo {
-            queue_create_infos: vec![QueueCreateInfo::family(queue_family)],
+            queue_create_infos: vec![QueueCreateInfo {
+                queue_family_index,
+                ..Default::default()
+            }],
             ..Default::default()
         },
     )
@@ -102,7 +111,7 @@ void main() {
             array_layers: 1,
         },
         Format::R8G8B8A8_UNORM,
-        Some(queue.family()),
+        Some(queue.queue_family_index()),
     )
     .unwrap();
 
@@ -116,7 +125,10 @@ void main() {
 
     let buf = CpuAccessibleBuffer::from_iter(
         device.clone(),
-        BufferUsage::all(),
+        BufferUsage {
+            transfer_dst: true,
+            ..Default::default()
+        },
         false,
         (0..1024 * 1024 * 4).map(|_| 0u8),
     )
@@ -124,7 +136,7 @@ void main() {
 
     let mut builder = AutoCommandBufferBuilder::primary(
         device.clone(),
-        queue.family(),
+        queue.queue_family_index(),
         CommandBufferUsage::OneTimeSubmit,
     )
     .unwrap();

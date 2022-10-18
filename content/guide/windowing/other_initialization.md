@@ -10,14 +10,14 @@ swapchain, to avoid any invalid format errors:
 ```rust
 use vulkano::render_pass::RenderPass;
 
-fn get_render_pass(device: Arc<Device>, swapchain: Arc<Swapchain<Window>>) -> Arc<RenderPass> {
+fn get_render_pass(device: Arc<Device>, swapchain: &Arc<Swapchain<Window>>) -> Arc<RenderPass> {
     vulkano::single_pass_renderpass!(
-        device.clone(),
+        device,
         attachments: {
             color: {
                 load: Clear,
                 store: Store,
-                format: swapchain.format(),  // set the format the same as the swapchain
+                format: swapchain.image_format(),  // set the format the same as the swapchain
                 samples: 1,
             }
         },
@@ -30,7 +30,7 @@ fn get_render_pass(device: Arc<Device>, swapchain: Arc<Swapchain<Window>>) -> Ar
 }
 
 // main()
-let render_pass = get_render_pass(device.clone(), swapchain.clone());
+let render_pass = get_render_pass(device.clone(), &swapchain);
 ```
 
 When we only had one image, we only needed to create one framebuffer for it. However, we now
@@ -43,7 +43,7 @@ use vulkano::render_pass::{Framebuffer, FramebufferCreateInfo};
 
 fn get_framebuffers(
     images: &[Arc<SwapchainImage<Window>>],
-    render_pass: Arc<RenderPass>,
+    render_pass: &Arc<RenderPass>,
 ) -> Vec<Arc<Framebuffer>> {
     images
         .iter()
@@ -62,7 +62,7 @@ fn get_framebuffers(
 }
 
 // main()
-let framebuffers = get_framebuffers(&images, render_pass.clone());
+let framebuffers = get_framebuffers(&images, &render_pass);
 ```
 
 We don't need to modify anything in the shaders and the vertex buffer
@@ -161,8 +161,8 @@ fn get_pipeline(
         .input_assembly_state(InputAssemblyState::new())
         .viewport_state(ViewportState::viewport_fixed_scissor_irrelevant([viewport]))
         .fragment_shader(fs.entry_point("main").unwrap(), ())
-        .render_pass(Subpass::from(render_pass.clone(), 0).unwrap())
-        .build(device.clone())
+        .render_pass(Subpass::from(render_pass, 0).unwrap())
+        .build(device)
         .unwrap()
 }
 
@@ -208,18 +208,18 @@ use vulkano::command_buffer::{
 use vulkano::device::Queue;
 
 fn get_command_buffers(
-    device: Arc<Device>,
-    queue: Arc<Queue>,
-    pipeline: Arc<GraphicsPipeline>,
+    device: &Arc<Device>,
+    queue: &Arc<Queue>,
+    pipeline: &Arc<GraphicsPipeline>,
     framebuffers: &Vec<Arc<Framebuffer>>,
-    vertex_buffer: Arc<CpuAccessibleBuffer<[Vertex]>>,
+    vertex_buffer: &Arc<CpuAccessibleBuffer<[Vertex]>>,
 ) -> Vec<Arc<PrimaryAutoCommandBuffer>> {
     framebuffers
         .iter()
         .map(|framebuffer| {
             let mut builder = AutoCommandBufferBuilder::primary(
                 device.clone(),
-                queue.family(),
+                queue.queue_family_index(),
                 CommandBufferUsage::MultipleSubmit,  // don't forget to write the correct buffer usage
             )
             .unwrap();
@@ -247,11 +247,11 @@ fn get_command_buffers(
 
 // main()
 let mut command_buffers = get_command_buffers(
-    device.clone(),
-    queue.clone(),
-    pipeline,
+    &device,
+    &queue,
+    &pipeline,
     &framebuffers,
-    vertex_buffer.clone(),
+    &vertex_buffer,
 );
 ```
 

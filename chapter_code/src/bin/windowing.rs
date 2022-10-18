@@ -19,7 +19,7 @@ use vulkano::command_buffer::{
     AutoCommandBufferBuilder, CommandBufferUsage, PrimaryAutoCommandBuffer, RenderPassBeginInfo,
     SubpassContents,
 };
-use vulkano::device::physical::{PhysicalDevice, PhysicalDeviceType, QueueFamily};
+use vulkano::device::physical::{PhysicalDevice, PhysicalDeviceType};
 use vulkano::device::{Device, DeviceCreateInfo, DeviceExtensions, Queue, QueueCreateInfo};
 use vulkano::image::view::ImageView;
 use vulkano::image::{ImageUsage, SwapchainImage};
@@ -31,7 +31,8 @@ use vulkano::pipeline::GraphicsPipeline;
 use vulkano::render_pass::{Framebuffer, FramebufferCreateInfo, RenderPass, Subpass};
 use vulkano::shader::ShaderModule;
 use vulkano::swapchain::{
-    self, AcquireError, Surface, Swapchain, SwapchainCreateInfo, SwapchainCreationError,
+    self, AcquireError, PresentInfo, Surface, Swapchain, SwapchainCreateInfo,
+    SwapchainCreationError,
 };
 use vulkano::sync::{self, FenceSignalFuture, FlushError, GpuFuture};
 use vulkano_win::VkSurfaceBuild;
@@ -73,27 +74,32 @@ f_color = vec4(1.0, 0.0, 0.0, 1.0);
     }
 }
 
-pub fn select_physical_device<'a>(
-    instance: &'a Arc<Instance>,
-    surface: Arc<Surface<Window>>,
+pub fn select_physical_device(
+    instance: &Arc<Instance>,
+    surface: &Arc<Surface<Window>>,
     device_extensions: &DeviceExtensions,
-) -> (PhysicalDevice<'a>, QueueFamily<'a>) {
-    let (physical_device, queue_family) = PhysicalDevice::enumerate(&instance)
-        .filter(|&p| p.supported_extensions().is_superset_of(&device_extensions))
+) -> (Arc<PhysicalDevice>, u32) {
+    instance
+        .enumerate_physical_devices()
+        .expect("failed to enumerate physical devices")
+        .filter(|p| p.supported_extensions().contains(device_extensions))
         .filter_map(|p| {
-            p.queue_families()
-                .find(|&q| q.supports_graphics() && q.supports_surface(&surface).unwrap_or(false))
-                .map(|q| (p, q))
+            p.queue_family_properties()
+                .iter()
+                .enumerate()
+                .position(|(i, q)| {
+                    q.queue_flags.graphics && p.surface_support(i as u32, surface).unwrap_or(false)
+                })
+                .map(|q| (p, q as u32))
         })
         .min_by_key(|(p, _)| match p.properties().device_type {
             PhysicalDeviceType::DiscreteGpu => 0,
             PhysicalDeviceType::IntegratedGpu => 1,
             PhysicalDeviceType::VirtualGpu => 2,
             PhysicalDeviceType::Cpu => 3,
-            PhysicalDeviceType::Other => 4,
+            _ => 4,
         })
-        .expect("no device available");
-    (physical_device, queue_family)
+        .expect("no device available")
 }
 
 fn get_render_pass(device: Arc<Device>, swapchain: Arc<Swapchain<Window>>) -> Arc<RenderPass> {
@@ -148,24 +154,24 @@ fn get_pipeline(
         .input_assembly_state(InputAssemblyState::new())
         .viewport_state(ViewportState::viewport_fixed_scissor_irrelevant([viewport]))
         .fragment_shader(fs.entry_point("main").unwrap(), ())
-        .render_pass(Subpass::from(render_pass.clone(), 0).unwrap())
-        .build(device.clone())
+        .render_pass(Subpass::from(render_pass, 0).unwrap())
+        .build(device)
         .unwrap()
 }
 
 fn get_command_buffers(
-    device: Arc<Device>,
-    queue: Arc<Queue>,
-    pipeline: Arc<GraphicsPipeline>,
-    framebuffers: &Vec<Arc<Framebuffer>>,
-    vertex_buffer: Arc<CpuAccessibleBuffer<[Vertex]>>,
+    device: &Arc<Device>,
+    queue: &Arc<Queue>,
+    pipeline: &Arc<GraphicsPipeline>,
+    framebuffers: &[Arc<Framebuffer>],
+    vertex_buffer: &Arc<CpuAccessibleBuffer<[Vertex]>>,
 ) -> Vec<Arc<PrimaryAutoCommandBuffer>> {
     framebuffers
         .iter()
         .map(|framebuffer| {
             let mut builder = AutoCommandBufferBuilder::primary(
                 device.clone(),
-                queue.family(),
+                queue.queue_family_index(),
                 CommandBufferUsage::MultipleSubmit,
             )
             .unwrap();
@@ -192,11 +198,15 @@ fn get_command_buffers(
 }
 
 fn main() {
-    let required_extensions = vulkano_win::required_extensions();
-    let instance = Instance::new(InstanceCreateInfo {
-        enabled_extensions: required_extensions,
-        ..Default::default()
-    })
+    let library = vulkano::VulkanLibrary::new().expect("no local Vulkan library/DLL");
+    let required_extensions = vulkano_win::required_extensions(&library);
+    let instance = Instance::new(
+        library,
+        InstanceCreateInfo {
+            enabled_extensions: required_extensions,
+            ..Default::default()
+        },
+    )
     .expect("failed to create instance");
 
     let event_loop = EventLoop::new();
@@ -206,16 +216,19 @@ fn main() {
 
     let device_extensions = DeviceExtensions {
         khr_swapchain: true,
-        ..DeviceExtensions::none()
+        ..DeviceExtensions::empty()
     };
 
-    let (physical_device, queue_family) =
-        select_physical_device(&instance, surface.clone(), &device_extensions);
+    let (physical_device, queue_family_index) =
+        select_physical_device(&instance, &surface, &device_extensions);
 
     let (device, mut queues) = Device::new(
-        physical_device,
+        physical_device.clone(),
         DeviceCreateInfo {
-            queue_create_infos: vec![QueueCreateInfo::family(queue_family)],
+            queue_create_infos: vec![QueueCreateInfo {
+                queue_family_index,
+                ..Default::default()
+            }],
             enabled_extensions: device_extensions, // new
             ..Default::default()
         },
@@ -245,7 +258,10 @@ fn main() {
                 min_image_count: caps.min_image_count,
                 image_format,
                 image_extent: dimensions.into(),
-                image_usage: ImageUsage::color_attachment(),
+                image_usage: ImageUsage {
+                    color_attachment: true,
+                    ..Default::default()
+                },
                 composite_alpha,
                 ..Default::default()
             },
@@ -269,7 +285,10 @@ fn main() {
     };
     let vertex_buffer = CpuAccessibleBuffer::from_iter(
         device.clone(),
-        BufferUsage::vertex_buffer(),
+        BufferUsage {
+            vertex_buffer: true,
+            ..Default::default()
+        },
         false,
         vec![vertex1, vertex2, vertex3].into_iter(),
     )
@@ -292,13 +311,8 @@ fn main() {
         viewport.clone(),
     );
 
-    let mut command_buffers = get_command_buffers(
-        device.clone(),
-        queue.clone(),
-        pipeline,
-        &framebuffers,
-        vertex_buffer.clone(),
-    );
+    let mut command_buffers =
+        get_command_buffers(&device, &queue, &pipeline, &framebuffers, &vertex_buffer);
 
     let mut window_resized = false;
     let mut recreate_swapchain = false;
@@ -349,11 +363,11 @@ fn main() {
                         viewport.clone(),
                     );
                     command_buffers = get_command_buffers(
-                        device.clone(),
-                        queue.clone(),
-                        new_pipeline,
+                        &device,
+                        &queue,
+                        &new_pipeline,
                         &new_framebuffers,
-                        vertex_buffer.clone(),
+                        &vertex_buffer,
                     );
                 }
             }
@@ -393,7 +407,13 @@ fn main() {
                 .join(acquire_future)
                 .then_execute(queue.clone(), command_buffers[image_i].clone())
                 .unwrap()
-                .then_swapchain_present(queue.clone(), swapchain.clone(), image_i)
+                .then_swapchain_present(
+                    queue.clone(),
+                    PresentInfo {
+                        index: image_i,
+                        ..PresentInfo::swapchain(swapchain.clone())
+                    },
+                )
                 .then_signal_fence_and_flush();
 
             fences[image_i] = match future {

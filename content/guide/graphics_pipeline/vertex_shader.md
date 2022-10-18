@@ -4,10 +4,10 @@
 
 The first part of drawing an object with the graphics pipeline is to describe the shape of this
 object. When you think "shape", you may think of squares, circles, etc., but in graphics
-programming the only shapes that we are going to manipulate are triangles.
+programming the most common shapes that one will need to work with are triangles.
 
-> **Note**: Tessellation shaders unlock the possibility to use other polygons, but this is
-> a more advanced topic.
+> **Note**: Tessellation shaders and alternative `PrimitiveTopology` values unlock the possibility 
+> to use other polygons, but this is a more advanced topic.
 
 Each triangle is made of three vertices, and the shape of an object is just a collection of
 vertices linked together to form triangles. For the purpose of this guide, we are only going to
@@ -32,7 +32,7 @@ vulkano::impl_vertex!(Vertex, position);
 
 Our struct contains a `position` field which we will use to store the position of the vertex on
 the image we are drawing to. Being a vectorial renderer, Vulkan doesn't use coordinates in
-pixels. Instead it considers that the image has a width and a height of 2 units, and that the
+pixels. Instead it considers that the image has a width and a height of 2 units (-1.0 to 1.0), and that the
 origin is at the center of the image.
 
 <center><object data="/guide-vertex-input-1.svg"></object></center>
@@ -55,13 +55,16 @@ let vertex3 = Vertex { position: [ 0.5, -0.25] };
 > **Note**: The field that contains the position is named `position`, but note that this name is
 > arbitrary. We will see below how to actually pass that position to the GPU.
 
-Now all we have to do is create a buffer that contains these three vertices. This is the buffer
-that we are going to pass as parameter when we start the drawing operation.
+Now all we have to do is create a buffer that contains these three vertices. This buffer
+will be passed as a parameter when we start the drawing operation.
 
 ```rust
 let vertex_buffer = CpuAccessibleBuffer::from_iter(
     device.clone(),
-    BufferUsage::vertex_buffer(),
+    BufferUsage {
+        vertex_buffer: true,
+        ..Default::default()
+    },
     false,
     vec![vertex1, vertex2, vertex3].into_iter(),
 )
@@ -69,7 +72,7 @@ let vertex_buffer = CpuAccessibleBuffer::from_iter(
 ```
 
 A buffer that contains a collection of vertices is commonly named a *vertex buffer*. Because we
-already know the specific use of this buffer, we can also specify the usage as `BufferUsage::vertex_buffer()`.
+know the specific use of this buffer is for storing vertices, we specify the usage flag `vertex_buffer` is `true`.
 
 > **Note**: Vertex buffers are not special in any way. The term *vertex buffer* indicates the
 > way the programmer intends to use the buffer, and it is not a property of the buffer.

@@ -5,6 +5,9 @@ Now that everything is initialized, let's configure the main loop to actually dr
 First, let's match two additional events:
 
 ```rust
+use winit::event::{Event, WindowEvent};
+use winit::event_loop::ControlFlow;
+
 let mut window_resized = false;
 let mut recreate_swapchain = false;
 
@@ -63,7 +66,7 @@ Event::RedrawEventsCleared => {
             Err(e) => panic!("Failed to recreate swapchain: {:?}", e),
         };
         swapchain = new_swapchain;
-        let new_framebuffers = get_framebuffers(&new_images, render_pass.clone());
+        let new_framebuffers = get_framebuffers(&new_images, &render_pass);
     }
 }
 ```
@@ -88,7 +91,7 @@ if window_resized || recreate_swapchain {
         Err(e) => panic!("Failed to recreate swapchain: {:?}", e),
     };
     swapchain = new_swapchain;
-    let new_framebuffers = get_framebuffers(&new_images, render_pass.clone());
+    let new_framebuffers = get_framebuffers(&new_images, &render_pass);
 
     if window_resized {
         window_resized = false;
@@ -102,11 +105,11 @@ if window_resized || recreate_swapchain {
             viewport.clone(),
         );
         command_buffers = get_command_buffers(
-            device.clone(),
-            queue.clone(),
-            new_pipeline,
+            &device,
+            &queue,
+            &new_pipeline,
             &new_framebuffers,
-            vertex_buffer.clone(),
+            &vertex_buffer,
         );
     }
 }
@@ -150,18 +153,26 @@ if suboptimal {
 The next step is to create the future that will be submitted to the GPU:
 
 ```rust
+use vulkano::swapchain::PresentInfo;
+
 let execution = sync::now(device.clone())
     .join(acquire_future)
     .then_execute(queue.clone(), command_buffers[image_i].clone())
     .unwrap()
-    .then_swapchain_present(queue.clone(), swapchain.clone(), image_i)
+    .then_swapchain_present(
+        queue.clone(),
+        PresentInfo {
+            index: image_i,
+            ..PresentInfo::swapchain(swapchain.clone())
+        },
+    )
     .then_signal_fence_and_flush();
 ```
 
 Like we did in earlier chapters, we start by synchronizing. However, the command buffer can't be executed immediately,
 as it needs to wait for the image to actually become available. To do that,
 we `.join()` with the other future that we got from `acquire_next_image()`, the two representing the moment where we have
-synchronized *and* actually acquired the said image. We can then instruct the gpu to execute our main command buffer
+synchronized *and* actually acquired the said image. We can then instruct the GPU to execute our main command buffer
 as usual (we select it by using the image index).
 
 In the end, we need to *present* the image to the swapchain, telling it that we have finished drawing and the image is
@@ -197,7 +208,7 @@ processing new frames while the GPU is working on older ones.
 
 To do that, we need to save the created fences and reuse them later. Each stored fence will correspond to a new frame that is being
 processed in advance. You can do it with only one fence
-(check Vulkano's [triangle example](https://github.com/vulkano-rs/vulkano/blob/v0.30.0/examples/src/bin/triangle.rs)
+(check Vulkano's [triangle example](https://github.com/vulkano-rs/vulkano/blob/v0.31.0/examples/src/bin/triangle.rs)
 if you want to do something like that). However, here we will use multiple fences (likewise multiple frames in flight), which
 will make easier for you implement any other synchronization technique you want.
 
@@ -268,7 +279,13 @@ let future = previous_future
     .join(acquire_future)
     .then_execute(queue.clone(), command_buffers[image_i].clone())
     .unwrap()
-    .then_swapchain_present(queue.clone(), swapchain.clone(), image_i)
+    .then_swapchain_present(
+        queue.clone(),
+        PresentInfo {
+            index: image_i,
+            ..PresentInfo::swapchain(swapchain.clone())
+        },
+    )
     .then_signal_fence_and_flush();
 ```
 

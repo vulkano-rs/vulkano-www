@@ -20,7 +20,11 @@ just drawn to, and in return the swapchain gives us drawing access to another of
 As you may recall, previously we just selected the first physical device available:
 
 ```rust
-let physical = PhysicalDevice::enumerate(&instance).next().expect("no device available");
+let physical = instance
+    .enumerate_physical_devices()
+    .expect("could not enumerate devices")
+    .next()
+    .expect("no devices available");
 ```
 
 However, some devices may not support swapchain creation or wouldn't be the best option.
@@ -36,7 +40,7 @@ use vulkano::device::DeviceExtensions;
 
 let device_extensions = DeviceExtensions {
     khr_swapchain: true,
-    ..DeviceExtensions::none()
+    ..DeviceExtensions::empty()
 };
 ```
 
@@ -45,10 +49,10 @@ Next, we are going to enumerate all the devices and filter them by supported ext
 ```rust
 use vulkano::device::physical::{PhysicalDevice, PhysicalDeviceType};
 
-PhysicalDevice::enumerate(&instance)
-    .filter(|&p| {
-        p.supported_extensions().is_superset_of(&device_extensions)
-    })
+instance
+    .enumerate_physical_devices()
+    .expect("could not enumerate devices")
+    .filter(|p| p.supported_extensions().contains(&device_extensions))
     // continues bellow
 ```
 
@@ -58,12 +62,16 @@ same time select the first queue family that is suitable:
 
 ```rust
     .filter_map(|p| {
-        p.queue_families()
+        p.queue_family_properties()
+            .iter()
+            .enumerate()
             // Find the first first queue family that is suitable.
-            // If none is found, `None` is returned to `filter_map`, 
+            // If none is found, `None` is returned to `filter_map`,
             // which disqualifies this physical device.
-            .find(|&q| q.supports_graphics() && q.supports_surface(surface).unwrap_or(false))
-            .map(|q| (p, q))
+            .position(|(i, q)| {
+                q.queue_flags.graphics && p.surface_support(i as u32, &surface).unwrap_or(false)
+            })
+            .map(|q| (p, q as u32))
     })
     // continues bellow
 ```
@@ -78,7 +86,11 @@ physical device a score, and pick the device with the lowest ("best") score.
         PhysicalDeviceType::IntegratedGpu => 1,
         PhysicalDeviceType::VirtualGpu => 2,
         PhysicalDeviceType::Cpu => 3,
-        PhysicalDeviceType::Other => 4,
+
+        // Note that there exists `PhysicalDeviceType::Other`, however,
+        // `PhysicalDeviceType` is a non-exhaustive enum. Thus, one should
+        // match wildcard `_` to catch all unknown device types.
+        _ => 4,
     })
     .expect("no device available");
 ```
@@ -89,45 +101,55 @@ In the end, your new function for selecting the best physical device should look
 use std::sync::Arc;
 
 // crop
-use vulkano::device::physical::QueueFamily;
 use vulkano::device::physical::{PhysicalDevice, PhysicalDeviceType};
 use vulkano::device::DeviceExtensions;
 use vulkano::swapchain::Surface;
 use winit::window::Window;
 
-fn select_physical_device<'a>(
-    instance: &'a Arc<Instance>,
-    surface: Arc<Surface<Window>>,
+fn select_physical_device(
+    instance: &Arc<Instance>,
+    surface: &Arc<Surface<Window>>,
     device_extensions: &DeviceExtensions,
-) -> (PhysicalDevice<'a>, QueueFamily<'a>) {
-    let (physical_device, queue_family) = PhysicalDevice::enumerate(&instance)
-        .filter(|&p| p.supported_extensions().is_superset_of(&device_extensions))
+) -> (Arc<PhysicalDevice>, u32) {
+    instance
+        .enumerate_physical_devices()
+        .expect("could not enumerate devices")
+        .filter(|p| p.supported_extensions().contains(&device_extensions))
         .filter_map(|p| {
-            p.queue_families()
-                .find(|&q| q.supports_graphics() && surface.is_supported(q).unwrap_or(false))
-                .map(|q| (p, q))
+            p.queue_family_properties()
+                .iter()
+                .enumerate()
+                // Find the first first queue family that is suitable.
+                // If none is found, `None` is returned to `filter_map`,
+                // which disqualifies this physical device.
+                .position(|(i, q)| {
+                    q.queue_flags.graphics && p.surface_support(i as u32, &surface).unwrap_or(false)
+                })
+                .map(|q| (p, q as u32))
         })
         .min_by_key(|(p, _)| match p.properties().device_type {
             PhysicalDeviceType::DiscreteGpu => 0,
             PhysicalDeviceType::IntegratedGpu => 1,
             PhysicalDeviceType::VirtualGpu => 2,
             PhysicalDeviceType::Cpu => 3,
-            PhysicalDeviceType::Other => 4,
-        })
-        .expect("no device available");
 
-    (physical_device, queue_family)
+            // Note that there exists `PhysicalDeviceType::Other`, however,
+            // `PhysicalDeviceType` is a non-exhaustive enum. Thus, one should
+            // match wildcard `_` to catch all unknown device types.
+            _ => 4,
+        })
+        .expect("no device available")
 }
 
-fn main {
+fn main() {
     // crop
 
     let device_extensions = DeviceExtensions {
         khr_swapchain: true,
-        ..DeviceExtensions::none()
+        ..DeviceExtensions::empty()
     };
 
-    let (physical_device, queue_family) = select_physical_device(&instance, surface.clone(), &device_extensions);
+    let (physical_device, queue_family_index) = select_physical_device(&instance, &surface, &device_extensions);
 
     // crop
 }
@@ -144,9 +166,12 @@ To do that, we need to pass all the previously required extensions:
 use vulkano::device::{Device, DeviceCreateInfo, QueueCreateInfo};
 
 let (device, mut queues) = Device::new(
-    physical_device,
+    physical_device.clone(),
     DeviceCreateInfo {
-        queue_create_infos: vec![QueueCreateInfo::family(queue_family)],
+        queue_create_infos: vec![QueueCreateInfo {
+            queue_family_index,
+            ..Default::default()
+        }],
         enabled_extensions: device_extensions,
         ..Default::default()
     },
@@ -197,7 +222,10 @@ let (swapchain, images) = Swapchain::new(
         min_image_count: caps.min_image_count + 1, // How many buffers to use in the swapchain
         image_format,
         image_extent: dimensions.into(),
-        image_usage: ImageUsage::color_attachment(), // What the images are going to be used for
+        image_usage: ImageUsage {
+            color_attachment: true,  // What the images are going to be used for
+            ..Default::default()
+        },
         composite_alpha,
         ..Default::default()
     },
@@ -209,6 +237,6 @@ It's good to have `min_image_count` be at least one more than the minimal, to gi
 the image queue.
 
 For additional information, check the
-[swapchain documentation](https://docs.rs/vulkano/0.30.0/vulkano/swapchain/index.html#swapchains).
+[swapchain documentation](https://docs.rs/vulkano/0.31.0/vulkano/swapchain/index.html#swapchains).
 
 Next: [Other initialization](/guide/windowing/other-initialization)
