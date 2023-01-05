@@ -16,7 +16,7 @@ equivalent of a CPU thread is a ***queue***. Queues are grouped by **queue famil
 The queue families of a physical device can be enumerated like this:
 
 ```rust
-for family in physical.queue_family_properties() {
+for family in physical_device.queue_family_properties() {
     println!("Found a queue family with {:?} queue(s)", family.queue_count);
 }
 ```
@@ -39,21 +39,21 @@ Vulkan implementation which type of queues we want to use. Queues are grouped in
 which describe their capabilities. Let's locate a queue family that supports graphical operations:
 
 ```rust
-let queue_family_index = physical
+let queue_family_index = physical_device
     .queue_family_properties()
     .iter()
     .enumerate()
-    .position(|(_, q)| q.queue_flags.graphics)
+    .position(|(_queue_family_index, queue_family_properties)| queue_family_properties.queue_flags.graphics)
     .expect("couldn't find a graphical queue family") as u32;
 ```
 
 Once we have the index of a viable queue family, we can use it to create the device:
 
 ```rust
-use vulkano::device::{Device, DeviceCreateInfo, Features, QueueCreateInfo};
+use vulkano::device::{Device, DeviceCreateInfo, QueueCreateInfo};
 
 let (device, mut queues) = Device::new(
-    physical,
+    physical_device,
     DeviceCreateInfo {
         // here we pass the desired queue family to use by index
         queue_create_infos: vec![QueueCreateInfo {

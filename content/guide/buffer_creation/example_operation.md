@@ -7,7 +7,7 @@ What we are going to ask in this example is very simple: we will ask it to copy 
 buffer to another.
 
 > **Note**: You can find the [full source code of this chapter
-> here](https://github.com/vulkano-rs/vulkano-www/blob/master/chapter_code/src/bin/buffer_creation.rs).
+> here](/../chapter_code/src/bin/buffer_creation.rs).
 
 ## Creating the buffers
 
@@ -15,9 +15,11 @@ The first step is to create two `CpuAccessibleBuffer`s: the source and the desti
 was covered in [the previous section](/guide/buffer-creation).
 
 ```rust
+// let memory_allocator = ...
+
 let source_content: Vec<i32> = (0..64).collect();
 let source = CpuAccessibleBuffer::from_iter(
-    device.clone(),
+    &memory_allocator,
     BufferUsage {
         transfer_src: true,
         ..Default::default()
@@ -29,7 +31,7 @@ let source = CpuAccessibleBuffer::from_iter(
 
 let destination_content: Vec<i32> = (0..64).map(|_| 0).collect();
 let destination = CpuAccessibleBuffer::from_iter(
-    device.clone(),
+    &memory_allocator,
     BufferUsage {
         transfer_dst: true,
         ..Default::default()
@@ -45,8 +47,21 @@ from 0 to 63. The `destination_content` iterator produces 64 values that are all
 In other words, once created the source buffer contains sixty-four values ranging from 0 to 63
 while the destination buffer contains sixty-four 0s.
 
-## Command buffers
+## Creating a command allocator
+Just like buffers, you need an allocator to allocate several command buffers, but you cannot use
+a memory allocator. You have to use a [command buffer allocator](https://docs.rs/vulkano/0.32.0/vulkano/command_buffer/allocator/trait.CommandBufferAllocator.html).
+In this case we just used the [Standard](https://docs.rs/vulkano/0.32.0/vulkano/command_buffer/allocator/struct.StandardCommandBufferAllocator.html) one.
+```rust
+use vulkano::command_buffer::allocator::{
+    StandardCommandBufferAllocator, StandardCommandBufferAllocatorCreateInfo,
+};
 
+let command_allocator = StandardCommandBufferAllocator::new(
+    device.clone(),
+    StandardCommandBufferAllocatorCreateInfo::default(),
+);
+```
+# Creating command buffers
 In order to ask the GPU to perform an operation, we need to create a type of object that we
 haven't covered yet, the *command buffer*.
 
@@ -55,13 +70,13 @@ Instead, we need to build a command buffer that contains a list of commands that
 execute.
 
 You can create many command buffers and use them at different times during the program. They can have
-different uses and can do many different things. In this case, we are just going to create for the
+different uses and can do many things. In this case, we are just going to create for the
 operation we are trying to achieve.
 
 Vulkan supports primary and secondary command buffers. Primary command buffers can be sent directly to the GPU
 while secondary command buffers allow you to store functionality that you can reuse multiple times in primary command buffers.
 We won't cover secondary command buffers here, but you can read
-[more about them](https://docs.rs/vulkano/0.31.0/vulkano/command_buffer/index.html).
+[more about them](https://docs.rs/vulkano/0.32.0/vulkano/command_buffer/index.html).
 
 > **Note**: Submitting a command to the GPU can take up to several hundred microseconds, which is
 > why we submit as many things as we can at once.
@@ -76,7 +91,7 @@ We are going to submit the commands to the GPU, so let's create a primary comman
 use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage, CopyBufferInfo};
 
 let mut builder = AutoCommandBufferBuilder::primary(
-    device.clone(),
+    &command_allocator,
     queue_family_index,
     CommandBufferUsage::OneTimeSubmit,
 )
@@ -91,7 +106,7 @@ let command_buffer = builder.build().unwrap();
 
 As you can see, it is very straight-forward. We create a *builder*, add a copy command to it with
 `copy_buffer`, then turn that builder into an actual command buffer with `.build()`. Like we saw in
-[the buffers creation section](/guide/buffer-creation), we call `.clone()` multiple times but we
+[the buffers creation section](/guide/buffer-creation), we call `.clone()` multiple times, but we
 only clone `Arc`s.
 
 One thing to notice is that the `AutoCommandBufferBuilder::primary()` method takes as
@@ -115,7 +130,7 @@ sync::now(device.clone())
 ```
 
 No function in Vulkano immediately sends an operation to the GPU
-(with the exception of some unsafe low-level functions). Instead, `sync::now()` creates a new
+(except some unsafe low-level functions). Instead, `sync::now()` creates a new
 type of object called a *future*, that keeps alive all the resources that will be used by the GPU
 and represents the execution in time of the actual operations.
 
@@ -140,6 +155,8 @@ know whenever the GPU has reached a certain point of execution.
 To do that, let's actually save the future from the above example and wait for the operations to finish:
 
 ```rust
+// let command_buffer = ...
+
 let future = sync::now(device.clone())
     .then_execute(queue.clone(), command_buffer)
     .unwrap()
@@ -148,7 +165,7 @@ let future = sync::now(device.clone())
 ```
 
 Signaling a fence returns a future object called
-[FenceSignalFuture](https://docs.rs/vulkano/0.31.0/vulkano/sync/struct.FenceSignalFuture.html),
+[FenceSignalFuture](https://docs.rs/vulkano/0.32.0/vulkano/sync/struct.FenceSignalFuture.html),
 that has a special method `.wait()`:
 
 ```rust
@@ -161,6 +178,8 @@ Only after this is done can we safely call `destination.read()` and check that o
 let src_content = source.read().unwrap();
 let destination_content = destination.read().unwrap();
 assert_eq!(&*src_content, &*destination_content);
+
+println!("Everything succeeded!");
 ```
 
 Next: [Introduction to compute operations](/guide/compute-intro)

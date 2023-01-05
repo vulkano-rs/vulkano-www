@@ -4,7 +4,7 @@
 
 Before you can start utilizing the Vulkan API, the first thing to do is to create
 an *instance*. An instance specifies the mapping between vulkano and the local Vulkan library.
-As of vulkano version `0.31.0`, the library needs to be explicitly specified by passing a `VulkanLibrary`
+As of vulkano version `0.32.0`, the library needs to be explicitly specified by passing a `VulkanLibrary`
 to the  `Instance` constructor.
 
 For starters, our program will be very simple, so, for now, creating an instance won't need any
@@ -47,7 +47,7 @@ Consequently the best thing to do in practice is to choose one physical device w
 everything:
 
 ```rust
-let physical = instance
+let physical_device = instance
     .enumerate_physical_devices()
     .expect("could not enumerate devices")
     .next()
