@@ -47,7 +47,7 @@ from 0 to 63. The `destination_content` iterator produces 64 values that are all
 In other words, once created the source buffer contains sixty-four values ranging from 0 to 63
 while the destination buffer contains sixty-four 0s.
 
-## Creating a command allocator
+## Creating a command buffer allocator
 Just like buffers, you need an allocator to allocate several command buffers, but you cannot use
 a memory allocator. You have to use a [command buffer allocator](https://docs.rs/vulkano/0.32.0/vulkano/command_buffer/allocator/trait.CommandBufferAllocator.html).
 In this case we just used the [Standard](https://docs.rs/vulkano/0.32.0/vulkano/command_buffer/allocator/struct.StandardCommandBufferAllocator.html) one.
