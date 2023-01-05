@@ -59,9 +59,11 @@ As a preliminary action we are going to create the buffer that will contain the 
 similar to what we already did twice:
 
 ```rust
+// let memory_allocator = ...
+
 let data_iter = 0..65536;
 let data_buffer =
-    CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage {
+    CpuAccessibleBuffer::from_iter(&memory_allocator, BufferUsage {
         storage_buffer: true,
         ..Default::default()
     }, false, data_iter)
