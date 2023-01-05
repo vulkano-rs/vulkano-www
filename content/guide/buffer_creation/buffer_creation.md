@@ -63,7 +63,7 @@ its constructor will result in an error. For the sake of the example, we just cr
 The third parameter indicates if the buffer should be CPU cached. This should rarely be true for most
 use cases, but in some cases where the application is writing data to the GPU through this buffer continuously,
 setting this parameter to true may yield some performance gain. This parameter should not be true if
-the user intends to read results from the GPU from this buffer than GPU changes may not reflect.
+the user intends to read results from the GPU from this buffer as GPU changes may not reflect.
 
 Finally, the fourth parameter is the content of the buffer. Here we create a buffer
 that contains a single integer with the value `12`.

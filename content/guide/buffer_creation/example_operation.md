@@ -7,7 +7,7 @@ What we are going to ask in this example is very simple: we will ask it to copy 
 buffer to another.
 
 > **Note**: You can find the [full source code of this chapter
-> here](/../chapter_code/src/bin/buffer_creation.rs).
+> here](https://github.com/vulkano-rs/vulkano-www/blob/master/chapter_code/src/bin/buffer_creation.rs).
 
 ## Creating the buffers
 
