@@ -56,7 +56,7 @@ use vulkano::command_buffer::allocator::{
     StandardCommandBufferAllocator, StandardCommandBufferAllocatorCreateInfo,
 };
 
-let command_allocator = StandardCommandBufferAllocator::new(
+let command_buffer_allocator = StandardCommandBufferAllocator::new(
     device.clone(),
     StandardCommandBufferAllocatorCreateInfo::default(),
 );
