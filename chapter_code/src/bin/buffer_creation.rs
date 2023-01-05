@@ -89,7 +89,7 @@ fn main() {
     );
 
     let mut builder = AutoCommandBufferBuilder::primary(
-        &command_allocator,
+        &command_buffer_allocator,
         queue_family_index,
         CommandBufferUsage::OneTimeSubmit,
     )
