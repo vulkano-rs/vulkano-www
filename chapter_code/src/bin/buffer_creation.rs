@@ -83,7 +83,7 @@ fn main() {
     )
     .expect("failed to create destination buffer");
 
-    let command_allocator = StandardCommandBufferAllocator::new(
+    let command_buffer_allocator = StandardCommandBufferAllocator::new(
         device.clone(),
         StandardCommandBufferAllocatorCreateInfo::default(),
     );
