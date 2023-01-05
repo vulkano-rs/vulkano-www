@@ -7,7 +7,7 @@ This is done in two steps:
 
 - First we write the source code of the program in a programming language called *GLSL*. Vulkano
   will compile the GLSL code at compile-time into an intermediate representation called *SPIR-V*.
-- At runtime we pass this *SPIR-V* to the Vulkan implementation, which in turn converts it into
+- At runtime we pass this *SPIR-V* to the Vulkan implementation (GPU driver), which in turn converts it into
   its own implementation-specific format.
 
 <center><object data="/guide-compute-pipeline-1.svg"></object></center>
@@ -26,7 +26,7 @@ many programming languages, the easiest way to learn GLSL is by looking at examp
 Let's take a look at some GLSL that takes each element of a buffer and multiplies it by 12:
 
 ```glsl
-#version 450
+#version 460
 
 layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
 
@@ -43,12 +43,14 @@ void main() {
 Let's break it down a bit.
 
 ```glsl
-#version 450
+#version 460
 ```
 
 The first line indicates which version of GLSL to use. Since GLSL was already the shading language
-of the OpenGL API (Vulkan's predecessor), we are in fact already at the version 4.50 of the
+of the OpenGL API (Vulkan's predecessor), we are in fact already at the version 4.60 of the
 language. You should always include this line at the start of every shader.
+
+> **Note**: You can use an older version for compatibility with older GPUs and Vulkan implementations.
 
 ```glsl
 layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
@@ -120,7 +122,7 @@ To use `vulkano-shaders`, we first have to add a dependency:
 
 ```toml
 # Notice that it uses the same version as vulkano
-vulkano-shaders = "0.31.0"
+vulkano-shaders = "0.32.0"
 ```
 NOTE: `vulkano-shaders` uses the crate `shaderc-sys` for the actual GLSL compilation step. 
 
@@ -133,7 +135,7 @@ mod cs {
     vulkano_shaders::shader!{
         ty: "compute",
         src: "
-#version 450
+#version 460
 
 layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
 
@@ -162,7 +164,7 @@ This feeds the shader to the Vulkan implementation. The last step to perform at 
 create a ***compute pipeline*** object from that shader. This is the object that actually describes
 the compute operation that we are going to perform. We won't cover the last three parameters, but
 you can search about them
-[here](https://docs.rs/vulkano/0.31.0/vulkano/pipeline/compute/struct.ComputePipeline.html).
+[here](https://docs.rs/vulkano/0.32.0/vulkano/pipeline/compute/struct.ComputePipeline.html).
 
 ```rust
 use vulkano::pipeline::ComputePipeline;
