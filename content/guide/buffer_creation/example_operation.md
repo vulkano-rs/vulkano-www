@@ -91,7 +91,7 @@ We are going to submit the commands to the GPU, so let's create a primary comman
 use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage, CopyBufferInfo};
 
 let mut builder = AutoCommandBufferBuilder::primary(
-    &command_allocator,
+    &command_buffer_allocator,
     queue_family_index,
     CommandBufferUsage::OneTimeSubmit,
 )
