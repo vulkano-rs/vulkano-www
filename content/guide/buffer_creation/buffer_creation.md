@@ -45,7 +45,8 @@ let buffer = CpuAccessibleBuffer::from_data(
     },
     false,
     data,
-).expect("failed to create buffer");
+)
+.expect("failed to create buffer");
 ```
 
 We have to indicate several things when creating the buffer. The first parameter is the device
@@ -104,7 +105,8 @@ let buffer = CpuAccessibleBuffer::from_data(
     },
     false,
     data,
-).unwrap();
+)
+.unwrap();
 ```
 
 > **Note**: While you can put any type that implements these traits in a buffer, using a type that doesn't implement
@@ -133,7 +135,8 @@ let buffer = CpuAccessibleBuffer::from_iter(
     },
     false,
     iter,
-).unwrap();
+)
+.unwrap();
 ```
 
 ## Reading and writing the contents of a buffer
