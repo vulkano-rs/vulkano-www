@@ -9,7 +9,7 @@ layout(set = 0, binding = 0) buffer Data {
 } buf;
 ```
 
-In Vulkan, the buffers that a compute pipeline needs to access must be bound to what are called
+In Vulkan, the buffers that a Compute pipeline needs to access must be bound to what are called
 *descriptor*s. The code above declares such a descriptor.
 
 > **Note**: A descriptor can contain a buffer, but also other types that we haven't covered yet:
@@ -22,15 +22,15 @@ GLSL code indicates that this descriptor is assigned to binding 0 in the set 0. 
 and set indices are 0-based.
 
 What we declared in the GLSL code is actually not a descriptor set, but only a slot for a
-descriptor set. Before we can invoke the compute pipeline, we first need to bind an actual
+descriptor set. Before we can invoke the Compute pipeline, we first need to bind an actual
 descriptor set to that slot.
 
-<center><object data="/guide-descriptor-sets-1.svg"></object></center>
+<div style="text-align: center;"><object data="/guide-descriptor-sets-1.svg"></object></div>
 
 ## Creating a descriptor set
 
 Just like there exist multiple kinds of buffers, there also exist multiple different structs that
-all represent a descriptor set.
+all represent a descriptor set. And surely, we also need an allocator for them.
 
 For our application, we are going to use a `PersistentDescriptorSet`. When creating this descriptor
 set, we attach to it the result buffer wrapped in a `WriteDescriptorSet`. This object will describe
@@ -39,10 +39,19 @@ how will the buffer be written:
 ```rust
 use vulkano::pipeline::Pipeline;
 use vulkano::descriptor_set::{PersistentDescriptorSet, WriteDescriptorSet};
+use vulkano::descriptor_set::allocator::StandardDescriptorSetAllocator;
 
-let layout = compute_pipeline.layout().set_layouts().get(0).unwrap();
-let set = PersistentDescriptorSet::new(
-    layout.clone(),
+let descriptor_set_allocator = StandardDescriptorSetAllocator::new(device.clone());
+let pipeline_layout = compute_pipeline.layout();
+let descriptor_set_layouts = pipeline_layout.set_layouts();
+
+let descriptor_set_layout_index = 0;
+let descriptor_set_layout = descriptor_set_layouts
+    .get(descriptor_set_layout_index)
+    .unwrap();
+let descriptor_set = PersistentDescriptorSet::new(
+    &descriptor_set_allocator,
+    descriptor_set_layout.clone(),
     [WriteDescriptorSet::buffer(0, data_buffer.clone())], // 0 is the binding
 )
 .unwrap();
@@ -63,5 +72,5 @@ for `compute_pipeline`, cloning `data_buffer` only clones an `Arc` and isn't exp
 
 > **Note**: `data_buffer` was created in [the introduction](/guide/compute-intro).
 
-Now that we have a compute pipeline and a descriptor set to bind to it, we can start our operation.
+Now that we have a Compute pipeline and a descriptor set to bind to it, we can start our operation.
 This is covered in [the next section](/guide/dispatch).

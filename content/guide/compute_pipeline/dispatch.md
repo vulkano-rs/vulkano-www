@@ -7,28 +7,38 @@ Creating a command buffer is similar to [the example operation in a previous
 section](/guide/example-operation).
 
 ```rust
+use vulkano::command_buffer::allocator::{
+    StandardCommandBufferAllocator, StandardCommandBufferAllocatorCreateInfo,
+};
 use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage};
 use vulkano::pipeline::PipelineBindPoint;
 
-let mut builder = AutoCommandBufferBuilder::primary(
+let command_buffer_allocator = StandardCommandBufferAllocator::new(
     device.clone(),
+    StandardCommandBufferAllocatorCreateInfo::default(),
+);
+
+let mut command_buffer_builder = AutoCommandBufferBuilder::primary(
+    &command_buffer_allocator,
     queue.queue_family_index(),
     CommandBufferUsage::OneTimeSubmit,
 )
 .unwrap();
 
-builder
+let work_group_counts = [1024, 1, 1];
+
+command_buffer_builder
     .bind_pipeline_compute(compute_pipeline.clone())
     .bind_descriptor_sets(
         PipelineBindPoint::Compute,
         compute_pipeline.layout().clone(),
-        0, // 0 is the index of our set
-        set,
+        descriptor_set_layout_index as u32,
+        descriptor_set,
     )
-    .dispatch([1024, 1, 1])
+    .dispatch(work_group_counts)
     .unwrap();
 
-let command_buffer = builder.build().unwrap();
+let command_buffer = command_buffer_builder.build().unwrap();
 ```
 
 First, we bind the pipeline and then the *descriptor set*s, indicating the type of set, the layout

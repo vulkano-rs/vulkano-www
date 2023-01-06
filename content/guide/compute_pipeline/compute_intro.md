@@ -10,7 +10,7 @@ mathematical operation.
 The instructions that a GPU can execute are often limited, but they can operate on a lot of
 data at once. You can, for example, instruct the GPU to multiply thirty-two values by a constant,
 in approximately the same time that a CPU would take to multiply a single value by that constant
-(ignoring the overhead of transfering data between the two devices).
+(ignoring the overhead of transferring data between the two devices).
 
 This is what makes GPUs very good at parallel computations which require executing the same
 sequence of operation on multiple values. While a CPU would perform this sequence on each value one
@@ -61,17 +61,23 @@ similar to what we already did twice:
 ```rust
 // let memory_allocator = ...
 
-let data_iter = 0..65536;
-let data_buffer =
-    CpuAccessibleBuffer::from_iter(&memory_allocator, BufferUsage {
+let data_iter = 0..65536u32;
+let data_buffer = CpuAccessibleBuffer::from_iter(
+    &memory_allocator,
+    BufferUsage {
         storage_buffer: true,
         ..Default::default()
-    }, false, data_iter)
-    .expect("failed to create buffer");
+    },
+    false,
+    data_iter,
+)
+.expect("failed to create buffer");
 ```
 
 The `data_buffer` buffer now contains the data before the transformation, and we are going to
 perform the calculation on each element.
+Although notice that we're using `storage_buffer` usage this time, since the buffer will be used
+in the compute shader.
 
 [The next section of the guide](/guide/compute-pipeline) will indicate how to actually code this
 operation.
