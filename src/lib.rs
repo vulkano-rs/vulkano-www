@@ -27,18 +27,16 @@ where
         rouille::content_encoding::apply(
             &request,
             rouille::log(request, io::stdout(), || {
-                {
-                    let mut r = rouille::match_assets(request, "./static");
-                    if r.is_success() {
-                        r.headers.push((
-                            "Cache-Control".into(),
-                            format!("max-age={}", 2 * 60 * 60).into(),
-                        ));
-                        return r;
-                    }
-                }
-
-                routes(request)
+                let response = rouille::match_assets(request, "./static");
+                response
+                    .is_success()
+                    .then(|| {
+                        response.with_additional_header(
+                            "Cache-Control",
+                            format!("max-age={}", 2 * 60 * 60),
+                        )
+                    })
+                    .unwrap_or_else(|| routes(request))
             }),
         )
     });
