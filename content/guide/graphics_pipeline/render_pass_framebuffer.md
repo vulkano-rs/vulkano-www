@@ -27,19 +27,20 @@ multiple attachments, and with various micro-optimizations. Vulkano's API is sui
 simple cases and the complex usages, which is why it may look complex at first.
 
 ```rust
-let render_pass = vulkano::single_pass_renderpass!(device.clone(),
+let render_pass = vulkano::single_pass_renderpass!(
+    device.clone(),
     attachments: {
         color: {
             load: Clear,
             store: Store,
             format: Format::R8G8B8A8_UNORM,
             samples: 1,
-        }
+        },
     },
     pass: {
         color: [color],
-        depth_stencil: {}
-    }
+        depth_stencil: {},
+    },
 )
 .unwrap();
 ```

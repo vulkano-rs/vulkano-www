@@ -39,7 +39,7 @@ let command_buffer = builder.build().unwrap();
 
 ## Normalized components
 
-[The `ClearColorValue` enum](https://docs.rs/vulkano/0.31.0/vulkano/format/enum.ClearColorValue.html) indicates
+[The `ClearColorValue` enum](https://docs.rs/vulkano/0.33.0/vulkano/format/enum.ClearColorValue.html) indicates
 which color to fill the image with. Depending on the format of the image, we have to use the right
 enum variant of `ClearValue`.
 

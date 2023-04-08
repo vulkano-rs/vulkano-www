@@ -39,11 +39,15 @@ Vulkan implementation which type of queues we want to use. Queues are grouped in
 which describe their capabilities. Let's locate a queue family that supports graphical operations:
 
 ```rust
+use vulkano::device::QueueFlags;
+
 let queue_family_index = physical_device
     .queue_family_properties()
     .iter()
     .enumerate()
-    .position(|(_queue_family_index, queue_family_properties)| queue_family_properties.queue_flags.graphics)
+    .position(|(_queue_family_index, queue_family_properties)| {
+        queue_family_properties.queue_flags.contains(QueueFlags::GRAPHICS)
+    })
     .expect("couldn't find a graphical queue family") as u32;
 ```
 

@@ -59,16 +59,17 @@ As a preliminary action we are going to create the buffer that will contain the 
 similar to what we already did twice:
 
 ```rust
-// let memory_allocator = ...
-
 let data_iter = 0..65536u32;
-let data_buffer = CpuAccessibleBuffer::from_iter(
+let data_buffer = Buffer::from_iter(
     &memory_allocator,
-    BufferUsage {
-        storage_buffer: true,
+    BufferCreateInfo {
+        usage: BufferUsage::STORAGE_BUFFER,
         ..Default::default()
     },
-    false,
+    AllocationCreateInfo {
+        usage: MemoryUsage::Upload,
+        ..Default::default()
+    },
     data_iter,
 )
 .expect("failed to create buffer");
@@ -76,7 +77,7 @@ let data_buffer = CpuAccessibleBuffer::from_iter(
 
 The `data_buffer` buffer now contains the data before the transformation, and we are going to
 perform the calculation on each element.
-Although notice that we're using `storage_buffer` usage this time, since the buffer will be used
+Although notice that we're using `STORAGE_BUFFER` usage this time, since the buffer will be used
 in the compute shader.
 
 [The next section of the guide](/guide/compute-pipeline) will indicate how to actually code this

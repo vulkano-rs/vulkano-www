@@ -1,11 +1,11 @@
 # Other initialization
 
-Now that we have a swapchain to work with, let's add all the missing Vulkan objects
-(same as in the previous chapter example) and modify them as needed. Let's also, for clarity,
-move some of them to separate functions.
+Now that we have a swapchain to work with, let's add all the missing Vulkan objects (same as in the 
+previous chapter example) and modify them as needed. Let's also, for clarity, move some of them to 
+separate functions.
 
-In the render pass, let's configure it to always use the same format as the
-swapchain, to avoid any invalid format errors:
+In the render pass, let's configure it to always use the same format as the swapchain, to avoid any 
+invalid format errors:
 
 ```rust
 use vulkano::render_pass::RenderPass;
@@ -17,14 +17,14 @@ fn get_render_pass(device: Arc<Device>, swapchain: &Arc<Swapchain<Window>>) -> A
             color: {
                 load: Clear,
                 store: Store,
-                format: swapchain.image_format(),  // set the format the same as the swapchain
+                format: swapchain.image_format(), // set the format the same as the swapchain
                 samples: 1,
-            }
+            },
         },
         pass: {
             color: [color],
-            depth_stencil: {}
-        }
+            depth_stencil: {},
+        },
     )
     .unwrap()
 }
@@ -33,8 +33,8 @@ fn get_render_pass(device: Arc<Device>, swapchain: &Arc<Swapchain<Window>>) -> A
 let render_pass = get_render_pass(device.clone(), &swapchain);
 ```
 
-When we only had one image, we only needed to create one framebuffer for it. However, we now
-need to create a different framebuffer for each of the images:
+When we only had one image, we only needed to create one framebuffer for it. However, we now need 
+to create a different framebuffer for each of the images:
 
 ```rust
 use vulkano::image::view::ImageView;
@@ -65,17 +65,18 @@ fn get_framebuffers(
 let framebuffers = get_framebuffers(&images, &render_pass);
 ```
 
-We don't need to modify anything in the shaders and the vertex buffer
-(we are using the same triangle), so let's just leave everything as it is,
-only changing the structure a bit:
+We don't need to modify anything in the shaders and the vertex buffer (we are using the same 
+triangle), so let's just leave everything as it is, only changing the structure a bit:
 
 ```rust
-use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
-use bytemuck::{Pod, Zeroable};
+use vulkano::buffer::{Buffer, BufferContents, BufferCreateInfo, BufferUsage};
+use vulkano::memory::allocator::AllocationCreateInfo;
+use vulkano::pipeline::graphics::vertex_input::Vertex;
 
+#[derive(BufferContents, Vertex)]
 #[repr(C)]
-#[derive(Default, Copy, Clone, Zeroable, Pod)]
-struct Vertex {
+struct MyVertex {
+    #[format(R32G32_SFLOAT)]
     position: [f32; 2],
 }
 
@@ -83,13 +84,14 @@ mod vs {
     vulkano_shaders::shader! {
         ty: "vertex",
         src: "
-#version 450
+            #version 460
 
-layout(location = 0) in vec2 position;
+            layout(location = 0) in vec2 position;
 
-void main() {
-    gl_Position = vec4(position, 0.0, 1.0);
-}"
+            void main() {
+                gl_Position = vec4(position, 0.0, 1.0);
+            }
+        ",
     }
 }
 
@@ -97,13 +99,14 @@ mod fs {
     vulkano_shaders::shader! {
         ty: "fragment",
         src: "
-#version 450
+            #version 460
 
-layout(location = 0) out vec4 f_color;
+            layout(location = 0) out vec4 f_color;
 
-void main() {
-    f_color = vec4(1.0, 0.0, 0.0, 1.0);
-}"
+            void main() {
+                f_color = vec4(1.0, 0.0, 0.0, 1.0);
+            }
+        ",
     }
 }
 ```
@@ -112,22 +115,26 @@ void main() {
 fn main() {
     // crop
 
-    vulkano::impl_vertex!(Vertex, position);
-
-    let vertex1 = Vertex {
+    let vertex1 = MyVertex {
         position: [-0.5, -0.5],
     };
-    let vertex2 = Vertex {
+    let vertex2 = MyVertex {
         position: [0.0, 0.5],
     };
-    let vertex3 = Vertex {
+    let vertex3 = MyVertex {
         position: [0.5, -0.25],
     };
-    let vertex_buffer = CpuAccessibleBuffer::from_iter(
-        device.clone(),
-        BufferUsage::vertex_buffer(),
-        false,
-        vec![vertex1, vertex2, vertex3].into_iter(),
+    let vertex_buffer = Buffer::from_iter(
+        &memory_allocator,
+        BufferCreateInfo {
+            usage: BufferUsage::VERTEX_BUFFER,
+            ..Default::default()
+        },
+        AllocationCreateInfo {
+            usage: MemoryUsage::Upload,
+            ..Default::default()
+        },
+        vec![vertex1, vertex2, vertex3],
     )
     .unwrap();
 
@@ -187,16 +194,16 @@ fn main() {
 }
 ```
 
-Currently the viewport state is set to `fixed_scissor_irrelevant`, meaning
-that it will be only using one fixed viewport. Because of this, we will need to recreate
-the pipeline every time the window gets resized (the viewport changes). If you expect the
-window to be resized many times, you can set the pipeline viewport to a dynamic state, using
+Currently the viewport state is set to `fixed_scissor_irrelevant`, meaning that it will be only 
+using one fixed viewport. Because of this, we will need to recreate the pipeline every time the 
+window gets resized (the viewport changes). If you expect the window to be resized many times, you 
+can set the pipeline viewport to a dynamic state, using
 `ViewportState::viewport_dynamic_scissor_irrelevant()`, at a cost of a bit of performance.
 
-Let's move now to the command buffers. In this example we are going to draw the same triangle
-over and over, so we can create a command buffer and call it multiple times. However, because
-we now also have multiple framebuffers, we will have multiple command buffers as well,
-one for each framebuffer. Let's put everything nicely into a function:
+Let's move now to the command buffers. In this example we are going to draw the same triangle over 
+and over, so we can create a command buffer and call it multiple times. However, because we now 
+also have multiple framebuffers, we will have multiple command buffers as well, one for each 
+framebuffer. Let's put everything nicely into a function:
 
 ```rust
 use vulkano::buffer::TypedBufferAccess;
@@ -212,7 +219,7 @@ fn get_command_buffers(
     queue: &Arc<Queue>,
     pipeline: &Arc<GraphicsPipeline>,
     framebuffers: &Vec<Arc<Framebuffer>>,
-    vertex_buffer: &Arc<CpuAccessibleBuffer<[Vertex]>>,
+    vertex_buffer: &Arc<CpuAccessibleBuffer<[MyVertex]>>,
 ) -> Vec<Arc<PrimaryAutoCommandBuffer>> {
     framebuffers
         .iter()
@@ -220,7 +227,7 @@ fn get_command_buffers(
             let mut builder = AutoCommandBufferBuilder::primary(
                 device.clone(),
                 queue.queue_family_index(),
-                CommandBufferUsage::MultipleSubmit,  // don't forget to write the correct buffer usage
+                CommandBufferUsage::MultipleSubmit, // don't forget to write the correct buffer usage
             )
             .unwrap();
 
@@ -255,8 +262,8 @@ let mut command_buffers = get_command_buffers(
 );
 ```
 
-If you have set your pipeline to use a dynamic viewport, don't forget to then
-set the viewport in the command buffers, by using `.set_viewport(0, [viewport.clone()])`.
+If you have set your pipeline to use a dynamic viewport, don't forget to then set the viewport in 
+the command buffers, by using `.set_viewport(0, [viewport.clone()])`.
 
 In the end, the structure of your `main` function should look something like this:
 
@@ -284,10 +291,10 @@ fn main() {
 }
 ```
 
-If you feel lost in all the code, feel free to take a look at
-[full source code here](https://github.com/vulkano-rs/vulkano-www/blob/master/chapter_code/src/bin/windowing.rs).
+If you feel lost in all the code, feel free to take a look at [full source code 
+here](https://github.com/vulkano-rs/vulkano-www/blob/master/chapter_code/src/bin/windowing.rs).
 
-The initialization is finally complete! Next, we will start working on the event loop and programming
-the functionality of each frame.
+The initialization is finally complete! Next, we will start working on the event loop and 
+programming the functionality of each frame.
 
 Next: [Event handling](/guide/windowing/event-handling)

@@ -13,26 +13,26 @@ Each triangle is made of three vertices, and the shape of an object is just a co
 vertices linked together to form triangles. For the purpose of this guide, we are only going to
 draw a single triangle first.
 
-The first step to describe a shape with vulkano is to create a struct named `Vertex` (the actual
+The first step to describe a shape with vulkano is to create a struct named `MyVertex` (the actual
 name doesn't matter) whose purpose is to describe the properties of a single vertex. Once this is
 done, the shape of our triangle is going to be a buffer whose content is an array of three
-`Vertex` objects.
+`MyVertex` objects.
 
 ```rust
-use bytemuck::{Pod, Zeroable};
+use vulkano::buffer::BufferContents;
+use vulkano::pipeline::graphics::vertex_input::Vertex;
 
+#[derive(BufferContents, Vertex)]
 #[repr(C)]
-#[derive(Default, Copy, Clone, Zeroable, Pod)]
-struct Vertex {
+struct MyVertex {
+    #[format(R32G32_SFLOAT)]
     position: [f32; 2],
 }
-
-vulkano::impl_vertex!(Vertex, position);
 ```
 
-Our struct contains a `position` field which we will use to store the position of the vertex on
-the image we are drawing to. Being a vectorial renderer, Vulkan doesn't use coordinates in
-pixels. Instead it considers that the image has a width and a height of 2 units (-1.0 to 1.0), and that the
+Our struct contains a `position` field which we will use to store the position of the vertex on the 
+image we are drawing to. Being a vectorial renderer, Vulkan doesn't use coordinates in pixels. 
+Instead it considers that the image has a width and a height of 2 units (-1.0 to 1.0), and that the
 origin is at the center of the image.
 
 <center><object data="/guide-vertex-input-1.svg"></object></center>
@@ -47,9 +47,9 @@ for example this one:
 Which translates into this code:
 
 ```rust
-let vertex1 = Vertex { position: [-0.5, -0.5] };
-let vertex2 = Vertex { position: [ 0.0,  0.5] };
-let vertex3 = Vertex { position: [ 0.5, -0.25] };
+let vertex1 = MyVertex { position: [-0.5, -0.5] };
+let vertex2 = MyVertex { position: [ 0.0,  0.5] };
+let vertex3 = MyVertex { position: [ 0.5, -0.25] };
 ```
 
 > **Note**: The field that contains the position is named `position`, but note that this name is
@@ -59,23 +59,27 @@ Now all we have to do is create a buffer that contains these three vertices. Thi
 will be passed as a parameter when we start the drawing operation.
 
 ```rust
-let vertex_buffer = CpuAccessibleBuffer::from_iter(
-    device.clone(),
-    BufferUsage {
-        vertex_buffer: true,
+let vertex_buffer = Buffer::from_iter(
+    &memory_allocator,
+    BufferCreateInfo {
+        usage: BufferUsage::VERTEX_BUFFER,
         ..Default::default()
     },
-    false,
-    vec![vertex1, vertex2, vertex3].into_iter(),
+    AllocationCreateInfo {
+        usage: MemoryUsage::Upload,
+        ..Default::default()
+    },
+    vec![vertex1, vertex2, vertex3],
 )
 .unwrap();
 ```
 
 A buffer that contains a collection of vertices is commonly named a *vertex buffer*. Because we
-know the specific use of this buffer is for storing vertices, we specify the usage flag `vertex_buffer` is `true`.
+know the specific use of this buffer is for storing vertices, we specify the usage flag 
+`VERTEX_BUFFER`.
 
-> **Note**: Vertex buffers are not special in any way. The term *vertex buffer* indicates the
-> way the programmer intends to use the buffer, and it is not a property of the buffer.
+> **Note**: Vertex buffers are not special in any way. The term *vertex buffer* indicates the way 
+> the programmer intends to use the buffer, and it is not a property of the buffer.
 
 ## Vertex shader
 
@@ -85,7 +89,7 @@ by one and call a ***vertex shader*** on them.
 Here is what the source code of a vertex shader looks like:
 
 ```glsl
-#version 450
+#version 460
 
 layout(location = 0) in vec2 position;
 
@@ -94,8 +98,9 @@ void main() {
 }
 ```
 
-The line `layout(location = 0) in vec2 position;` declares that each vertex has an *attribute* named
-`position` and of type `vec2`. This corresponds to the definition of the `Vertex` struct we created.
+The line `layout(location = 0) in vec2 position;` declares that each vertex has an *attribute* 
+named `position` and of type `vec2`. This corresponds to the definition of the `MyVertex` struct we 
+created.
 
 > **Note**: Calling the `impl_vertex!` macro is what makes it possible for vulkano to build the
 > link between the content of the buffer and the input of the vertex shader.

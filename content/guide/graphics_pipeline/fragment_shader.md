@@ -8,8 +8,8 @@ modified on the final image.
 > GPU considers that the whole pixel is inside.
 
 <center>
-    <object data='/guide-fragment-shader-1.svg'>
-            alt='Illustration of which pixels are inside the triangle'
+    <object data='/guide-fragment-shader-1.svg'
+            alt='Illustration of which pixels are inside the triangle'>
     </object>
 </center>
 
@@ -20,7 +20,7 @@ our draw operation.
 Here is what an example fragment shader looks like:
 
 ```glsl
-#version 450
+#version 460
 
 layout(location = 0) out vec4 f_color;
 

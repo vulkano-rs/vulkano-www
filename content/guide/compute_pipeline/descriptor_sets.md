@@ -29,8 +29,7 @@ descriptor set to that slot.
 
 ## Creating a descriptor set
 
-Just like there exist multiple kinds of buffers, there also exist multiple different structs that
-all represent a descriptor set. And surely, we also need an allocator for them.
+Just like for buffers and command buffers, we also need an allocator for descriptor sets.
 
 For our application, we are going to use a `PersistentDescriptorSet`. When creating this descriptor
 set, we attach to it the result buffer wrapped in a `WriteDescriptorSet`. This object will describe
@@ -57,10 +56,10 @@ let descriptor_set = PersistentDescriptorSet::new(
 .unwrap();
 ```
 
-In order to create a descriptor set, you'll need to know the layout that it is targeting. We do this by using the "Pipeline" trait
-and calling `.layout()` on our pipeline to obtain the pipeline's layout. Next we'll fetch the layout
-specific to the pass that we want to target by using `.set_layouts().get(0)` where zero indicates the
-first index of the pass that we are targeting.
+In order to create a descriptor set, you'll need to know the layout that it is targeting. We do 
+this by using the "Pipeline" trait and calling `.layout()` on our pipeline to obtain the pipeline's 
+layout. Next we'll fetch the layout specific to the pass that we want to target by using 
+`.set_layouts().get(0)` where zero indicates the first index of the pass that we are targeting.
 
 Once you have created a descriptor set, you may also use it with other pipelines, as long as the
 bindings' types match those the pipelines' shaders expect. But Vulkan requires that you provide a
