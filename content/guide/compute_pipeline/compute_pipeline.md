@@ -57,7 +57,7 @@ language. You should always include this line at the start of every shader.
 layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
 ```
 
-We want to invoke the Compute shader 65536 times in total, once for each element in the buffer.
+We want to invoke the compute shader 65536 times in total, once for each element in the buffer.
 But in practice we are going to ask the GPU to spawn 1024 ***work groups***, where each work group
 has a ***local size*** of 64. This line of code declares what the *local size* is. Each element of
 the local size corresponds to one invocation of the shader, which gives us 1024 * 64 = 65536
@@ -169,7 +169,7 @@ let shader = cs::load(device.clone())
 ```
 
 This feeds the shader to the Vulkan implementation. The last step to perform at runtime is to
-create a ***Compute pipeline*** object from that shader. This is the object that actually describes
+create a ***compute pipeline*** object from that shader. This is the object that actually describes
 the compute operation that we are going to perform. We won't cover the last three parameters, but
 you can search about them
 [here](https://docs.rs/vulkano/0.33.0/vulkano/pipeline/compute/struct.ComputePipeline.html).
