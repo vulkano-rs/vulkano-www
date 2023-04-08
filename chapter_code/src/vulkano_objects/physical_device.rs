@@ -1,14 +1,13 @@
 use std::sync::Arc;
 
 use vulkano::device::physical::{PhysicalDevice, PhysicalDeviceType};
-use vulkano::device::DeviceExtensions;
+use vulkano::device::{DeviceExtensions, QueueFlags};
 use vulkano::instance::Instance;
 use vulkano::swapchain::Surface;
-use winit::window::Window;
 
 pub fn select_physical_device(
     instance: &Arc<Instance>,
-    surface: Arc<Surface<Window>>,
+    surface: Arc<Surface>,
     device_extensions: &DeviceExtensions,
 ) -> (Arc<PhysicalDevice>, u32) {
     instance
@@ -20,7 +19,8 @@ pub fn select_physical_device(
                 .iter()
                 .enumerate()
                 .position(|(i, q)| {
-                    q.queue_flags.graphics && p.surface_support(i as u32, &surface).unwrap_or(false)
+                    q.queue_flags.contains(QueueFlags::GRAPHICS)
+                        && p.surface_support(i as u32, &surface).unwrap_or(false)
                 })
                 .map(|q| (p, q as u32))
         })

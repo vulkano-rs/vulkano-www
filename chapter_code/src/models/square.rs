@@ -4,7 +4,7 @@ use crate::Vertex2d;
 
 pub struct SquareModel;
 
-type UniformData = movable_square::vs::ty::Data;
+type UniformData = movable_square::vs::Data;
 
 impl Model<Vertex2d, UniformData> for SquareModel {
     fn get_vertices() -> Vec<Vertex2d> {
@@ -30,9 +30,8 @@ impl Model<Vertex2d, UniformData> for SquareModel {
 
     fn get_initial_uniform_data() -> UniformData {
         UniformData {
-            color: [0.0, 0.0, 0.0],
+            color: [0.0, 0.0, 0.0].into(),
             position: [0.0, 0.0],
-            _dummy0: [0, 0, 0, 0],
         }
     }
 }

@@ -1,20 +1,16 @@
 use std::time::Duration;
+
+use chapter_code::game_objects::Square;
 use winit::event::{ElementState, VirtualKeyCode};
 use winit::event_loop::EventLoop;
 
 use crate::render::RenderLoop;
-use chapter_code::game_objects::Square;
 
-#[derive(PartialEq)]
+#[derive(Default, PartialEq)]
 pub enum KeyState {
     Pressed,
+    #[default]
     Released,
-}
-
-impl Default for KeyState {
-    fn default() -> Self {
-        KeyState::Released
-    }
 }
 
 use KeyState::{Pressed, Released};

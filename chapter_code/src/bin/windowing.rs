@@ -13,70 +13,77 @@
 
 use std::sync::Arc;
 
-use bytemuck::{Pod, Zeroable};
-use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer, TypedBufferAccess};
+use vulkano::buffer::{Buffer, BufferContents, BufferCreateInfo, BufferUsage, Subbuffer};
+use vulkano::command_buffer::allocator::StandardCommandBufferAllocator;
 use vulkano::command_buffer::{
     AutoCommandBufferBuilder, CommandBufferUsage, PrimaryAutoCommandBuffer, RenderPassBeginInfo,
     SubpassContents,
 };
 use vulkano::device::physical::{PhysicalDevice, PhysicalDeviceType};
-use vulkano::device::{Device, DeviceCreateInfo, DeviceExtensions, Queue, QueueCreateInfo};
+use vulkano::device::{
+    Device, DeviceCreateInfo, DeviceExtensions, Queue, QueueCreateInfo, QueueFlags,
+};
 use vulkano::image::view::ImageView;
 use vulkano::image::{ImageUsage, SwapchainImage};
 use vulkano::instance::{Instance, InstanceCreateInfo};
+use vulkano::memory::allocator::{AllocationCreateInfo, MemoryUsage, StandardMemoryAllocator};
 use vulkano::pipeline::graphics::input_assembly::InputAssemblyState;
-use vulkano::pipeline::graphics::vertex_input::BuffersDefinition;
+use vulkano::pipeline::graphics::vertex_input::Vertex;
 use vulkano::pipeline::graphics::viewport::{Viewport, ViewportState};
 use vulkano::pipeline::GraphicsPipeline;
 use vulkano::render_pass::{Framebuffer, FramebufferCreateInfo, RenderPass, Subpass};
 use vulkano::shader::ShaderModule;
 use vulkano::swapchain::{
-    self, AcquireError, PresentInfo, Surface, Swapchain, SwapchainCreateInfo,
-    SwapchainCreationError,
+    self, AcquireError, Surface, Swapchain, SwapchainCreateInfo, SwapchainCreationError,
+    SwapchainPresentInfo,
 };
-use vulkano::sync::{self, FenceSignalFuture, FlushError, GpuFuture};
+use vulkano::sync::future::FenceSignalFuture;
+use vulkano::sync::{self, FlushError, GpuFuture};
 use vulkano_win::VkSurfaceBuild;
 use winit::event::{Event, WindowEvent};
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::{Window, WindowBuilder};
 
+#[derive(BufferContents, Vertex)]
 #[repr(C)]
-#[derive(Default, Copy, Clone, Zeroable, Pod)]
-struct Vertex {
+struct MyVertex {
+    #[format(R32G32_SFLOAT)]
     position: [f32; 2],
 }
 
 mod vs {
     vulkano_shaders::shader! {
         ty: "vertex",
-        src: "
-#version 450
+        src: r"
+            #version 460
 
-layout(location = 0) in vec2 position;
+            layout(location = 0) in vec2 position;
 
-void main() {
-gl_Position = vec4(position, 0.0, 1.0);
-}"
+            void main() {
+                gl_Position = vec4(position, 0.0, 1.0);
+            }
+        ",
     }
 }
 
 mod fs {
     vulkano_shaders::shader! {
         ty: "fragment",
-        src: "
-#version 450
+        src: r"
+            #version 460
 
-layout(location = 0) out vec4 f_color;
+            layout(location = 0) out vec4 f_color;
 
-void main() {
-f_color = vec4(1.0, 0.0, 0.0, 1.0);
-}"
+            void main() {
+                f_color = vec4(1.0, 0.0, 0.0, 1.0);
+            }
+        ",
     }
 }
 
 pub fn select_physical_device(
     instance: &Arc<Instance>,
-    surface: &Arc<Surface<Window>>,
+    surface: &Arc<Surface>,
     device_extensions: &DeviceExtensions,
 ) -> (Arc<PhysicalDevice>, u32) {
     instance
@@ -88,7 +95,8 @@ pub fn select_physical_device(
                 .iter()
                 .enumerate()
                 .position(|(i, q)| {
-                    q.queue_flags.graphics && p.surface_support(i as u32, surface).unwrap_or(false)
+                    q.queue_flags.contains(QueueFlags::GRAPHICS)
+                        && p.surface_support(i as u32, surface).unwrap_or(false)
                 })
                 .map(|q| (p, q as u32))
         })
@@ -102,27 +110,27 @@ pub fn select_physical_device(
         .expect("no device available")
 }
 
-fn get_render_pass(device: Arc<Device>, swapchain: Arc<Swapchain<Window>>) -> Arc<RenderPass> {
+fn get_render_pass(device: Arc<Device>, swapchain: Arc<Swapchain>) -> Arc<RenderPass> {
     vulkano::single_pass_renderpass!(
-        device.clone(),
+        device,
         attachments: {
             color: {
                 load: Clear,
                 store: Store,
-                format: swapchain.image_format(),  // set the format the same as the swapchain
+                format: swapchain.image_format(), // set the format the same as the swapchain
                 samples: 1,
-            }
+            },
         },
         pass: {
             color: [color],
-            depth_stencil: {}
-        }
+            depth_stencil: {},
+        },
     )
     .unwrap()
 }
 
 fn get_framebuffers(
-    images: &[Arc<SwapchainImage<Window>>],
+    images: &[Arc<SwapchainImage>],
     render_pass: Arc<RenderPass>,
 ) -> Vec<Arc<Framebuffer>> {
     images
@@ -149,7 +157,7 @@ fn get_pipeline(
     viewport: Viewport,
 ) -> Arc<GraphicsPipeline> {
     GraphicsPipeline::start()
-        .vertex_input_state(BuffersDefinition::new().vertex::<Vertex>())
+        .vertex_input_state(MyVertex::per_vertex())
         .vertex_shader(vs.entry_point("main").unwrap(), ())
         .input_assembly_state(InputAssemblyState::new())
         .viewport_state(ViewportState::viewport_fixed_scissor_irrelevant([viewport]))
@@ -160,17 +168,17 @@ fn get_pipeline(
 }
 
 fn get_command_buffers(
-    device: &Arc<Device>,
+    command_buffer_allocator: &StandardCommandBufferAllocator,
     queue: &Arc<Queue>,
     pipeline: &Arc<GraphicsPipeline>,
     framebuffers: &[Arc<Framebuffer>],
-    vertex_buffer: &Arc<CpuAccessibleBuffer<[Vertex]>>,
+    vertex_buffer: &Subbuffer<[MyVertex]>,
 ) -> Vec<Arc<PrimaryAutoCommandBuffer>> {
     framebuffers
         .iter()
         .map(|framebuffer| {
             let mut builder = AutoCommandBufferBuilder::primary(
-                device.clone(),
+                command_buffer_allocator,
                 queue.queue_family_index(),
                 CommandBufferUsage::MultipleSubmit,
             )
@@ -214,6 +222,13 @@ fn main() {
         .build_vk_surface(&event_loop, instance.clone())
         .unwrap();
 
+    let window = surface
+        .object()
+        .unwrap()
+        .clone()
+        .downcast::<Window>()
+        .unwrap();
+
     let device_extensions = DeviceExtensions {
         khr_swapchain: true,
         ..DeviceExtensions::empty()
@@ -242,8 +257,8 @@ fn main() {
             .surface_capabilities(&surface, Default::default())
             .expect("failed to get surface capabilities");
 
-        let dimensions = surface.window().inner_size();
-        let composite_alpha = caps.supported_composite_alpha.iter().next().unwrap();
+        let dimensions = window.inner_size();
+        let composite_alpha = caps.supported_composite_alpha.into_iter().next().unwrap();
         let image_format = Some(
             physical_device
                 .surface_formats(&surface, Default::default())
@@ -253,15 +268,12 @@ fn main() {
 
         Swapchain::new(
             device.clone(),
-            surface.clone(),
+            surface,
             SwapchainCreateInfo {
                 min_image_count: caps.min_image_count,
                 image_format,
                 image_extent: dimensions.into(),
-                image_usage: ImageUsage {
-                    color_attachment: true,
-                    ..Default::default()
-                },
+                image_usage: ImageUsage::COLOR_ATTACHMENT,
                 composite_alpha,
                 ..Default::default()
             },
@@ -272,24 +284,27 @@ fn main() {
     let render_pass = get_render_pass(device.clone(), swapchain.clone());
     let framebuffers = get_framebuffers(&images, render_pass.clone());
 
-    vulkano::impl_vertex!(Vertex, position);
+    let memory_allocator = StandardMemoryAllocator::new_default(device.clone());
 
-    let vertex1 = Vertex {
+    let vertex1 = MyVertex {
         position: [-0.5, -0.5],
     };
-    let vertex2 = Vertex {
+    let vertex2 = MyVertex {
         position: [0.0, 0.5],
     };
-    let vertex3 = Vertex {
+    let vertex3 = MyVertex {
         position: [0.5, -0.25],
     };
-    let vertex_buffer = CpuAccessibleBuffer::from_iter(
-        device.clone(),
-        BufferUsage {
-            vertex_buffer: true,
+    let vertex_buffer = Buffer::from_iter(
+        &memory_allocator,
+        BufferCreateInfo {
+            usage: BufferUsage::VERTEX_BUFFER,
             ..Default::default()
         },
-        false,
+        AllocationCreateInfo {
+            usage: MemoryUsage::Upload,
+            ..Default::default()
+        },
         vec![vertex1, vertex2, vertex3].into_iter(),
     )
     .unwrap();
@@ -299,7 +314,7 @@ fn main() {
 
     let mut viewport = Viewport {
         origin: [0.0, 0.0],
-        dimensions: surface.window().inner_size().into(),
+        dimensions: window.inner_size().into(),
         depth_range: 0.0..1.0,
     };
 
@@ -311,8 +326,16 @@ fn main() {
         viewport.clone(),
     );
 
-    let mut command_buffers =
-        get_command_buffers(&device, &queue, &pipeline, &framebuffers, &vertex_buffer);
+    let command_buffer_allocator =
+        StandardCommandBufferAllocator::new(device.clone(), Default::default());
+
+    let mut command_buffers = get_command_buffers(
+        &command_buffer_allocator,
+        &queue,
+        &pipeline,
+        &framebuffers,
+        &vertex_buffer,
+    );
 
     let mut window_resized = false;
     let mut recreate_swapchain = false;
@@ -338,7 +361,7 @@ fn main() {
             if window_resized || recreate_swapchain {
                 recreate_swapchain = false;
 
-                let new_dimensions = surface.window().inner_size();
+                let new_dimensions = window.inner_size();
 
                 let (new_swapchain, new_images) = match swapchain.recreate(SwapchainCreateInfo {
                     image_extent: new_dimensions.into(),
@@ -346,7 +369,7 @@ fn main() {
                 }) {
                     Ok(r) => r,
                     Err(SwapchainCreationError::ImageExtentNotSupported { .. }) => return,
-                    Err(e) => panic!("Failed to recreate swapchain: {:?}", e),
+                    Err(e) => panic!("failed to recreate swapchain: {e}"),
                 };
                 swapchain = new_swapchain;
                 let new_framebuffers = get_framebuffers(&new_images, render_pass.clone());
@@ -363,7 +386,7 @@ fn main() {
                         viewport.clone(),
                     );
                     command_buffers = get_command_buffers(
-                        &device,
+                        &command_buffer_allocator,
                         &queue,
                         &new_pipeline,
                         &new_framebuffers,
@@ -379,7 +402,7 @@ fn main() {
                         recreate_swapchain = true;
                         return;
                     }
-                    Err(e) => panic!("Failed to acquire next image: {:?}", e),
+                    Err(e) => panic!("failed to acquire next image: {e}"),
                 };
 
             if suboptimal {
@@ -387,11 +410,11 @@ fn main() {
             }
 
             // wait for the fence related to this image to finish (normally this would be the oldest fence)
-            if let Some(image_fence) = &fences[image_i] {
+            if let Some(image_fence) = &fences[image_i as usize] {
                 image_fence.wait(None).unwrap();
             }
 
-            let previous_future = match fences[previous_fence_i].clone() {
+            let previous_future = match fences[previous_fence_i as usize].clone() {
                 // Create a NowFuture
                 None => {
                     let mut now = sync::now(device.clone());
@@ -405,25 +428,22 @@ fn main() {
 
             let future = previous_future
                 .join(acquire_future)
-                .then_execute(queue.clone(), command_buffers[image_i].clone())
+                .then_execute(queue.clone(), command_buffers[image_i as usize].clone())
                 .unwrap()
                 .then_swapchain_present(
                     queue.clone(),
-                    PresentInfo {
-                        index: image_i,
-                        ..PresentInfo::swapchain(swapchain.clone())
-                    },
+                    SwapchainPresentInfo::swapchain_image_index(swapchain.clone(), image_i),
                 )
                 .then_signal_fence_and_flush();
 
-            fences[image_i] = match future {
+            fences[image_i as usize] = match future {
                 Ok(value) => Some(Arc::new(value)),
                 Err(FlushError::OutOfDate) => {
                     recreate_swapchain = true;
                     None
                 }
                 Err(e) => {
-                    println!("Failed to flush future: {:?}", e);
+                    println!("failed to flush future: {e}");
                     None
                 }
             };

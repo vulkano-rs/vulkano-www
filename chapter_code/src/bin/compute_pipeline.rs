@@ -11,16 +11,16 @@
 //!
 //! It is not commented, as the explanations can be found in the guide itself.
 
-use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
+use vulkano::buffer::{Buffer, BufferCreateInfo, BufferUsage};
 use vulkano::command_buffer::allocator::{
     StandardCommandBufferAllocator, StandardCommandBufferAllocatorCreateInfo,
 };
 use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage};
 use vulkano::descriptor_set::allocator::StandardDescriptorSetAllocator;
 use vulkano::descriptor_set::{PersistentDescriptorSet, WriteDescriptorSet};
-use vulkano::device::{Device, DeviceCreateInfo, DeviceExtensions, QueueCreateInfo};
+use vulkano::device::{Device, DeviceCreateInfo, DeviceExtensions, QueueCreateInfo, QueueFlags};
 use vulkano::instance::{Instance, InstanceCreateInfo};
-use vulkano::memory::allocator::StandardMemoryAllocator;
+use vulkano::memory::allocator::{AllocationCreateInfo, MemoryUsage, StandardMemoryAllocator};
 use vulkano::pipeline::{ComputePipeline, Pipeline, PipelineBindPoint};
 use vulkano::sync::{self, GpuFuture};
 
@@ -39,7 +39,11 @@ fn main() {
         .queue_family_properties()
         .iter()
         .enumerate()
-        .position(|(_, queue_family_properties)| queue_family_properties.queue_flags.graphics)
+        .position(|(_, queue_family_properties)| {
+            queue_family_properties
+                .queue_flags
+                .contains(QueueFlags::GRAPHICS)
+        })
         .expect("couldn't find a graphical queue family") as u32;
 
     let (device, mut queues) = Device::new(
@@ -65,13 +69,16 @@ fn main() {
     let memory_allocator = StandardMemoryAllocator::new_default(device.clone());
 
     let data_iter = 0..65536u32;
-    let data_buffer = CpuAccessibleBuffer::from_iter(
+    let data_buffer = Buffer::from_iter(
         &memory_allocator,
-        BufferUsage {
-            storage_buffer: true,
+        BufferCreateInfo {
+            usage: BufferUsage::STORAGE_BUFFER,
             ..Default::default()
         },
-        false,
+        AllocationCreateInfo {
+            usage: MemoryUsage::Upload,
+            ..Default::default()
+        },
         data_iter,
     )
     .expect("failed to create buffer");
@@ -150,8 +157,8 @@ fn main() {
 
     let command_buffer = command_buffer_builder.build().unwrap();
 
-    let future = sync::now(device.clone())
-        .then_execute(queue.clone(), command_buffer)
+    let future = sync::now(device)
+        .then_execute(queue, command_buffer)
         .unwrap()
         .then_signal_fence_and_flush()
         .unwrap();

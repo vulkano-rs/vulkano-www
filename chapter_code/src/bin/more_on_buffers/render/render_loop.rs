@@ -1,21 +1,21 @@
 use std::sync::Arc;
 
+use chapter_code::game_objects::Square;
 use vulkano::swapchain::AcquireError;
 use vulkano::sync::{FlushError, GpuFuture};
 use winit::event_loop::EventLoop;
 
 use crate::render::renderer::{Fence, Renderer};
-use chapter_code::game_objects::Square;
 
 pub struct RenderLoop {
     renderer: Renderer,
     recreate_swapchain: bool,
     window_resized: bool,
     fences: Vec<Option<Arc<Fence>>>,
-    previous_fence_i: usize,
+    previous_fence_i: u32,
 }
 
-impl<'a> RenderLoop {
+impl RenderLoop {
     pub fn new(event_loop: &EventLoop<()>) -> Self {
         let renderer = Renderer::initialize(event_loop);
         let frames_in_flight = renderer.get_image_count();
@@ -54,7 +54,7 @@ impl<'a> RenderLoop {
             self.recreate_swapchain = true;
         }
 
-        if let Some(image_fence) = &self.fences[image_i] {
+        if let Some(image_fence) = &self.fences[image_i as usize] {
             image_fence.wait(None).unwrap();
         }
 
@@ -62,7 +62,7 @@ impl<'a> RenderLoop {
         self.renderer.update_uniform(image_i, triangle);
 
         let something_needs_all_gpu_resources = false;
-        let previous_future = match self.fences[self.previous_fence_i].clone() {
+        let previous_future = match self.fences[self.previous_fence_i as usize].clone() {
             None => self.renderer.synchronize().boxed(),
             Some(fence) => {
                 if something_needs_all_gpu_resources {
@@ -80,7 +80,7 @@ impl<'a> RenderLoop {
             .renderer
             .flush_next_future(previous_future, acquire_future, image_i);
 
-        self.fences[image_i] = match result {
+        self.fences[image_i as usize] = match result {
             Ok(fence) => Some(Arc::new(fence)),
             Err(FlushError::OutOfDate) => {
                 self.recreate_swapchain = true;

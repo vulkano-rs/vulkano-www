@@ -1,6 +1,5 @@
 mod square;
 mod traits;
 
-pub use traits::Model;
-
 pub use square::SquareModel;
+pub use traits::Model;

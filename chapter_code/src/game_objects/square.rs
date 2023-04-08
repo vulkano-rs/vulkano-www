@@ -7,6 +7,7 @@ pub struct Square {
 }
 
 impl Square {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             color: [1.0, 0.0, 0.0],
