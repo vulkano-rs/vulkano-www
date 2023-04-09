@@ -1,5 +1,6 @@
-use crate::render::RenderLoop;
 use winit::event_loop::EventLoop;
+
+use crate::render::RenderLoop;
 
 pub struct App {
     render_loop: RenderLoop,

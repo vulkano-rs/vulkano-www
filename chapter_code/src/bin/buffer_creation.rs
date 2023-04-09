@@ -11,10 +11,12 @@
 //!
 //! It is not commented, as the explanations can be found in the guide itself.
 
-use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
+use vulkano::buffer::{Buffer, BufferCreateInfo, BufferUsage};
+use vulkano::command_buffer::allocator::StandardCommandBufferAllocator;
 use vulkano::command_buffer::{AutoCommandBufferBuilder, CommandBufferUsage, CopyBufferInfo};
-use vulkano::device::{Device, DeviceCreateInfo, QueueCreateInfo};
+use vulkano::device::{Device, DeviceCreateInfo, QueueCreateInfo, QueueFlags};
 use vulkano::instance::{Instance, InstanceCreateInfo};
+use vulkano::memory::allocator::{AllocationCreateInfo, MemoryUsage, StandardMemoryAllocator};
 use vulkano::sync::{self, GpuFuture};
 use vulkano::VulkanLibrary;
 
@@ -24,22 +26,22 @@ fn main() {
     let instance =
         Instance::new(library, InstanceCreateInfo::default()).expect("failed to create instance");
 
-    let physical = instance
+    let physical_device = instance
         .enumerate_physical_devices()
         .expect("could not enumerate devices")
         .next()
         .expect("no devices available");
 
     // Device creation
-    let queue_family_index = physical
+    let queue_family_index = physical_device
         .queue_family_properties()
         .iter()
         .enumerate()
-        .position(|(_, q)| q.queue_flags.graphics)
+        .position(|(_, q)| q.queue_flags.contains(QueueFlags::GRAPHICS))
         .expect("couldn't find a graphical queue family") as u32;
 
     let (device, mut queues) = Device::new(
-        physical,
+        physical_device,
         DeviceCreateInfo {
             // here we pass the desired queue family to use by index
             queue_create_infos: vec![QueueCreateInfo {
@@ -53,33 +55,44 @@ fn main() {
 
     let queue = queues.next().unwrap();
 
+    let memory_allocator = StandardMemoryAllocator::new_default(device.clone());
+
     // Example operation
-    let source_content = 0..64;
-    let source = CpuAccessibleBuffer::from_iter(
-        device.clone(),
-        BufferUsage {
-            transfer_src: true,
+    let source_content: Vec<i32> = (0..64).collect();
+    let source = Buffer::from_iter(
+        &memory_allocator,
+        BufferCreateInfo {
+            usage: BufferUsage::TRANSFER_SRC,
             ..Default::default()
         },
-        false,
+        AllocationCreateInfo {
+            usage: MemoryUsage::Upload,
+            ..Default::default()
+        },
         source_content,
     )
-    .expect("failed to create buffer");
+    .expect("failed to create source buffer");
 
     let destination_content: Vec<i32> = (0..64).map(|_| 0).collect();
-    let destination = CpuAccessibleBuffer::from_iter(
-        device.clone(),
-        BufferUsage {
-            transfer_dst: true,
+    let destination = Buffer::from_iter(
+        &memory_allocator,
+        BufferCreateInfo {
+            usage: BufferUsage::TRANSFER_DST,
             ..Default::default()
         },
-        false,
+        AllocationCreateInfo {
+            usage: MemoryUsage::Download,
+            ..Default::default()
+        },
         destination_content,
     )
-    .expect("failed to create buffer");
+    .expect("failed to create destination buffer");
+
+    let command_buffer_allocator =
+        StandardCommandBufferAllocator::new(device.clone(), Default::default());
 
     let mut builder = AutoCommandBufferBuilder::primary(
-        device.clone(),
+        &command_buffer_allocator,
         queue_family_index,
         CommandBufferUsage::OneTimeSubmit,
     )
@@ -92,8 +105,8 @@ fn main() {
     let command_buffer = builder.build().unwrap();
 
     // Start the execution
-    let future = sync::now(device.clone())
-        .then_execute(queue.clone(), command_buffer)
+    let future = sync::now(device)
+        .then_execute(queue, command_buffer)
         .unwrap()
         .then_signal_fence_and_flush() // same as signal fence, and then flush
         .unwrap();

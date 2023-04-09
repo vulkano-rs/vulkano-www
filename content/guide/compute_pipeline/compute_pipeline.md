@@ -7,10 +7,10 @@ This is done in two steps:
 
 - First we write the source code of the program in a programming language called *GLSL*. Vulkano
   will compile the GLSL code at compile-time into an intermediate representation called *SPIR-V*.
-- At runtime we pass this *SPIR-V* to the Vulkan implementation, which in turn converts it into
-  its own implementation-specific format.
+- At runtime, we pass this *SPIR-V* to the Vulkan implementation (GPU driver), which in turn 
+  converts it into its own implementation-specific format.
 
-<center><object data="/guide-compute-pipeline-1.svg"></object></center>
+<div style="text-align: center;"><object data="/guide-compute-pipeline-1.svg"></object></div>
 
 > **Note**: In the very far future it may be possible to write shaders in Rust, or in a
 > domain specific language that resembles Rust.
@@ -20,13 +20,13 @@ This is done in two steps:
 But first, we need to write the source code of the operation. The GLSL language looks a lot like
 the C programming language, but has some differences.
 
-This guide is not going to cover teaching you GLSL, as it is an entire programming language. As with
-many programming languages, the easiest way to learn GLSL is by looking at examples.
+This guide is not going to cover teaching you GLSL, as it is an entire programming language. As 
+with many programming languages, the easiest way to learn GLSL is by looking at examples.
 
 Let's take a look at some GLSL that takes each element of a buffer and multiplies it by 12:
 
 ```glsl
-#version 450
+#version 460
 
 layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
 
@@ -43,12 +43,15 @@ void main() {
 Let's break it down a bit.
 
 ```glsl
-#version 450
+#version 460
 ```
 
 The first line indicates which version of GLSL to use. Since GLSL was already the shading language
-of the OpenGL API (Vulkan's predecessor), we are in fact already at the version 4.50 of the
+of the OpenGL API (Vulkan's predecessor), we are in fact already at the version 4.60 of the
 language. You should always include this line at the start of every shader.
+
+> **Note**: You can use an older version for compatibility with older GPUs and Vulkan 
+> implementations.
 
 ```glsl
 layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
@@ -114,17 +117,22 @@ with 12.
 ## Embedding the GLSL code in the Rust code
 
 Now that we've written the shader in GLSL, we're going to be compiling the shaders *at
-application compile-time*. We'll accomplish this using `vulkano-shaders`, which is a procedural macro that manages the compile-time compilation of GLSL into SPIR-V and generation of associated rust code.
+application compile-time*. We'll accomplish this using `vulkano-shaders`
+which is a procedural macro that manages the compile-time compilation of GLSL into SPIR-V
+and generation of associated rust code.
 
 To use `vulkano-shaders`, we first have to add a dependency:
 
 ```toml
 # Notice that it uses the same version as vulkano
-vulkano-shaders = "0.31.0"
+vulkano-shaders = "0.33.0"
 ```
-NOTE: `vulkano-shaders` uses the crate `shaderc-sys` for the actual GLSL compilation step. 
-
-When you build your project, an attempt will be made at automatigical SPIR-V install if don't already have it. SPIR-V also comes in [the Vulkan SDK](https://www.vulkan.org/tools#download-these-essential-development-tools)). See https://lib.rs/crates/shaderc-sys for installation instructions should the automatic system fail. 
+> **Note**: `vulkano-shaders` uses the crate `shaderc-sys` for the actual GLSL compilation step. 
+> When you build your project, an attempt will be made to automatically install shaderc if you 
+> don't already have it. shaderc also comes in [the Vulkan 
+> SDK](https://www.vulkan.org/tools#download-these-essential-development-tools)). See [shaderc-sys 
+> crate](https://lib.rs/crates/shaderc-sys) for installation instructions should the automatic 
+> system fail. 
 
 Here is the syntax:
 
@@ -132,26 +140,28 @@ Here is the syntax:
 mod cs {
     vulkano_shaders::shader!{
         ty: "compute",
-        src: "
-#version 450
+        src: r"
+            #version 460
 
-layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+            layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
 
-layout(set = 0, binding = 0) buffer Data {
-    uint data[];
-} buf;
+            layout(set = 0, binding = 0) buffer Data {
+                uint data[];
+            } buf;
 
-void main() {
-    uint idx = gl_GlobalInvocationID.x;
-    buf.data[idx] *= 12;
-}"
+            void main() {
+                uint idx = gl_GlobalInvocationID.x;
+                buf.data[idx] *= 12;
+            }
+        ",
     }
 }
 ```
 
-As you can see, we specify some "fields" in the `vulkano_shaders::shader!` macro to specify our shader.
-The macro will then compile the GLSL code (outputting compilation errors if any) and generate several structs and methods, including one named `load`.
-This is the method that we have to use next:
+As you can see, we specify some "fields" in the `vulkano_shaders::shader!` macro to specify our 
+shader. The macro will then compile the GLSL code (outputting compilation errors if any) and 
+generate several structs and methods, including one named `load`. This is the method that we have 
+to use next:
 
 ```rust
 let shader = cs::load(device.clone())
@@ -162,7 +172,7 @@ This feeds the shader to the Vulkan implementation. The last step to perform at 
 create a ***compute pipeline*** object from that shader. This is the object that actually describes
 the compute operation that we are going to perform. We won't cover the last three parameters, but
 you can search about them
-[here](https://docs.rs/vulkano/0.31.0/vulkano/pipeline/compute/struct.ComputePipeline.html).
+[here](https://docs.rs/vulkano/0.33.0/vulkano/pipeline/compute/struct.ComputePipeline.html).
 
 ```rust
 use vulkano::pipeline::ComputePipeline;

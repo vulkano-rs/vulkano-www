@@ -26,14 +26,15 @@ This is done by first creating the shaders, just like for a compute pipeline:
 mod vs {
     vulkano_shaders::shader!{
         ty: "vertex",
-        src: "
-#version 450
+        src: r"
+            #version 460
 
-layout(location = 0) in vec2 position;
+            layout(location = 0) in vec2 position;
 
-void main() {
-    gl_Position = vec4(position, 0.0, 1.0);
-}"
+            void main() {
+                gl_Position = vec4(position, 0.0, 1.0);
+            }
+        ",
     }
 }
 
@@ -41,13 +42,14 @@ mod fs {
     vulkano_shaders::shader!{
         ty: "fragment",
         src: "
-#version 450
+            #version 460
 
-layout(location = 0) out vec4 f_color;
+            layout(location = 0) out vec4 f_color;
 
-void main() {
-    f_color = vec4(1.0, 0.0, 0.0, 1.0);
-}"
+            void main() {
+                f_color = vec4(1.0, 0.0, 0.0, 1.0);
+            }
+        ",
     }
 }
 
@@ -59,7 +61,7 @@ Then we can create the graphics pipeline by using a builder.
 
 ```rust
 use vulkano::pipeline::graphics::input_assembly::InputAssemblyState;
-use vulkano::pipeline::graphics::vertex_input::BuffersDefinition;
+use vulkano::pipeline::graphics::vertex_input::Vertex;
 use vulkano::pipeline::graphics::viewport::{Viewport, ViewportState};
 use vulkano::pipeline::GraphicsPipeline;
 use vulkano::render_pass::Subpass;
@@ -73,7 +75,7 @@ let viewport = Viewport {
 
 let pipeline = GraphicsPipeline::start()
     // Describes the layout of the vertex input and how should it behave
-    .vertex_input_state(BuffersDefinition::new().vertex::<Vertex>())
+    .vertex_input_state(MyVertex::per_vertex())
     // A Vulkan shader can in theory contain multiple entry points, so we have to specify
     // which one.
     .vertex_shader(vs.entry_point("main").unwrap(), ())
@@ -91,24 +93,25 @@ let pipeline = GraphicsPipeline::start()
 ```
 
 When we draw, we have the possibility to draw only to a specific rectangle of the screen called a
-***viewport***. The borders of the viewport will map to the `-1.0` and `1.0` logical coordinates that
-we covered in [the vertex input section of the guide](/guide/vertex-input). Any part of the shape
-that ends up outside of this rectangle will be discarded.
+***viewport***. The borders of the viewport will map to the `-1.0` and `1.0` logical coordinates 
+that we covered in [the vertex input section of the guide](/guide/vertex-input). Any part of the 
+shape that ends up outside of this rectangle will be discarded.
 
-The state `ViewportState::viewport_fixed_scissor_irrelevant()` configures the builder so that we use one
-specific viewport, and that the state of this viewport is *fixed*. This makes it not possible to change the
-viewport for each draw command, but adds more performance. Because we are drawing only one image and not
-changing the viewport between draws, this is the optimal approach. If you wanted to draw to another image
-of a different size, you would have to create a new pipeline object. Another approach would be to use a
-dynamic viewport, where you would pass your viewport in the command buffer instead.
+The state `ViewportState::viewport_fixed_scissor_irrelevant()` configures the builder so that we 
+use one specific viewport, and that the state of this viewport is *fixed*. This makes it not 
+possible to change the viewport for each draw command, but adds more performance. Because we are 
+drawing only one image and not changing the viewport between draws, this is the optimal approach. 
+If you wanted to draw to another image of a different size, you would have to create a new pipeline 
+object. Another approach would be to use a dynamic viewport, where you would pass your viewport in 
+the command buffer instead.
 
 > **Note**: If you configure multiple viewports, you can use geometry shaders to choose which
 > viewport the shape is going to be drawn to. This topic isn't covered here.
 
 ## Drawing
 
-Now that we have all the ingredients, it is time to bind everything and insert a draw call inside of
-our render pass.
+Now that we have all the ingredients, it is time to bind everything and insert a draw call inside 
+of our render pass.
 
 To draw the triangle, we need to pass the pipeline, the vertex_buffer and the actual draw command:
 
@@ -145,8 +148,9 @@ builder
 ```
 
 The first parameter of the `.draw()` method is the number of vertices of our shape. All the other
-constants are in the case of drawing on multiple viewports or drawing multiple objects with instancing
-(we won't cover that here).
+constants are in the case of drawing on multiple viewports or drawing multiple objects with 
+instancing (we won't cover that here).
+
 > **Note**: If you wanted to draw multiple objects, the most straight-forward method is to call
 > `draw()` multiple time in a row.
 
@@ -158,13 +162,16 @@ To do that, as before, let's first create the buffer:
 ```rust
 // crop
 
-let buf = CpuAccessibleBuffer::from_iter(
-    device.clone(),
-    BufferUsage {
-        transfer_dst: true,
+let buf = Buffer::from_iter(
+    &memory_allocator,
+    BufferCreateInfo {
+        usage: BuferUsage::TRANSFER_DST,
         ..Default::default()
     },
-    false,
+    AllocationCreateInfo {
+        usage: MemoryUsage::Download,
+        ..Default::default()
+    },
     (0..1024 * 1024 * 4).map(|_| 0u8),
 )
 .expect("failed to create buffer");

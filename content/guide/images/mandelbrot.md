@@ -5,9 +5,9 @@ a compute shader to write a [Mandelbrot set](https://en.wikipedia.org/wiki/Mande
 image.
 
 Just like in [the introduction to compute pipelines](/guide/compute-pipeline), we need to write
-some GLSL code and create a compute pipeline. This is done with the `vulkano_shader::shader!` macro,
-as explained in that section. Each invocation of the `main` function of the shader will write
-one pixel.
+some GLSL code and create a compute pipeline. This is done with the `vulkano_shader::shader!` 
+macro, as explained in that section. Each invocation of the `main` function of the shader will 
+write one pixel.
 
 > **Note**: You can find the [full source code of this section
 > here](https://github.com/vulkano-rs/vulkano-www/blob/master/chapter_code/src/bin/images/mandelbrot.rs).
@@ -17,7 +17,7 @@ one pixel.
 Let's spend some time on the GLSL code of the shader, which I wrote for you:
 
 ```glsl
-#version 450
+#version 460
 
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 
@@ -93,9 +93,9 @@ for (i = 0.0; i < 1.0; i += 0.005) {
 }
 ```
 
-We now want to find out whether the complex number that we are manipulating (i.e. `c`) is within the
-Mandelbrot set. The definition of the Mandelbrot set says that a number `c` is within the set if
-the function `f(z) = z² + c` diverges when iterated from `z = 0` (`z` being a complex number).
+We now want to find out whether the complex number that we are manipulating (i.e. `c`) is within 
+the Mandelbrot set. The definition of the Mandelbrot set says that a number `c` is within the set 
+if the function `f(z) = z² + c` diverges when iterated from `z = 0` (`z` being a complex number).
 
 This is exactly what we do in this code. We start from `z = vec2(0.0, 0.0)` and iterate with a
 *for* loop. Each iteration puts the value of the next iteration in `z` and checks whether it is
@@ -153,7 +153,8 @@ use vulkano::image::view::ImageView;
 let view = ImageView::new_default(image.clone()).unwrap();
 ```
 
-Now, let's create the descriptor set by adding the image view, like we did [earlier](/guide/descriptor-sets):
+Now, let's create the descriptor set by adding the image view, like we did 
+[earlier](/guide/descriptor-sets):
 
 ```rust
 let layout = compute_pipeline.layout().set_layouts().get(0).unwrap();
@@ -167,13 +168,16 @@ let set = PersistentDescriptorSet::new(
 Next, we can create a buffer for storing the image output:
 
 ```rust
-let buf = CpuAccessibleBuffer::from_iter(
-    device.clone(),
-    BufferUsage {
-        transfer_dst: true,
+let buf = Buffer::from_iter(
+    &memory_allocator,
+    BufferCreateInfo {
+        usage: BufferUsage::TRANSFER_DST,
         ..Default::default()
     },
-    false,
+    AllocationCreateInfo {
+        usage: MemoryUsage::Download,
+        ..Default::default()
+    },
     (0..1024 * 1024 * 4).map(|_| 0u8),
 )
 .expect("failed to create buffer");

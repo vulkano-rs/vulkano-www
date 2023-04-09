@@ -1,4 +1,5 @@
 use std::sync::Arc;
+
 use vulkano::instance::{Instance, InstanceCreateInfo, LayerProperties};
 
 const LIST_AVAILABLE_LAYERS: bool = false;

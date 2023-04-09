@@ -25,7 +25,7 @@ where
 {
     rouille::start_server(addr, move |request| {
         rouille::content_encoding::apply(
-            &request,
+            request,
             rouille::log(request, io::stdout(), || {
                 {
                     let mut r = rouille::match_assets(request, "./static");

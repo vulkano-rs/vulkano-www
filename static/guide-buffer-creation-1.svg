@@ -2,19 +2,19 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="344.69461"
    height="172.67822"
    id="svg4732"
    version="1.1"
-   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
-   sodipodi:docname="guide-buffer-creation-1.svg">
+   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14, custom)"
+   sodipodi:docname="guide-buffer-creation-1.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs4734">
     <style
@@ -28,9 +28,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="1"
      inkscape:pageshadow="2"
-     inkscape:zoom="6.5045477"
-     inkscape:cx="172.34731"
-     inkscape:cy="86.364751"
+     inkscape:zoom="2.2997049"
+     inkscape:cx="153.93279"
+     inkscape:cy="80.010266"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -38,11 +38,14 @@
      fit-margin-top="5"
      fit-margin-right="5"
      fit-margin-bottom="5"
-     inkscape:window-width="3840"
-     inkscape:window-height="2031"
+     inkscape:window-width="1920"
+     inkscape:window-height="1051"
      inkscape:window-x="0"
-     inkscape:window-y="55"
-     inkscape:window-maximized="1" />
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:showpageshadow="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#000000" />
   <metadata
      id="metadata4737">
     <rdf:RDF>
@@ -60,6 +63,13 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(-267.43841,-479.20374)">
+    <rect
+       style="fill:#222222;stroke-width:16;stroke-linecap:square;paint-order:markers fill stroke;fill-opacity:1"
+       id="rect875"
+       width="344.69461"
+       height="172.67822"
+       x="267.43842"
+       y="479.20374" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Open Sans';-inkscape-font-specification:'Open Sans';letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
@@ -70,7 +80,7 @@
          id="tspan2989-4-7"
          x="297.37845"
          y="623.27228"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.54603386px;line-height:1.25;font-family:'Open Sans';-inkscape-font-specification:'Open Sans'">CPU</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.546px;line-height:1.25;font-family:'Open Sans';-inkscape-font-specification:'Open Sans'">CPU</tspan></text>
     <path
        style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;stroke:#ffffff;stroke-width:1.69095254;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
        d="m 275.28389,488.81183 v 38.52927 h 87.71793 v -38.52927 z"
@@ -87,7 +97,7 @@
          id="tspan2989-4-7-5"
          x="294.84644"
          y="516.15692"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.54603386px;line-height:1.25;font-family:'Open Sans';-inkscape-font-specification:'Open Sans'">RAM</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.546px;line-height:1.25;font-family:'Open Sans';-inkscape-font-specification:'Open Sans'">RAM</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Open Sans';-inkscape-font-specification:'Open Sans';letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
@@ -98,7 +108,7 @@
          id="tspan2989-4-7-6"
          x="530.52313"
          y="623.2998"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.54603386px;line-height:1.25;font-family:'Open Sans';-inkscape-font-specification:'Open Sans'">VRAM</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.546px;line-height:1.25;font-family:'Open Sans';-inkscape-font-specification:'Open Sans'">VRAM</tspan></text>
     <path
        style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;stroke:#ffffff;stroke-width:1.69095254;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
        d="m 275.28389,595.95469 v 38.52927 h 87.71793 v -38.52927 z"
@@ -127,7 +137,7 @@
          id="tspan2989-4-7-5-2"
          x="537.56329"
          y="516.12939"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.54603386px;line-height:1.25;font-family:'Open Sans';-inkscape-font-specification:'Open Sans'">GPU</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.546px;line-height:1.25;font-family:'Open Sans';-inkscape-font-specification:'Open Sans'">GPU</tspan></text>
     <path
        style="fill:none;stroke:#ffffff;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 319.14285,539.1479 v 45"

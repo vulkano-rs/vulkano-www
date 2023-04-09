@@ -1,97 +1,57 @@
-use bytemuck::Pod;
 use std::sync::Arc;
-use vulkano::buffer::{
-    device_local::DeviceLocalBuffer, BufferContents, BufferUsage, CpuAccessibleBuffer,
-    TypedBufferAccess,
-};
-use vulkano::command_buffer::{CommandBufferExecFuture, PrimaryAutoCommandBuffer};
-use vulkano::descriptor_set::layout::DescriptorSetLayout;
-use vulkano::descriptor_set::{
-    DescriptorSetsCollection, PersistentDescriptorSet, WriteDescriptorSet,
-};
-use vulkano::device::{Device, Queue};
-use vulkano::pipeline::graphics::vertex_input::VertexBuffersCollection;
-use vulkano::sync::{GpuFuture, NowFuture};
 
+use vulkano::buffer::{Buffer, BufferContents, BufferCreateInfo, BufferUsage, Subbuffer};
+use vulkano::command_buffer::{
+    AutoCommandBufferBuilder, CommandBufferExecFuture, CommandBufferUsage, CopyBufferInfo,
+    PrimaryCommandBufferAbstract,
+};
+use vulkano::descriptor_set::layout::DescriptorSetLayout;
+use vulkano::descriptor_set::{PersistentDescriptorSet, WriteDescriptorSet};
+use vulkano::device::Queue;
+use vulkano::memory::allocator::{AllocationCreateInfo, MemoryUsage};
+use vulkano::sync::future::NowFuture;
+use vulkano::sync::GpuFuture;
+use vulkano::DeviceSize;
+
+use super::allocators::Allocators;
 use crate::models::Model;
 
-pub type Uniform<U> = (Arc<CpuAccessibleBuffer<U>>, Arc<PersistentDescriptorSet>);
+pub type Uniform<U> = (Subbuffer<U>, Arc<PersistentDescriptorSet>);
 
-// This trait will apply to all structs that contain vertex, index and uniform buffers
-pub trait Buffers<Vb, Ib, D>
-where
-    Vb: VertexBuffersCollection,                      // Vertex buffer
-    Ib: TypedBufferAccess<Content = [u16]> + 'static, // Index buffer
-    D: DescriptorSetsCollection,
-{
-    fn get_vertex(&self) -> Vb;
-
-    // Vb and D have their own collection, so they are implicitly wrapped in an Arc, but Ib should be wrapped explicitly
-    fn get_index(&self) -> Arc<Ib>;
-    fn get_uniform_descriptor_set(&self, i: usize) -> D;
-}
-
-// Struct with a cpu accessible vertex, index and uniform buffer, with generic (V)ertices and (U)niforms
-pub struct SimpleBuffers<V: BufferContents + Pod, U: BufferContents> {
-    pub vertex: Arc<CpuAccessibleBuffer<[V]>>,
-    pub index: Arc<CpuAccessibleBuffer<[u16]>>,
+/// Struct with a vertex, index and uniform buffer, with generic (V)ertices and (U)niforms.
+pub struct Buffers<V: BufferContents, U: BufferContents> {
+    pub vertex: Subbuffer<[V]>,
+    pub index: Subbuffer<[u16]>,
     pub uniforms: Vec<Uniform<U>>,
 }
 
-impl<V: BufferContents + Pod, U: BufferContents + Copy> SimpleBuffers<V, U> {
-    pub fn initialize<M: Model<V, U>>(
-        device: Arc<Device>,
+impl<V: BufferContents, U: BufferContents> Buffers<V, U> {
+    pub fn initialize_host_accessible<M: Model<V, U>>(
+        allocators: &Allocators,
         descriptor_set_layout: Arc<DescriptorSetLayout>,
         uniform_buffer_count: usize,
     ) -> Self {
         Self {
-            vertex: create_cpu_accessible_vertex::<V, U, M>(device.clone()),
-            index: create_cpu_accessible_index::<V, U, M>(device.clone()),
+            vertex: create_cpu_accessible_vertex::<V, U, M>(allocators),
+            index: create_cpu_accessible_index::<V, U, M>(allocators),
             uniforms: create_cpu_accessible_uniforms::<V, U, M>(
-                device,
+                allocators,
                 descriptor_set_layout,
                 uniform_buffer_count,
             ),
         }
     }
-}
 
-impl<'a, V, U>
-    Buffers<Arc<CpuAccessibleBuffer<[V]>>, CpuAccessibleBuffer<[u16]>, Arc<PersistentDescriptorSet>>
-    for SimpleBuffers<V, U>
-where
-    V: BufferContents + Pod,
-    U: BufferContents,
-{
-    fn get_vertex(&self) -> Arc<CpuAccessibleBuffer<[V]>> {
-        self.vertex.clone()
-    }
-
-    fn get_index(&self) -> Arc<CpuAccessibleBuffer<[u16]>> {
-        self.index.clone()
-    }
-
-    fn get_uniform_descriptor_set(&self, i: usize) -> Arc<PersistentDescriptorSet> {
-        self.uniforms[i].1.clone()
-    }
-}
-
-// Struct with vertex and index buffer and a cpu accessible uniform buffer, with generic (V)ertices and (U)niforms
-pub struct DeviceLocalBuffers<V: BufferContents + Pod, U: BufferContents> {
-    pub vertex: Arc<DeviceLocalBuffer<[V]>>,
-    pub index: Arc<DeviceLocalBuffer<[u16]>>,
-    pub uniforms: Vec<Uniform<U>>,
-}
-
-impl<V: BufferContents + Pod, U: BufferContents + Copy> DeviceLocalBuffers<V, U> {
-    pub fn initialize<M: Model<V, U>>(
-        device: Arc<Device>,
+    pub fn initialize_device_local<M: Model<V, U>>(
+        allocators: &Allocators,
         descriptor_set_layout: Arc<DescriptorSetLayout>,
         uniform_buffer_count: usize,
         transfer_queue: Arc<Queue>,
     ) -> Self {
-        let (vertex, vertex_future) = create_device_local_vertex::<V, U, M>(transfer_queue.clone());
-        let (index, index_future) = create_device_local_index::<V, U, M>(transfer_queue);
+        let (vertex, vertex_future) =
+            create_device_local_vertex::<V, U, M>(allocators, transfer_queue.clone());
+        let (index, index_future) =
+            create_device_local_index::<V, U, M>(allocators, transfer_queue);
 
         let fence = vertex_future
             .join(index_future)
@@ -104,138 +64,204 @@ impl<V: BufferContents + Pod, U: BufferContents + Copy> DeviceLocalBuffers<V, U>
             vertex,
             index,
             uniforms: create_cpu_accessible_uniforms::<V, U, M>(
-                device,
+                allocators,
                 descriptor_set_layout,
                 uniform_buffer_count,
             ),
         }
     }
-}
 
-impl<'a, V, U>
-    Buffers<Arc<DeviceLocalBuffer<[V]>>, DeviceLocalBuffer<[u16]>, Arc<PersistentDescriptorSet>>
-    for DeviceLocalBuffers<V, U>
-where
-    V: BufferContents + Pod,
-    U: BufferContents,
-{
-    fn get_vertex(&self) -> Arc<DeviceLocalBuffer<[V]>> {
+    pub fn get_vertex(&self) -> Subbuffer<[V]> {
         self.vertex.clone()
     }
 
-    fn get_index(&self) -> Arc<DeviceLocalBuffer<[u16]>> {
+    pub fn get_index(&self) -> Subbuffer<[u16]> {
         self.index.clone()
     }
 
-    fn get_uniform_descriptor_set(&self, i: usize) -> Arc<PersistentDescriptorSet> {
+    pub fn get_uniform_descriptor_set(&self, i: usize) -> Arc<PersistentDescriptorSet> {
         self.uniforms[i].1.clone()
     }
 }
 
-fn create_cpu_accessible_vertex<V, U, M>(device: Arc<Device>) -> Arc<CpuAccessibleBuffer<[V]>>
+fn create_cpu_accessible_vertex<V, U, M>(allocators: &Allocators) -> Subbuffer<[V]>
 where
-    V: BufferContents + Pod,
+    V: BufferContents,
     U: BufferContents,
     M: Model<V, U>,
 {
-    CpuAccessibleBuffer::from_iter(
-        device,
-        BufferUsage {
-            vertex_buffer: true,
+    Buffer::from_iter(
+        &allocators.memory,
+        BufferCreateInfo {
+            usage: BufferUsage::VERTEX_BUFFER,
             ..Default::default()
         },
-        false,
-        M::get_vertices().into_iter(),
+        AllocationCreateInfo {
+            usage: MemoryUsage::Upload,
+            ..Default::default()
+        },
+        M::get_vertices(),
     )
     .unwrap()
 }
 
 fn create_device_local_vertex<V, U, M>(
+    allocators: &Allocators,
     queue: Arc<Queue>,
-) -> (
-    Arc<DeviceLocalBuffer<[V]>>,
-    CommandBufferExecFuture<NowFuture, PrimaryAutoCommandBuffer>,
-)
-where
-    V: BufferContents + Pod,
-    U: BufferContents,
-    M: Model<V, U>,
-{
-    DeviceLocalBuffer::from_iter(
-        M::get_vertices().into_iter(),
-        BufferUsage {
-            vertex_buffer: true,
-            ..Default::default()
-        },
-        queue,
-    )
-    .unwrap()
-}
-
-fn create_cpu_accessible_index<V, U, M>(device: Arc<Device>) -> Arc<CpuAccessibleBuffer<[u16]>>
+) -> (Subbuffer<[V]>, CommandBufferExecFuture<NowFuture>)
 where
     V: BufferContents,
     U: BufferContents,
     M: Model<V, U>,
 {
-    CpuAccessibleBuffer::from_iter(
-        device,
-        BufferUsage {
-            index_buffer: true,
+    let vertices = M::get_vertices();
+
+    let buffer = Buffer::new_slice(
+        &allocators.memory,
+        BufferCreateInfo {
+            usage: BufferUsage::VERTEX_BUFFER | BufferUsage::TRANSFER_DST,
             ..Default::default()
         },
-        false,
-        M::get_indices().into_iter(),
+        AllocationCreateInfo {
+            usage: MemoryUsage::DeviceOnly,
+            ..Default::default()
+        },
+        vertices.len() as DeviceSize,
+    )
+    .unwrap();
+
+    let staging_buffer = Buffer::from_iter(
+        &allocators.memory,
+        BufferCreateInfo {
+            usage: BufferUsage::TRANSFER_SRC,
+            ..Default::default()
+        },
+        AllocationCreateInfo {
+            usage: MemoryUsage::Upload,
+            ..Default::default()
+        },
+        vertices,
+    )
+    .unwrap();
+
+    let mut builder = AutoCommandBufferBuilder::primary(
+        &allocators.command_buffer,
+        queue.queue_family_index(),
+        CommandBufferUsage::OneTimeSubmit,
+    )
+    .unwrap();
+    builder
+        .copy_buffer(CopyBufferInfo::buffers(staging_buffer, buffer.clone()))
+        .unwrap();
+
+    let future = builder.build().unwrap().execute(queue).unwrap();
+
+    (buffer, future)
+}
+
+fn create_cpu_accessible_index<V, U, M>(allocators: &Allocators) -> Subbuffer<[u16]>
+where
+    V: BufferContents,
+    U: BufferContents,
+    M: Model<V, U>,
+{
+    Buffer::from_iter(
+        &allocators.memory,
+        BufferCreateInfo {
+            usage: BufferUsage::INDEX_BUFFER,
+            ..Default::default()
+        },
+        AllocationCreateInfo {
+            usage: MemoryUsage::Upload,
+            ..Default::default()
+        },
+        M::get_indices(),
     )
     .unwrap()
 }
 
 fn create_device_local_index<V, U, M>(
+    allocators: &Allocators,
     queue: Arc<Queue>,
-) -> (
-    Arc<DeviceLocalBuffer<[u16]>>,
-    CommandBufferExecFuture<NowFuture, PrimaryAutoCommandBuffer>,
-)
+) -> (Subbuffer<[u16]>, CommandBufferExecFuture<NowFuture>)
 where
     V: BufferContents,
     U: BufferContents,
     M: Model<V, U>,
 {
-    DeviceLocalBuffer::from_iter(
-        M::get_indices().into_iter(),
-        BufferUsage {
-            index_buffer: true,
+    let indices = M::get_indices();
+
+    let buffer = Buffer::new_slice(
+        &allocators.memory,
+        BufferCreateInfo {
+            usage: BufferUsage::INDEX_BUFFER | BufferUsage::TRANSFER_DST,
             ..Default::default()
         },
-        queue,
+        AllocationCreateInfo {
+            usage: MemoryUsage::DeviceOnly,
+            ..Default::default()
+        },
+        indices.len() as DeviceSize,
     )
-    .unwrap()
+    .unwrap();
+
+    let staging_buffer = Buffer::from_iter(
+        &allocators.memory,
+        BufferCreateInfo {
+            usage: BufferUsage::TRANSFER_SRC,
+            ..Default::default()
+        },
+        AllocationCreateInfo {
+            usage: MemoryUsage::Upload,
+            ..Default::default()
+        },
+        indices,
+    )
+    .unwrap();
+
+    let mut builder = AutoCommandBufferBuilder::primary(
+        &allocators.command_buffer,
+        queue.queue_family_index(),
+        CommandBufferUsage::OneTimeSubmit,
+    )
+    .unwrap();
+    builder
+        .copy_buffer(CopyBufferInfo::buffers(staging_buffer, buffer.clone()))
+        .unwrap();
+
+    let future = builder.build().unwrap().execute(queue).unwrap();
+
+    (buffer, future)
 }
 
 fn create_cpu_accessible_uniforms<V, U, M>(
-    device: Arc<Device>,
+    allocators: &Allocators,
     descriptor_set_layout: Arc<DescriptorSetLayout>,
     buffer_count: usize,
 ) -> Vec<Uniform<U>>
 where
     V: BufferContents,
-    U: BufferContents + Copy,
+    U: BufferContents,
     M: Model<V, U>,
 {
     (0..buffer_count)
         .map(|_| {
-            let buffer = CpuAccessibleBuffer::from_data(
-                device.clone(),
-                BufferUsage {
-                    uniform_buffer: true,
+            let buffer = Buffer::from_data(
+                &allocators.memory,
+                BufferCreateInfo {
+                    usage: BufferUsage::INDEX_BUFFER,
                     ..Default::default()
                 },
-                false,
+                AllocationCreateInfo {
+                    usage: MemoryUsage::Upload,
+                    ..Default::default()
+                },
                 M::get_initial_uniform_data(),
             )
             .unwrap();
 
             let descriptor_set = PersistentDescriptorSet::new(
+                &allocators.descriptor_set,
                 descriptor_set_layout.clone(),
                 [WriteDescriptorSet::buffer(0, buffer.clone())],
             )

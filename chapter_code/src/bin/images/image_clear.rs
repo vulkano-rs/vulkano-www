@@ -12,14 +12,16 @@
 //! It is not commented, as the explanations can be found in the guide itself.
 
 use image::{ImageBuffer, Rgba};
-use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
+use vulkano::buffer::{Buffer, BufferCreateInfo, BufferUsage};
+use vulkano::command_buffer::allocator::StandardCommandBufferAllocator;
 use vulkano::command_buffer::{
     AutoCommandBufferBuilder, ClearColorImageInfo, CommandBufferUsage, CopyImageToBufferInfo,
 };
-use vulkano::device::{Device, DeviceCreateInfo, QueueCreateInfo};
+use vulkano::device::{Device, DeviceCreateInfo, QueueCreateInfo, QueueFlags};
 use vulkano::format::{ClearColorValue, Format};
 use vulkano::image::{ImageDimensions, StorageImage};
 use vulkano::instance::{Instance, InstanceCreateInfo};
+use vulkano::memory::allocator::{AllocationCreateInfo, MemoryUsage, StandardMemoryAllocator};
 use vulkano::sync;
 use vulkano::sync::GpuFuture;
 
@@ -38,7 +40,7 @@ pub fn main() {
         .queue_family_properties()
         .iter()
         .enumerate()
-        .position(|(_, q)| q.queue_flags.graphics)
+        .position(|(_, q)| q.queue_flags.contains(QueueFlags::GRAPHICS))
         .expect("couldn't find a graphical queue family") as u32;
 
     let (device, mut queues) = Device::new(
@@ -55,9 +57,13 @@ pub fn main() {
 
     let queue = queues.next().unwrap();
 
+    let memory_allocator = StandardMemoryAllocator::new_default(device.clone());
+    let command_buffer_allocator =
+        StandardCommandBufferAllocator::new(device.clone(), Default::default());
+
     // Image creation
     let image = StorageImage::new(
-        device.clone(),
+        &memory_allocator,
         ImageDimensions::Dim2d {
             width: 1024,
             height: 1024,
@@ -68,19 +74,22 @@ pub fn main() {
     )
     .unwrap();
 
-    let buf = CpuAccessibleBuffer::from_iter(
-        device.clone(),
-        BufferUsage {
-            transfer_dst: true,
+    let buf = Buffer::from_iter(
+        &memory_allocator,
+        BufferCreateInfo {
+            usage: BufferUsage::TRANSFER_DST,
             ..Default::default()
         },
-        false,
+        AllocationCreateInfo {
+            usage: MemoryUsage::Download,
+            ..Default::default()
+        },
         (0..1024 * 1024 * 4).map(|_| 0u8),
     )
     .expect("failed to create buffer");
 
     let mut builder = AutoCommandBufferBuilder::primary(
-        device.clone(),
+        &command_buffer_allocator,
         queue.queue_family_index(),
         CommandBufferUsage::OneTimeSubmit,
     )
@@ -91,15 +100,12 @@ pub fn main() {
             ..ClearColorImageInfo::image(image.clone())
         })
         .unwrap()
-        .copy_image_to_buffer(CopyImageToBufferInfo::image_buffer(
-            image.clone(),
-            buf.clone(),
-        ))
+        .copy_image_to_buffer(CopyImageToBufferInfo::image_buffer(image, buf.clone()))
         .unwrap();
     let command_buffer = builder.build().unwrap();
 
-    let future = sync::now(device.clone())
-        .then_execute(queue.clone(), command_buffer)
+    let future = sync::now(device)
+        .then_execute(queue, command_buffer)
         .unwrap()
         .then_signal_fence_and_flush()
         .unwrap();

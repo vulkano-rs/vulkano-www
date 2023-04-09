@@ -5,7 +5,8 @@ If you were going to write directly to the window's surface, you would introduce
 strange artifacts, because you would be updating an image that's already visible on a screen.
 To ensure that only complete images are shown, Vulkan uses what is called a *swapchain*.
 
-> **Note**: See also [the wikipedia article for a swap chain](https://en.wikipedia.org/wiki/Swap_Chain).
+> **Note**: See also [the wikipedia article for a swap 
+> chain](https://en.wikipedia.org/wiki/Swap_Chain).
 
 A swapchain is a group of one or multiple images, sometimes two images but most commonly three. If
 you have ever heard terms such as *double buffering* or *triple buffering*, it refers to having
@@ -27,11 +28,10 @@ let physical = instance
     .expect("no devices available");
 ```
 
-However, some devices may not support swapchain creation or wouldn't be the best option.
-So, in this optional sub-chapter, we are going to write a simple function to filter devices
-for specific Vulkan extension support and select the best device. In a real application,
-this could be your "default" or "recommended" device, and the user could choose any other
-if needed.
+However, some devices may not support swapchain creation or wouldn't be the best option. So, in 
+this optional sub-chapter, we are going to write a simple function to filter devices for specific 
+Vulkan extension support and select the best device. In a real application, this could be your 
+"default" or "recommended" device, and the user could choose any other if needed.
 
 The first step is to select all the extensions needed for your application:
 
@@ -56,9 +56,9 @@ instance
     // continues bellow
 ```
 
-Some devices that passed the test may not have the needed queue family(ies) to present images
-to the surface or even support graphical operations. So, we are going to filter them and at the
-same time select the first queue family that is suitable:
+Some devices that passed the test may not have the needed queue family(ies) to present images to 
+the surface or even support graphical operations. So, we are going to filter them and at the same 
+time select the first queue family that is suitable:
 
 ```rust
     .filter_map(|p| {
@@ -149,7 +149,11 @@ fn main() {
         ..DeviceExtensions::empty()
     };
 
-    let (physical_device, queue_family_index) = select_physical_device(&instance, &surface, &device_extensions);
+    let (physical_device, queue_family_index) = select_physical_device(
+        &instance, 
+        &surface, 
+        &device_extensions,
+    );
 
     // crop
 }
@@ -157,8 +161,8 @@ fn main() {
 
 ## Updating logical device creation
 
-Now that we have our desired physical device, the next step is to create a logical device
-that can support the swapchain.
+Now that we have our desired physical device, the next step is to create a logical device that can 
+support the swapchain.
 
 To do that, we need to pass all the previously required extensions:
 
@@ -194,9 +198,9 @@ let caps = physical_device
     .expect("failed to get surface capabilities");
 ```
 
-Of all of these properties, we only care about some of them, mainly
-the dimensions of the image (which have to be constrained between a minimum and a maximum), the
-behavior when it comes to transparency (composite alpha), and the format of the images.
+Of all of these properties, we only care about some of them, mainly the dimensions of the image 
+(which have to be constrained between a minimum and a maximum), the behavior when it comes to 
+transparency (composite alpha), and the format of the images.
 
 ```rust
 let dimensions = surface.window().inner_size();
@@ -233,10 +237,10 @@ let (swapchain, images) = Swapchain::new(
 .unwrap();
 ```
 
-It's good to have `min_image_count` be at least one more than the minimal, to give a bit more freedom to
-the image queue.
+It's good to have `min_image_count` be at least one more than the minimal, to give a bit more 
+freedom to the image queue.
 
 For additional information, check the
-[swapchain documentation](https://docs.rs/vulkano/0.31.0/vulkano/swapchain/index.html#swapchains).
+[swapchain documentation](https://docs.rs/vulkano/0.33.0/vulkano/swapchain/index.html#swapchains).
 
 Next: [Other initialization](/guide/windowing/other-initialization)

@@ -31,11 +31,10 @@ pub fn select_example_to_run(examples: &Vec<&str>, execute: fn(&str)) {
 
     selection = selection.trim().to_string();
 
-    if selection.len() == 0 {
+    if selection.is_empty() {
         execute(examples[0]);
-    }
     // else if selection is numeric
-    else if let Some(i) = selection.parse::<usize>().ok() {
+    } else if let Ok(i) = selection.parse::<usize>() {
         if i >= examples.len() {
             println!(
                 "The given index \"{}\" doesn't correspond to any known example",

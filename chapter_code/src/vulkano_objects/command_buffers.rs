@@ -1,31 +1,30 @@
 use std::sync::Arc;
 
-use vulkano::buffer::{CpuAccessibleBuffer, TypedBufferAccess};
+use vulkano::buffer::{BufferContents, Subbuffer};
 use vulkano::command_buffer::{
     AutoCommandBufferBuilder, CommandBufferUsage, PrimaryAutoCommandBuffer, RenderPassBeginInfo,
     SubpassContents,
 };
-use vulkano::descriptor_set::DescriptorSetsCollection;
-use vulkano::device::{Device, Queue};
-use vulkano::pipeline::graphics::vertex_input::VertexBuffersCollection;
+use vulkano::device::Queue;
 use vulkano::pipeline::{GraphicsPipeline, Pipeline, PipelineBindPoint};
 use vulkano::render_pass::Framebuffer;
 
+use super::allocators::Allocators;
 use crate::vulkano_objects::buffers::Buffers;
 use crate::Vertex2d;
 
 pub fn create_only_vertex_command_buffers(
-    device: Arc<Device>,
+    allocators: &Allocators,
     queue: Arc<Queue>,
     pipeline: Arc<GraphicsPipeline>,
-    framebuffers: &Vec<Arc<Framebuffer>>,
-    vertex_buffer: Arc<CpuAccessibleBuffer<[Vertex2d]>>,
+    framebuffers: &[Arc<Framebuffer>],
+    vertex_buffer: Subbuffer<[Vertex2d]>,
 ) -> Vec<Arc<PrimaryAutoCommandBuffer>> {
     framebuffers
         .iter()
         .map(|framebuffer| {
             let mut builder = AutoCommandBufferBuilder::primary(
-                device.clone(),
+                &allocators.command_buffer,
                 queue.queue_family_index(),
                 CommandBufferUsage::MultipleSubmit,
             )
@@ -52,23 +51,19 @@ pub fn create_only_vertex_command_buffers(
         .collect()
 }
 
-pub fn create_simple_command_buffers<
-    Vb: VertexBuffersCollection,
-    Ib: TypedBufferAccess<Content = [u16]> + 'static,
-    D: DescriptorSetsCollection,
->(
-    device: Arc<Device>,
+pub fn create_simple_command_buffers<V: BufferContents, U: BufferContents>(
+    allocators: &Allocators,
     queue: Arc<Queue>,
     pipeline: Arc<GraphicsPipeline>,
-    framebuffers: &Vec<Arc<Framebuffer>>,
-    buffers: &dyn Buffers<Vb, Ib, D>,
+    framebuffers: &[Arc<Framebuffer>],
+    buffers: &Buffers<V, U>,
 ) -> Vec<Arc<PrimaryAutoCommandBuffer>> {
     framebuffers
         .iter()
         .enumerate()
         .map(|(i, framebuffer)| {
             let mut builder = AutoCommandBufferBuilder::primary(
-                device.clone(),
+                &allocators.command_buffer,
                 queue.queue_family_index(),
                 CommandBufferUsage::MultipleSubmit,
             )

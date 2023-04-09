@@ -25,12 +25,11 @@ What we declared in the GLSL code is actually not a descriptor set, but only a s
 descriptor set. Before we can invoke the compute pipeline, we first need to bind an actual
 descriptor set to that slot.
 
-<center><object data="/guide-descriptor-sets-1.svg"></object></center>
+<div style="text-align: center;"><object data="/guide-descriptor-sets-1.svg"></object></div>
 
 ## Creating a descriptor set
 
-Just like there exist multiple kinds of buffers, there also exist multiple different structs that
-all represent a descriptor set.
+Just like for buffers and command buffers, we also need an allocator for descriptor sets.
 
 For our application, we are going to use a `PersistentDescriptorSet`. When creating this descriptor
 set, we attach to it the result buffer wrapped in a `WriteDescriptorSet`. This object will describe
@@ -39,19 +38,28 @@ how will the buffer be written:
 ```rust
 use vulkano::pipeline::Pipeline;
 use vulkano::descriptor_set::{PersistentDescriptorSet, WriteDescriptorSet};
+use vulkano::descriptor_set::allocator::StandardDescriptorSetAllocator;
 
-let layout = compute_pipeline.layout().set_layouts().get(0).unwrap();
-let set = PersistentDescriptorSet::new(
-    layout.clone(),
+let descriptor_set_allocator = StandardDescriptorSetAllocator::new(device.clone());
+let pipeline_layout = compute_pipeline.layout();
+let descriptor_set_layouts = pipeline_layout.set_layouts();
+
+let descriptor_set_layout_index = 0;
+let descriptor_set_layout = descriptor_set_layouts
+    .get(descriptor_set_layout_index)
+    .unwrap();
+let descriptor_set = PersistentDescriptorSet::new(
+    &descriptor_set_allocator,
+    descriptor_set_layout.clone(),
     [WriteDescriptorSet::buffer(0, data_buffer.clone())], // 0 is the binding
 )
 .unwrap();
 ```
 
-In order to create a descriptor set, you'll need to know the layout that it is targeting. We do this by using the "Pipeline" trait
-and calling `.layout()` on our pipeline to obtain the pipeline's layout. Next we'll fetch the layout
-specific to the pass that we want to target by using `.set_layouts().get(0)` where zero indicates the
-first index of the pass that we are targeting.
+In order to create a descriptor set, you'll need to know the layout that it is targeting. We do 
+this by using the "Pipeline" trait and calling `.layout()` on our pipeline to obtain the pipeline's 
+layout. Next we'll fetch the layout specific to the pass that we want to target by using 
+`.set_layouts().get(0)` where zero indicates the first index of the pass that we are targeting.
 
 Once you have created a descriptor set, you may also use it with other pipelines, as long as the
 bindings' types match those the pipelines' shaders expect. But Vulkan requires that you provide a
