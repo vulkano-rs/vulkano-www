@@ -1,3 +1,6 @@
+> **Note**
+> This repository is no longer maintained and has been superseded by [vulkano-book](https://github.com/vulkano-rs/vulkano-book).
+
 # Source code of the vulkano website
 
 To run the website, just do:
